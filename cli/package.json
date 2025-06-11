@@ -1,7 +1,17 @@
 {
   "name": "mark-deco-cli",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Command-line interface for mark-deco enhanced markdown processor",
+  "keywords": [
+    "markdown",
+    "cli",
+    "processor",
+    "mark-deco",
+    "oembed",
+    "frontmatter"
+  ],
+  "author": "Kouji Matsui (@kekyo@mi.kekyo.net)",
+  "license": "MIT",
   "bin": {
     "mark-deco-cli": "./dist/cli.cjs"
   },
@@ -12,7 +22,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run lint && npm run typecheck && vite build",
+    "build": "rv --npm . && npm run lint && npm run typecheck && vite build",
     "build:bundle": "ncc build src/cli.ts -o dist-bundle",
     "build:native": "npm run build:bundle && npm run pkg",
     "build:native:all": "npm run build:bundle && npm run pkg:all",
@@ -28,16 +38,6 @@
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm run test"
   },
-  "keywords": [
-    "markdown",
-    "cli",
-    "processor",
-    "mark-deco",
-    "oembed",
-    "frontmatter"
-  ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "commander": "^12.0.0",
     "mark-deco": "file:.."

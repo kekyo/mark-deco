@@ -1,7 +1,17 @@
 {
   "name": "mark-deco",
   "version": "0.1.0",
-  "description": "Enhanced markdown processor with plugin support for oEmbed, Amazon cards, and more",
+  "description": "A high-performance Markdown to HTML conversion library written in TypeScript.",
+  "keywords": [
+    "markdown",
+    "processor",
+    "oembed",
+    "frontmatter",
+    "ast",
+    "plugin"
+  ],
+  "author": "Kouji Matsui (@kekyo@mi.kekyo.net)",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -37,16 +47,6 @@
     "typecheck": "tsc --noEmit && tsc --project tsconfig.tests.json --noEmit",
     "update:providers": "curl -s https://oembed.com/providers.json | node -pe 'JSON.stringify(JSON.parse(require(\"fs\").readFileSync(0, \"utf8\")), null, 2)' > src/plugins/oembed/providers.json"
   },
-  "keywords": [
-    "markdown",
-    "processor",
-    "oembed",
-    "frontmatter",
-    "ast",
-    "plugin"
-  ],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.28.0",
     "@playwright/test": "^1.52.0",

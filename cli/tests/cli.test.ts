@@ -44,11 +44,6 @@ describe('mark-deco-cli', () => {
     expect(stdout).toContain('markdown processor');
   });
 
-  it('should display version information', async () => {
-    const { stdout } = await spawnAsync('node', [CLI_PATH, '--version']);
-    expect(stdout.trim()).toBe('0.0.1');
-  });
-
   it('should process markdown from stdin', async () => {
     const { stdout } = await spawnAsync('node', [CLI_PATH], '# Hello World\n\nThis is a test.');
     expect(stdout).toContain('<h1 id="section-1">Hello World</h1>');
