@@ -1,6 +1,6 @@
 {
   "name": "mark-deco-cli",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Command-line interface for mark-deco enhanced markdown processor",
   "bin": {
     "mark-deco-cli": "./dist/cli.cjs"
@@ -12,7 +12,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run lint && npm run typecheck && vite build",
+    "build": "rv --npm . && npm run lint && npm run typecheck && vite build",
     "build:bundle": "ncc build src/cli.ts -o dist-bundle",
     "build:native": "npm run build:bundle && npm run pkg",
     "build:native:all": "npm run build:bundle && npm run pkg:all",
