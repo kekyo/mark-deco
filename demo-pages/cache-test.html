@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .results {
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #007cba;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005a87;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cache Storage Test Page</h1>
+    
+    <div class="test-section">
+        <h2>LocalStorage Cache Test</h2>
+        <button onclick="runLocalStorageTest()">Run LocalStorage Test</button>
+        <div id="localStorage-results" class="results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Cache Persistence Test</h2>
+        <button onclick="storeTestData()">Store Test Data</button>
+        <button onclick="retrieveTestData()">Retrieve Test Data</button>
+        <button onclick="clearTestData()">Clear Test Data</button>
+        <div id="persistence-results" class="results"></div>
+    </div>
+
+    <script type="module">
+        // Import library functions
+        import { createLocalCacheStorage } from '../dist/index.js';
+
+        // Test functions
+        async function runLocalStorageTest() {
+            const results = document.getElementById('localStorage-results');
+            results.textContent = 'Running localStorage test...';
+            
+            try {
+                console.log('Creating cache instance...');
+                const cache = createLocalCacheStorage('test:');
+                console.log('Cache instance created:', cache);
+                
+                // Store data
+                console.log('Setting key1...');
+                await cache.set('key1', 'value1');
+                console.log('Setting key2...');
+                await cache.set('key2', 'value2');
+                console.log('Setting ttl-key...');
+                await cache.set('ttl-key', 'ttl-value', 100); // 100ms TTL
+                
+                // Retrieve immediately
+                console.log('Getting key1...');
+                const retrieved1 = await cache.get('key1');
+                console.log('Retrieved1:', retrieved1);
+                console.log('Getting key2...');
+                const retrieved2 = await cache.get('key2');
+                console.log('Retrieved2:', retrieved2);
+                console.log('Getting ttl-key...');
+                const ttlValue = await cache.get('ttl-key');
+                console.log('TTL value:', ttlValue);
+                console.log('Getting size...');
+                const size1 = await cache.size();
+                console.log('Size1:', size1);
+                
+                // Wait for TTL expiry
+                console.log('Waiting for TTL expiry...');
+                await new Promise(resolve => setTimeout(resolve, 150));
+                
+                // Retrieve after expiry
+                console.log('Getting expired value...');
+                const expiredValue = await cache.get('ttl-key');
+                console.log('Expired value:', expiredValue);
+                console.log('Getting size after expiry...');
+                const size2 = await cache.size();
+                console.log('Size2:', size2);
+                
+                // Check if actually stored in localStorage
+                console.log('Checking raw localStorage...');
+                const rawValue = localStorage.getItem('test:key1');
+                console.log('Raw value:', rawValue);
+                const parsedValue = JSON.parse(rawValue);
+                console.log('Parsed value:', parsedValue);
+                
+                const testResults = {
+                    retrieved1,
+                    retrieved2,
+                    ttlValue,
+                    expiredValue,
+                    size1,
+                    size2,
+                    rawStorageExists: !!rawValue,
+                    rawStorageData: parsedValue.data,
+                    localStorageKeyCount: Object.keys(localStorage).filter(k => k.startsWith('test:')).length
+                };
+                
+                console.log('Final test results:', testResults);
+                window.localStorageTestResults = testResults;
+                results.textContent = JSON.stringify(testResults, null, 2);
+                
+            } catch (error) {
+                console.error('Test error details:', error);
+                const errorResult = { error: error.message, stack: error.stack };
+                window.localStorageTestResults = errorResult;
+                results.textContent = JSON.stringify(errorResult, null, 2);
+            }
+        }
+        
+        function storeTestData() {
+            localStorage.setItem('persist-test:data', JSON.stringify({
+                data: 'persistent-value',
+                timestamp: Date.now()
+            }));
+            window.persistenceTestStored = true;
+            
+            const results = document.getElementById('persistence-results');
+            results.textContent = 'Test data stored in localStorage';
+        }
+        
+        function retrieveTestData() {
+            const stored = localStorage.getItem('persist-test:data');
+            const result = stored ? JSON.parse(stored) : null;
+            
+            window.persistenceTestResult = {
+                found: !!stored,
+                data: result ? result.data : null,
+                hasTimestamp: result ? !!result.timestamp : false
+            };
+            
+            const results = document.getElementById('persistence-results');
+            results.textContent = JSON.stringify(window.persistenceTestResult, null, 2);
+        }
+        
+        function clearTestData() {
+            localStorage.removeItem('persist-test:data');
+            window.persistenceTestStored = false;
+            window.persistenceTestResult = null;
+            
+            const results = document.getElementById('persistence-results');
+            results.textContent = 'Test data cleared';
+        }
+
+        // Make functions available globally for onclick handlers
+        window.runLocalStorageTest = runLocalStorageTest;
+        window.storeTestData = storeTestData;
+        window.retrieveTestData = retrieveTestData;
+        window.clearTestData = clearTestData;
+    </script>
+</body>
+</html> 

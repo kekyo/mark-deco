@@ -1,0 +1,127 @@
+<h1>Advanced Features Test</h1>
+<p>This file tests advanced features of the MarkDeco.</p>
+<h2>Complex Frontmatter</h2>
+<p>The frontmatter above includes various data types:</p>
+<ul>
+  <li>String values</li>
+  <li>Array values</li>
+  <li>Boolean values</li>
+  <li>Date values</li>
+</ul>
+<h2>Multiple Headers</h2>
+<h3>Subsection 1</h3>
+<p>Content for subsection 1 with <strong>bold text</strong> and <em>italic text</em>.</p>
+<h4>Deep Nesting Level 4</h4>
+<p>This is level 4 header content.</p>
+<h5>Even Deeper Level 5</h5>
+<p>This is level 5 header content.</p>
+<h3>Subsection 2</h3>
+<p>Content for subsection 2 with <code>inline code</code> and <a href="https://example.com">a link</a>.</p>
+<h1>Second Main Section</h1>
+<p>This is another main section with more complex content.</p>
+<h2>Advanced Markdown Features</h2>
+<h3>Code Block with Language</h3>
+<pre><code class="language-python">def hello_world():
+    print("Hello, World!")
+    return "success"
+
+# This is a comment
+result = hello_world()
+</code></pre>
+<h3>Complex Table</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Status</th>
+      <th>Priority</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Frontmatter</td>
+      <td>✅ Complete</td>
+      <td>High</td>
+      <td>YAML parsing</td>
+    </tr>
+    <tr>
+      <td>Headers</td>
+      <td>✅ Complete</td>
+      <td>High</td>
+      <td>H1-H6 support</td>
+    </tr>
+    <tr>
+      <td>Code Blocks</td>
+      <td>✅ Complete</td>
+      <td>Medium</td>
+      <td>Syntax highlighting</td>
+    </tr>
+    <tr>
+      <td>Tables</td>
+      <td>✅ Complete</td>
+      <td>Medium</td>
+      <td>GFM style</td>
+    </tr>
+    <tr>
+      <td>Links</td>
+      <td>✅ Complete</td>
+      <td>Low</td>
+      <td>Internal/external</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Mixed Content Lists</h3>
+<ol>
+  <li>
+    <p><strong>First item</strong> with <em>emphasis</em></p>
+    <ul>
+      <li>Nested unordered item</li>
+      <li>Another nested item with <code>code</code></li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Second item</strong> with <a href="https://example.com">link</a></p>
+    <ol>
+      <li>Nested ordered item</li>
+      <li>Another nested ordered item</li>
+    </ol>
+  </li>
+  <li>
+    <p><strong>Third item</strong> with complex content:</p>
+    <p>This is a paragraph within a list item.</p>
+    <pre><code class="language-javascript">console.log("Code within list");
+</code></pre>
+  </li>
+</ol>
+<h1>Third Main Section</h1>
+<p>Final section for testing H1 extraction with advanced content.</p>
+<h2>Blockquotes and Citations</h2>
+<blockquote>
+  <p>This is a simple blockquote.</p>
+</blockquote>
+<blockquote>
+  <p>This is a multi-line blockquote.
+    It spans multiple lines and can contain <strong>bold text</strong>,
+    <em>italic text</em>, and even <code>inline code</code>.
+  </p>
+</blockquote>
+<blockquote>
+  <h3>Quote with Header</h3>
+  <p>Blockquotes can also contain headers and other markdown elements.</p>
+  <ul>
+    <li>List item in quote</li>
+    <li>Another list item</li>
+  </ul>
+</blockquote>
+<h2>Summary</h2>
+<p>This file comprehensively tests:</p>
+<ul>
+  <li>Complex frontmatter parsing with multiple data types</li>
+  <li>Multiple H1 elements for extraction testing</li>
+  <li>Advanced markdown features (nested lists, complex tables, code blocks)</li>
+  <li>Text formatting within various contexts</li>
+  <li>Blockquotes with rich content</li>
+  <li>Deep header nesting (H1-H5)</li>
+</ul>
+<p>All content is deterministic and produces stable output.</p>

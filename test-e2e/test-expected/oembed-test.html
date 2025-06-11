@@ -1,0 +1,62 @@
+<h1 id="id-1">oEmbed Test</h1>
+<p>This test verifies that oEmbed processing works correctly with local test server.</p>
+<h2 id="id-2">Test Video</h2>
+<div class="oembed-container oembed-video">
+  <div class="oembed-header">
+    <div class="oembed-title">Test Video</div>
+    <div class="oembed-author">by Test Author</div>
+    <div class="oembed-provider">localhost</div>
+    <div class="oembed-description">Test Author</div>
+  </div>
+  <div class="oembed-content">
+    <style>
+      .oembed-responsive-wrapper {
+        position: relative;
+        width: 100%;
+        height: 0;
+        overflow: hidden;
+      }
+      .oembed-iframe-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .oembed-iframe-container iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+      }
+    </style>
+    <div class="oembed-responsive-wrapper" style="padding-bottom: 56.25%;">
+      <div class="oembed-iframe-container">
+        <iframe width="640" height="360" src="http://localhost:12347/embed/video-1" frameborder="0" allowfullscreen=""></iframe>
+      </div>
+    </div>
+          <div class="oembed-external-link">
+        <a href="http://localhost:12347/content/video-1" target="_blank" rel="noopener noreferrer">
+          Visit localhost
+        </a>
+      </div>
+  </div>
+</div>
+<p>This should embed a test video from local server.</p>
+<h2 id="id-3">Test Photo</h2>
+<div class="oembed-container oembed-photo">
+  <div class="oembed-header">
+    <div class="oembed-title">Test Photo</div>
+    <div class="oembed-author">by Test Photographer</div>
+    <div class="oembed-provider">localhost</div>
+    <div class="oembed-description">Test Photographer</div>
+  </div>
+  <div class="oembed-content">
+    <img src="http://localhost:12347/images/test-photo.jpg" alt="Test Photo" width="800" height="600">
+    <div class="oembed-external-link">
+      <a href="http://localhost:12347/content/photo-1" target="_blank" rel="noopener noreferrer">
+        Visit localhost
+      </a>
+    </div>
+  </div>
+</div>
+<p>This should embed a test photo from local server.</p> 

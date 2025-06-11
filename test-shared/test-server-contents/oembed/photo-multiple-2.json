@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "type": "photo",
+  "title": "Multiple Block Test Photo 2",
+  "author_name": "Test Photographer 2",
+  "author_url": "http://localhost:{{PORT}}/users/photographer2",
+  "provider_name": "Test Photo Server",
+  "provider_url": "http://localhost:{{PORT}}/",
+  "url": "http://localhost:{{PORT}}/images/multiple-2.jpg",
+  "width": 800,
+  "height": 600,
+  "thumbnail_url": "http://localhost:{{PORT}}/thumbs/multiple-2.jpg",
+  "thumbnail_width": 150,
+  "thumbnail_height": 150,
+  "cache_age": 3600
+} 

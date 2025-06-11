@@ -1,0 +1,82 @@
+{
+  "name": "mark-deco",
+  "version": "0.1.0",
+  "description": "Enhanced markdown processor with plugin support for oEmbed, Amazon cards, and more",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "workspaces": [
+    "test-node",
+    "test-e2e",
+    "demo-pages",
+    "cli"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "npm run build:root && npm run build --workspace=test-node && npm run build --workspace=demo-pages && npm run build --workspace=test-e2e && npm run build --workspace=cli",
+    "build:root": "rv --npm . && npm run lint && npm run typecheck && vite build",
+    "build:native": "npm run build && npm run build:native --workspace=cli",
+    "dev": "npm run build:root && npm run dev --workspace=demo-pages",
+    "test": "npm run test:root && npm run test:cli && npm run test:node && npm run test:e2e",
+    "test:root": "npm run build:root && vitest --run",
+    "test:node": "npm run build --workspace=test-node && npm run test --workspace=test-node",
+    "test:e2e": "npm run build --workspace=test-e2e && npm run test --workspace=test-e2e",
+    "test:cli": "npm run build --workspace=cli && npm run test --workspace=cli",
+    "prepublishOnly": "npm run build && npm run test",
+    "lint": "eslint . --ext .ts,.tsx --report-unused-disable-directives",
+    "typecheck": "tsc --noEmit && tsc --project tsconfig.tests.json --noEmit",
+    "update:providers": "curl -s https://oembed.com/providers.json | node -pe 'JSON.stringify(JSON.parse(require(\"fs\").readFileSync(0, \"utf8\")), null, 2)' > src/plugins/oembed/providers.json"
+  },
+  "keywords": [
+    "markdown",
+    "processor",
+    "oembed",
+    "frontmatter",
+    "ast",
+    "plugin"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@playwright/test": "^1.52.0",
+    "@rollup/plugin-swc": "^0.4.0",
+    "@swc/core": "^1.11.29",
+    "@types/cheerio": "^0.22.35",
+    "@types/js-beautify": "^1.14.3",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
+    "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-import": "^2.31.0",
+    "typescript": "^5.0.0",
+    "vite": "^6.3.5",
+    "vite-plugin-eslint": "^1.8.1",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "async-primitives": "^0.2.0",
+    "cheerio": "^1.0.0",
+    "js-beautify": "^1.15.4",
+    "js-yaml": "^4.1.0",
+    "jsdom": "^26.1.0",
+    "rehype-stringify": "^10.0.0",
+    "remark-gfm": "^4.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.0.0",
+    "unified": "^11.0.0",
+    "unist-util-visit": "^5.0.0"
+  }
+}

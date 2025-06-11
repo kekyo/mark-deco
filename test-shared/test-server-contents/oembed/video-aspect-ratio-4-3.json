@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "type": "video",
+  "title": "アスペクト比率4:3の動画サンプル",
+  "author_name": "松井滋",
+  "author_url": "http://localhost:{{PORT}}/author/matsui",
+  "provider_name": "Test Video Server",
+  "provider_url": "http://localhost:{{PORT}}/",
+  "thumbnail_url": "http://localhost:{{PORT}}/thumbs/aspect-4-3.jpg",
+  "thumbnail_width": 320,
+  "thumbnail_height": 240,
+  "html": "<iframe width=\"400\" height=\"300\" src=\"http://localhost:{{PORT}}/embed/aspect-4-3\" frameborder=\"0\" allowfullscreen title=\"アスペクト比率4:3の動画サンプル\"></iframe>",
+  "width": 400,
+  "height": 300,
+  "cache_age": 3600
+} 

@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "type": "photo",
+  "title": "Bacon Lollys",
+  "author_name": "‮‭‬bees‬",
+  "author_url": "http://localhost:{{PORT}}/users/bees",
+  "provider_name": "Test Photo Server",
+  "provider_url": "http://localhost:{{PORT}}/",
+  "url": "http://localhost:{{PORT}}/images/bacon-lollys.jpg",
+  "width": 1024,
+  "height": 768,
+  "thumbnail_url": "http://localhost:{{PORT}}/thumbs/bacon-lollys.jpg",
+  "thumbnail_width": 150,
+  "thumbnail_height": 150,
+  "cache_age": 3600
+} 

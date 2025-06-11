@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "type": "video",
+  "title": "Multiple Block Test Video 1",
+  "author_name": "Test Creator 1",
+  "author_url": "http://localhost:{{PORT}}/author/creator1",
+  "provider_name": "Test Video Server",
+  "provider_url": "http://localhost:{{PORT}}/",
+  "thumbnail_url": "http://localhost:{{PORT}}/thumbs/multiple-1.jpg",
+  "thumbnail_width": 480,
+  "thumbnail_height": 360,
+  "html": "<iframe width=\"560\" height=\"315\" src=\"http://localhost:{{PORT}}/embed/multiple-1\" frameborder=\"0\" allowfullscreen title=\"Multiple Block Test Video 1\"></iframe>",
+  "width": 560,
+  "height": 315,
+  "cache_age": 3600
+} 

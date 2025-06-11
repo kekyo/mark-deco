@@ -1,0 +1,90 @@
+<h1>oEmbed Plugin Test</h1>
+<p>This file tests various oEmbed functionality using localhost endpoints.</p>
+<h2>Photo Type</h2>
+<div class="oembed-container oembed-photo">
+  <div class="oembed-header">
+    <div class="oembed-title">Test Photo</div>
+    <div class="oembed-author">by Test Author</div>
+    <div class="oembed-provider">localhost</div>
+  </div>
+  <div class="oembed-content">
+    <img src="http://localhost:12345/test-photo.jpg" alt="Test Photo" width="800" height="600" />
+  </div>
+</div>
+<h2>Video Type</h2>
+<div class="oembed-container oembed-video">
+  <div class="oembed-header">
+    <div class="oembed-title">Test Video</div>
+    <div class="oembed-author">by Video Creator</div>
+    <div class="oembed-provider">localhost</div>
+  </div>
+  <div class="oembed-content">
+
+    <style>
+      .oembed-responsive-wrapper {
+        position: relative;
+        width: 100%;
+        height: 0;
+        overflow: hidden;
+      }
+
+      .oembed-iframe-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .oembed-iframe-container iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+      }
+    </style>
+    <div class="oembed-responsive-wrapper" style="padding-bottom: 56.25%;">
+      <div class="oembed-iframe-container"><iframe width="560" height="315" src="http://localhost:12345/embed/video" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+  </div>
+</div>
+<h2>Rich Content Type</h2>
+<div class="oembed-container oembed-video">
+  <div class="oembed-header">
+    <div class="oembed-title">Rich Content</div>
+    <div class="oembed-author">by Content Creator</div>
+    <div class="oembed-provider">localhost</div>
+  </div>
+  <div class="oembed-content">
+    <div style="background: #f0f0f0; padding: 20px; border-radius: 8px;">
+      <h3>Rich Embedded Content</h3>
+      <p>This is rich content with custom HTML</p>
+    </div>
+  </div>
+</div>
+<h2>Link Type</h2>
+<div class="oembed-container oembed-link">
+  <div class="oembed-header">
+    <div class="oembed-title">Test Link</div>
+    <div class="oembed-description">Link Author</div>
+    <div class="oembed-provider">localhost</div>
+  </div>
+  <div class="oembed-content">
+    <div class="oembed-thumbnail">
+      <img src="http://localhost:12345/link-thumb.jpg" alt="Test Link" />
+    </div><a href="http://localhost:12345/content/link" target="_blank" rel="noopener noreferrer">
+      Visit localhost
+    </a>
+  </div>
+</div>
+<h2>Error Handling</h2>
+<div class="oembed-container oembed-fallback">
+  <div class="oembed-header">
+    <div class="oembed-title">External Content</div>
+    <div class="oembed-provider">localhost (Failed by Error[HTTP error, status: 404])</div>
+  </div>
+  <div class="oembed-content">
+    <a href="http://localhost:12345/content/error" target="_blank" rel="noopener noreferrer">
+      View content on localhost
+    </a>
+  </div>
+</div>

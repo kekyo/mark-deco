@@ -1,0 +1,11 @@
+{
+  "type": "photo",
+  "version": "1.0",
+  "title": "Test Photo",
+  "author_name": "Test Photographer",
+  "provider_name": "Test Provider",
+  "provider_url": "http://localhost:{{PORT}}",
+  "width": 800,
+  "height": 600,
+  "url": "http://localhost:{{PORT}}/images/test-photo.jpg"
+} 

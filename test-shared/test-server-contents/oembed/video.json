@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "type": "video",
+  "title": "Test Video",
+  "author_name": "Video Creator",
+  "author_url": "http://localhost:12345/creator",
+  "provider_name": "Video Platform",
+  "provider_url": "http://localhost:12345",
+  "html": "<iframe width=\"560\" height=\"315\" src=\"http://localhost:12345/embed/video\" frameborder=\"0\" allowfullscreen></iframe>",
+  "width": 560,
+  "height": 315,
+  "thumbnail_url": "http://localhost:12345/video-thumb.jpg",
+  "thumbnail_width": 480,
+  "thumbnail_height": 360
+} 
