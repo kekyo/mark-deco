@@ -1,7 +1,7 @@
 {
   "name": "mark-deco-cli",
-  "version": "0.1.0",
-  "description": "Command-line interface for mark-deco enhanced markdown processor",
+  "version": "0.3.0",
+  "description": "Command-line interface for mark-deco Markdown to HTML conversion processor",
   "keywords": [
     "markdown",
     "cli",
@@ -12,6 +12,11 @@
   ],
   "author": "Kouji Matsui (@kekyo@mi.kekyo.net)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kekyo/mark-deco.git"
+  },
+  "homepage": "https://github.com/kekyo/mark-deco#readme",
   "bin": {
     "mark-deco-cli": "./dist/cli.cjs"
   },
@@ -29,7 +34,7 @@
     "build:esbuild": "esbuild src/cli.ts --bundle --platform=node --target=node18 --outfile=dist/cli-esbuild.js --format=cjs --minify",
     "build:ncc": "ncc build src/cli.ts -o dist-ncc --minify",
     "pkg": "pkg dist-bundle/index.js --target node18-linux-x64 --output bin/mark-deco-cli-linux",
-    "pkg:all": "pkg dist-bundle/index.js --target node18-linux-x64 --output bin/mark-deco-cli-linux && pkg dist-bundle/index.js --target node18-macos-x64 --output bin/mark-deco-cli-macos && pkg dist-bundle/index.js --target node18-win-x64 --output bin/mark-deco-cli-win.exe",
+    "pkg:all": "pkg dist-bundle/index.js --target node18-linux-x64 --output bin/mark-deco-cli-linux && pkg dist-bundle/index.js --target node18-win-x64 --output bin/mark-deco-cli-win.exe",
     "pkg:clean": "rm -rf bin/ dist-bundle/",
     "dev": "vite build --watch",
     "test": "vitest --run",
@@ -63,7 +68,6 @@
   "pkg": {
     "targets": [
       "node18-linux-x64",
-      "node18-macos-x64",
       "node18-win-x64"
     ],
     "assets": [],

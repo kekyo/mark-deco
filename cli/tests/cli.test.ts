@@ -41,7 +41,6 @@ describe('mark-deco-cli', () => {
   it('should display help information', async () => {
     const { stdout } = await spawnAsync('node', [CLI_PATH, '--help']);
     expect(stdout).toContain('mark-deco-cli');
-    expect(stdout).toContain('markdown processor');
   });
 
   it('should process markdown from stdin', async () => {
