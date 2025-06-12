@@ -24,7 +24,7 @@ const program = new Command();
 async function main() {
   program
     .name('mark-deco-cli')
-    .description('MarkDeco - markdown processor')
+    .description('MarkDeco - Markdown to HTML conversion processor.\nCopyright (c) Kouji Matsui (@kekyo@mi.kekyo.net)')
     .version(__VERSION__);
 
   program

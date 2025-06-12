@@ -1,6 +1,6 @@
 # mark-deco-cli
 
-Command-line interface for [mark-deco](https://npmjs.com/package/mark-deco) enhanced markdown processor with plugin support for oEmbed, Amazon cards, and more.
+Command-line interface for [mark-deco](https://github.com/kekyo/mark-deco) Markdown to HTML conversion processor.
 
 ## Installation
 
@@ -89,47 +89,14 @@ You can use a JSON configuration file to set default options:
 
 ## Supported Features
 
-- **Frontmatter**: YAML frontmatter extraction and processing
-- **GitHub Flavored Markdown**: Tables, task lists, strikethrough, and more
-- **oEmbed**: Automatic embedding of YouTube, Twitter, and other oEmbed providers
-- **Amazon Cards**: Rich cards for Amazon product links
-- **Mermaid Diagrams**: Flowcharts, sequence diagrams, and more
-- **Hierarchical Heading IDs**: Automatic generation of structured heading IDs
-- **Responsive Images**: Automatic responsive image handling
-
-## Plugin Support
-
-### oEmbed Plugin
-Automatically converts URLs from supported providers into rich embeds:
-- YouTube videos
-- Twitter posts  
-- Instagram posts
-- And many more oEmbed providers
-
-### Card Plugin
-Creates rich cards for supported URLs:
-- Amazon product links
-- General webpage cards
-
-### Mermaid Plugin
-Renders Mermaid diagrams from code blocks:
-```markdown
-```mermaid
-graph TD
-    A[Start] --> B[Process]
-    B --> C[End]
-```
-```
-
-## Development
-
-This CLI is part of the mark-deco monorepo. To contribute:
-
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Build the project: `npm run build`
-4. Run tests: `npm test`
+- Frontmatter: YAML frontmatter extraction and processing
+- GitHub Flavored Markdown: Tables, task lists, strikethrough, and more
+- oEmbed: Automatic embedding of YouTube, Twitter, and other oEmbed providers
+- Amazon Cards: Rich cards for Amazon product links
+- Mermaid Diagrams: Flowcharts, sequence diagrams, and more
+- Hierarchical Heading IDs: Automatic generation of structured heading IDs
+- Responsive Images: Automatic responsive image handling
 
 ## License
 
-MIT License - see LICENSE file for details. 
+Under MIT.

@@ -12,6 +12,11 @@
   ],
   "author": "Kouji Matsui (@kekyo@mi.kekyo.net)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kekyo/mark-deco.git"
+  },
+  "homepage": "https://github.com/kekyo/mark-deco#readme",
   "readme": "README-package.md",
   "type": "module",
   "main": "./dist/index.js",
