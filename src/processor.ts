@@ -10,6 +10,7 @@ import { getNoOpLogger } from './logger.js';
 import { escapeHtml } from './plugins/oembed/utils.js';
 import { remarkAttr } from './plugins/remark-attr.js';
 import { rehypeResponsiveImages } from './plugins/responsive-images.js';
+import { generateHeadingId } from './utils.js';
 import type {
   Plugin,
   PluginContext,
@@ -103,30 +104,12 @@ const buildHierarchicalNumbers = (headings: Array<{ level: number; text: string 
 };
 
 /**
- * Generate ID from heading text with fallback strategy
+ * Generate ID from heading text with fallback strategy (internal use)
  */
-const generateHeadingId = (prefix: string, text: string, fallbackId: () => string): string => {
-  // Step 1: Unicode normalization and accent removal
-  let processed = text
-    .normalize('NFD')                       // Unicode normalization (decomposition)
-    .replace(/[\u0300-\u036f]/g, '')        // Remove combining characters (accents, etc.)
-    .toLowerCase()
-    .replace(/\\[nrtbfv0]/g, '-')           // Replace escape sequence strings with hyphens
-    .replace(/[\x00-\x1F\x7F-\x9F]/g, '-'); // Replace actual control characters with hyphens
-
-  // Step 2: Extract ASCII characters only
-  const asciiOnly = processed.replace(/[^\x20-\x7E]/g, '');
-
-  // Step 3: Generate valid ID from ASCII characters
-  const finalId = asciiOnly
-    .replace(/[^\w\s-]/g, '')               // Remove non-word characters except spaces and hyphens
-    .replace(/\s+/g, '-')                   // Replace spaces with hyphens
-    .replace(/-+/g, '-')                    // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, '');                 // Remove leading/trailing hyphens
-
-  // Step 4: Use fallback if valid ID cannot be created (minimum 3 characters)
-  if (finalId.length >= 3) {
-    return `${prefix}-${finalId}`;
+const generateHeadingIdInternal = (prefix: string, text: string, fallbackId: () => string): string => {
+  const result = generateHeadingId(text);
+  if (result !== undefined) {
+    return `${prefix}-${result}`;
   } else {
     return fallbackId();
   }
@@ -267,7 +250,7 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
    */
   const createHeadingTreePlugin = (
     headingTree: HeadingNode[],
-    generateHeadingId: (headingText: string) => string,
+    generateId: (headingText: string) => string,
     useHierarchicalId: boolean = false,
     useContentBasedId: boolean = false,
     uniqueIdPrefix: string = ''
@@ -308,7 +291,7 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
             headingId = existingId;
           } else if (useHierarchicalId && useContentBasedId) {
             // Both hierarchical and content-based: create hierarchical content IDs
-            const contentBasedId = generateHeadingId(headingText).replace(`${uniqueIdPrefix}-`, '');
+            const contentBasedId = generateHeadingIdInternal(uniqueIdPrefix, headingText, () => generateId(headingText)).replace(`${uniqueIdPrefix}-`, '');
 
             // Remove parent IDs that are deeper than current level
             while (parentContentIds.length > 0) {
@@ -338,10 +321,10 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
             if (hierarchicalData) {
               headingId = generateHierarchicalId(uniqueIdPrefix, hierarchicalData.numbers);
             } else {
-              headingId = generateHeadingId(headingText);
+              headingId = generateId(headingText);
             }
           } else {
-            headingId = generateHeadingId(headingText);
+            headingId = generateId(headingText);
           }
 
           // Set the ID on the node for later use by rehype
@@ -423,7 +406,7 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
         .use(remarkAttr) // Add remark-attr for CSS attribute support (before heading tree and custom plugins)
         .use(createHeadingTreePlugin(
           headingTree,
-          useContentStringHeaderId ? (text => generateHeadingId(uniqueIdPrefix, text, getUniqueId)) : getUniqueId,
+          useContentStringHeaderId ? (text => generateHeadingIdInternal(uniqueIdPrefix, text, getUniqueId)) : getUniqueId,
           useHierarchicalHeadingId,
           useContentStringHeaderId,
           uniqueIdPrefix))

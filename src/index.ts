@@ -8,7 +8,7 @@ export { createMermaidPlugin } from './plugins/mermaid-plugin.js';
 export { defaultProviderList } from './plugins/oembed/providers.js';
 
 // Utility exports
-export { createCachedFetcher, createDirectFetcher } from './utils.js';
+export { createCachedFetcher, createDirectFetcher, generateHeadingId } from './utils.js';
 export type { CachedFetcherOptions } from './utils.js';
 
 // Cache exports
