@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest';
-import { createDirectFetcher } from '../src/utils.js';
+import { createDirectFetcher } from '../src/fetcher.js';
 
 // Mock fetch globally
 const mockFetch = vi.fn() as MockedFunction<typeof fetch>;
