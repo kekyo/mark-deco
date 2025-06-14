@@ -54,8 +54,8 @@ async function main() {
 
         // Process markdown
         const result = await processor.process(markdown, options.uniqueIdPrefix || 'section', {
-          useHierarchicalHeadingId: options.hierarchicalHeadingId,
-          useContentStringHeaderId: options.contentBasedHeadingId
+          useHierarchicalHeadingId: options.hierarchicalHeadingId ?? true,
+          useContentStringHeaderId: options.contentBasedHeadingId ?? false
         });
 
         // Write output

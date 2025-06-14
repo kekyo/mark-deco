@@ -30,27 +30,17 @@ export function setupProcessor(config: Config): MarkdownProcessor {
 
   // Add oEmbed plugin
   if (enabledPlugins.includes('oembed') && config.oembed?.enabled !== false) {
-    plugins.push(createOEmbedPlugin(defaultProviderList, {
-      fetcher,
-      logger,
-      timeout: config.oembed?.timeout || 5000
-    }));
+    plugins.push(createOEmbedPlugin(defaultProviderList, {}));
   }
 
   // Add card plugin
   if (enabledPlugins.includes('card') && config.card?.enabled !== false) {
-    plugins.push(createCardPlugin({
-      fetcher,
-      logger,
-      amazonAssociateId: config.card?.amazonAssociateId
-    }));
+    plugins.push(createCardPlugin({}));
   }
 
   // Add Mermaid plugin
   if (enabledPlugins.includes('mermaid') && config.mermaid?.enabled !== false) {
-    plugins.push(createMermaidPlugin({
-      theme: config.mermaid?.theme || 'default'
-    }));
+    plugins.push(createMermaidPlugin({}));
   }
 
   // Create and return processor

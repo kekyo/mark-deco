@@ -1,6 +1,7 @@
 import { resolve } from 'path';
 import swc from '@rollup/plugin-swc';
 import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 import eslint from 'vite-plugin-eslint';
 
 export default defineConfig({
@@ -44,6 +45,10 @@ export default defineConfig({
       exclude: ['node_modules', 'dist'],
       failOnWarning: true,
       failOnError: true,
+    }),
+    dts({
+      insertTypesEntry: true,
+      copyDtsFiles: true,
     }),
   ],
   build: {
