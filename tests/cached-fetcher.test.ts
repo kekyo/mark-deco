@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest';
-import { createCachedFetcher, generateCacheKey, createMemoryCacheStorage } from '../src/utils.js';
+import { generateCacheKey, createMemoryCacheStorage } from '../src/cache/index.js';
+import { createCachedFetcher } from '../src/fetcher.js';
 
 // Mock fetch globally
 const mockFetch = vi.fn() as MockedFunction<typeof fetch>;
