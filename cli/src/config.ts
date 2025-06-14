@@ -10,16 +10,12 @@ export interface Config {
   // Plugin-specific configurations
   oembed?: {
     enabled?: boolean;
-    timeout?: number;
-    providers?: string[];
   };
   card?: {
     enabled?: boolean;
-    amazonAssociateId?: string;
   };
   mermaid?: {
     enabled?: boolean;
-    theme?: string;
   };
 }
 
@@ -61,15 +57,13 @@ export function getDefaultConfig(): Config {
     hierarchicalHeadingId: true,
     contentBasedHeadingId: false,
     oembed: {
-      enabled: true,
-      timeout: 5000
+      enabled: true
     },
     card: {
       enabled: true
     },
     mermaid: {
-      enabled: true,
-      theme: 'default'
+      enabled: true
     }
   };
 }
