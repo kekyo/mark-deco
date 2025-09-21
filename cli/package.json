@@ -17,14 +17,13 @@
     "url": "https://github.com/kekyo/mark-deco.git"
   },
   "homepage": "https://github.com/kekyo/mark-deco#readme",
+  "readme": "README.md",
   "bin": {
     "mark-deco-cli": "./dist/cli.cjs"
   },
   "main": "./dist/cli.cjs",
   "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+    "dist"
   ],
   "scripts": {
     "build": "vite build",
@@ -43,7 +42,7 @@
   },
   "dependencies": {
     "commander": "^12.0.0",
-    "mark-deco": "file:../mark-deco"
+    "mark-deco": "*"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",

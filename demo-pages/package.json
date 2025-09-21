@@ -2,13 +2,13 @@
   "name": "mark-deco-demo-pages",
   "version": "1.0.0",
   "description": "Demo web pages for mark-deco browser functionality",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --port 63892",
     "test:playwright": "vite --port 63783",
     "build": "vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "preview": "vite preview"
   },
   "dependencies": {
     "buffer": "^6.0.3",
@@ -18,7 +18,7 @@
     "stream-browserify": "^3.0.0",
     "url": "^0.11.4",
     "util": "^0.12.5",
-    "mark-deco": "file:../mark-deco"
+    "mark-deco": "*"
   },
   "devDependencies": {
     "crypto-browserify": "^3.12.0",

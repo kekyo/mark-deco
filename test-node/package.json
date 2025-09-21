@@ -26,7 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "commander": "^12.1.0",
-    "mark-deco": "file:../mark-deco"
+    "mark-deco": "*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
