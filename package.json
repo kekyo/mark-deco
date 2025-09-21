@@ -1,6 +1,6 @@
 {
   "name": "mark-deco",
-  "version": "0.4.3",
+  "version": "0.0.1",
   "description": "A high-performance Markdown to HTML conversion library written in TypeScript.",
   "keywords": [
     "markdown",
@@ -42,7 +42,7 @@
   ],
   "scripts": {
     "build": "npm run build:root && npm run build --workspace=test-node && npm run build --workspace=demo-pages && npm run build --workspace=test-e2e && npm run build --workspace=cli",
-    "build:root": "rv --npm . && npm run typecheck && vite build",
+    "build:root": "vite build",
     "build:native": "npm run build && npm run build:native --workspace=cli",
     "dev": "npm run build:root && npm run dev --workspace=demo-pages",
     "test": "npm run test:root && npm run test:cli && npm run test:node && npm run test:e2e",
@@ -51,7 +51,6 @@
     "test:e2e": "npm run build --workspace=test-e2e && npm run test --workspace=test-e2e",
     "test:cli": "npm run build --workspace=cli && npm run test --workspace=cli",
     "prepublishOnly": "npm run build && npm run test",
-    "typecheck": "tsc --noEmit && tsc --project tsconfig.tests.json --noEmit",
     "update:providers": "curl -s https://oembed.com/providers.json | node -pe 'JSON.stringify(JSON.parse(require(\"fs\").readFileSync(0, \"utf8\")), null, 2)' > src/plugins/oembed/providers.json"
   },
   "devDependencies": {

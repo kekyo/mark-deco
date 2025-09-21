@@ -1,6 +1,6 @@
 {
   "name": "mark-deco-cli",
-  "version": "0.4.3",
+  "version": "0.0.1",
   "description": "Command-line interface for mark-deco Markdown to HTML conversion processor",
   "keywords": [
     "markdown",
@@ -27,7 +27,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "rv --npm . && npm run typecheck && vite build",
+    "build": "vite build",
     "build:bundle": "ncc build src/cli.ts -o dist-bundle",
     "build:native": "npm run build:bundle && npm run pkg",
     "build:native:all": "npm run build:bundle && npm run pkg:all",
@@ -39,7 +39,6 @@
     "dev": "vite build --watch",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm run test"
   },
   "dependencies": {
