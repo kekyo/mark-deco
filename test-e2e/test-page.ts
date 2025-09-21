@@ -6,8 +6,9 @@ import {
   defaultProviderList,
   type MarkdownProcessor
 } from 'mark-deco';
-// Removed unused imports
-import { createTestCustomProviders } from '../test-shared/test-helpers.js';
+import * as testHelpers from '../test-shared/test-helpers.js';
+
+const { createTestCustomProviders } = testHelpers;
 
 // Window型拡張
 declare global {

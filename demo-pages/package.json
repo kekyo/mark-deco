@@ -18,7 +18,7 @@
     "stream-browserify": "^3.0.0",
     "url": "^0.11.4",
     "util": "^0.12.5",
-    "mark-deco": "file:../"
+    "mark-deco": "file:../mark-deco"
   },
   "devDependencies": {
     "crypto-browserify": "^3.12.0",

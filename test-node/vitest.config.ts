@@ -13,7 +13,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
       // Directly reference library source files during development
-      'mark-deco': path.resolve(__dirname, '../src/index.ts')
+      'mark-deco': path.resolve(__dirname, '../mark-deco/src/index.ts')
     }
   }
 });

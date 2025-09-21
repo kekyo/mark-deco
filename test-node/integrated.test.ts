@@ -2,8 +2,18 @@ import { readFile, readdir, writeFile, mkdir, rm } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
-import { createTestProcessor, normalizeHtml, extractMermaidInfo, validatePluginOutputs, countTotalHeadings } from '../test-shared/test-helpers.js';
-import { createTestServer, type TestServer } from '../test-shared/test-server.js';
+import * as testHelpers from '../test-shared/test-helpers.js';
+import * as testServerModule from '../test-shared/test-server.js';
+import type { TestServer } from '../test-shared/test-server.js';
+
+const {
+  createTestProcessor,
+  normalizeHtml,
+  extractMermaidInfo,
+  validatePluginOutputs,
+  countTotalHeadings,
+} = testHelpers;
+const { createTestServer } = testServerModule;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

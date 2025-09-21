@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "commander": "^12.0.0",
-    "mark-deco": "file:.."
+    "mark-deco": "file:../mark-deco"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",

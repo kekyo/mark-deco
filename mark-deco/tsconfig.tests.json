@@ -4,7 +4,10 @@
     "noEmit": true,
     "skipLibCheck": true,
     "rootDir": ".",
-    "types": ["vitest/globals", "node"]
+    "types": [
+      "vitest/globals",
+      "node"
+    ]
   },
   "include": [
     "tests/**/*",
@@ -13,9 +16,11 @@
   "exclude": [
     "node_modules",
     "dist",
-    "demo-pages",
-    "test-node",
-    "test-e2e",
+    "../cli",
+    "../demo-pages",
+    "../test-e2e",
+    "../test-node",
+    "../test-shared",
     "examples"
   ]
-} 
+}

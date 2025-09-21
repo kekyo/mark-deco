@@ -2,10 +2,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
-import { normalizeHtml, extractMermaidInfo } from '../test-shared/test-helpers.js';
-import { createTestServer, createViteServer, type TestServer, type ViteServer } from '../test-shared/test-server.js';
+import * as testHelpers from '../test-shared/test-helpers.js';
+import * as testServerModule from '../test-shared/test-server.js';
+import type { TestServer, ViteServer } from '../test-shared/test-server.js';
+
 import { getBrowserInjectionScript } from './browser-utils';
 import type { MarkdownProcessor } from 'mark-deco';
+const { normalizeHtml, extractMermaidInfo } = testHelpers;
+const { createTestServer, createViteServer } = testServerModule;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

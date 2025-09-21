@@ -81,7 +81,7 @@ https://example.com
   console.log('Demo completed! The card plugin is working! 🎉');
   console.log('\nTo see the demo in a browser:');
   console.log('1. http://localhost:8080 (if demo server is running)');
-  console.log('2. Open dist-demo-pages/index.html in a browser');
+  console.log('2. Open demo-pages/dist/index.html in a browser');
 }
 
 demonstrateCardPlugin().catch(console.error); 

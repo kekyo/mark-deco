@@ -22,7 +22,7 @@
     "strictFunctionTypes": true,
     "baseUrl": ".",
     "paths": {
-      "mark-deco": ["../../src/index.ts"]
+      "mark-deco": ["../mark-deco/src/index.ts"]
     }
   },
   "include": [
@@ -34,4 +34,4 @@
     "dist",
     "test-results"
   ]
-} 
+}

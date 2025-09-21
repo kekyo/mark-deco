@@ -16,7 +16,7 @@
     "exactOptionalPropertyTypes": true,
     "baseUrl": ".",
     "paths": {
-      "mark-deco": ["../src/index.ts"]
+      "mark-deco": ["../mark-deco/src/index.ts"]
     },
     "allowImportingTsExtensions": true,
     "skipLibCheck": true,
@@ -30,10 +30,10 @@
   "include": [
     "*.ts",
     "*.js",
-    "../src/**/*"
+    "../mark-deco/src/**/*"
   ],
   "exclude": [
     "node_modules",
-    "../dist-demo-pages"
+    "./dist"
   ]
-} 
+}

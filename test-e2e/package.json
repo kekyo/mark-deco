@@ -18,6 +18,6 @@
     "vitest": "^1.0.0"
   },
   "dependencies": {
-    "mark-deco": "file:../"
+    "mark-deco": "file:../mark-deco"
   }
 }

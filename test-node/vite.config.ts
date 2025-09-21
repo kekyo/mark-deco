@@ -21,7 +21,7 @@ export default defineConfig({
       ],
       output: {
         globals: {
-          'commander': 'commander',
+          commander: 'commander',
           'mark-deco': 'markDeco'
         }
       }
@@ -32,7 +32,7 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, '.'),
       // Directly reference library source files during development
-      'mark-deco': resolve(__dirname, '../src/index.ts')
+      'mark-deco': resolve(__dirname, '../mark-deco/src/index.ts')
     }
   }
 });

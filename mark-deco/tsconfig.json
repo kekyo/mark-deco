@@ -29,9 +29,11 @@
     "node_modules",
     "dist",
     "tests",
-
-    "demo-pages",
-    "test-pages",
+    "../cli",
+    "../demo-pages",
+    "../test-e2e",
+    "../test-node",
+    "../test-shared",
     "examples"
   ]
-} 
+}

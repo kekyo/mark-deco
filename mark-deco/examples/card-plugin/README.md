@@ -118,6 +118,6 @@ All examples should:
 
 These examples complement the main demo page available at:
 - **Development**: `http://localhost:8080` (when demo server is running)
-- **Built version**: Open `dist-demo-pages/index.html` in a browser
+- **Built version**: Open `demo-pages/dist/index.html` in a browser
 
 The examples provide programmatic testing while the demo page offers interactive browser-based testing. 
