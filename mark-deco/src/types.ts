@@ -34,7 +34,12 @@ export interface HeadingNode {
  */
 export interface FetcherType {
   /** The actual fetcher function */
-  readonly rawFetcher: (url: string, accept: string, signal: AbortSignal | undefined, logger?: Logger) => Promise<Response>;
+  readonly rawFetcher: (
+    url: string,
+    accept: string,
+    signal: AbortSignal | undefined,
+    logger?: Logger
+  ) => Promise<Response>;
   /** User-Agent string used for fetcher HTTP requests */
   readonly userAgent: string;
 }
@@ -68,7 +73,10 @@ export interface Plugin {
    * @param context - Plugin context containing logger and signal
    * @returns Promise resolving to HTML string or modified AST node
    */
-  readonly processBlock: (content: string, context: PluginContext) => Promise<string>;
+  readonly processBlock: (
+    content: string,
+    context: PluginContext
+  ) => Promise<string>;
 }
 
 /**
@@ -136,7 +144,11 @@ export interface MarkdownProcessor {
    * @param options - Processing options
    * @returns Promise resolving to processed result
    */
-  readonly process: (markdown: string, uniqueIdPrefix: string, options?: ProcessOptions) => Promise<ProcessResult>;
+  readonly process: (
+    markdown: string,
+    uniqueIdPrefix: string,
+    options?: ProcessOptions
+  ) => Promise<ProcessResult>;
 }
 
 /**

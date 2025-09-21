@@ -27,9 +27,9 @@ import { createCachedFetcher, createMemoryCacheStorage } from 'mark-deco';
 
 const memoryStorage = createMemoryCacheStorage();
 const fetcher = createCachedFetcher(
-  'MyApp/1.0',        // ユーザーエージェント
-  60000,              // タイムアウト（ミリ秒）
-  memoryStorage       // キャッシュストレージ
+  'MyApp/1.0', // ユーザーエージェント
+  60000, // タイムアウト（ミリ秒）
+  memoryStorage // キャッシュストレージ
 );
 ```
 
@@ -57,22 +57,18 @@ const fetcher = createCachedFetcher('MyApp/1.0', 60000, fileStorage);
 詳細なキャッシュ動作を制御できます:
 
 ```typescript
-const fetcher = createCachedFetcher(
-  'MyApp/1.0',
-  60000,
-  fileStorage, {
-    cache: true,                    // キャッシュの有効/無効
-    cacheTTL: 30 * 60 * 1000,       // キャッシュ生存時間（30分）
-    cacheFailures: true,            // 失敗したリクエストもキャッシュ
-    failureCacheTTL: 5 * 60 * 1000  // 失敗キャッシュの生存時間（5分）
-  }
-);
+const fetcher = createCachedFetcher('MyApp/1.0', 60000, fileStorage, {
+  cache: true, // キャッシュの有効/無効
+  cacheTTL: 30 * 60 * 1000, // キャッシュ生存時間（30分）
+  cacheFailures: true, // 失敗したリクエストもキャッシュ
+  failureCacheTTL: 5 * 60 * 1000, // 失敗キャッシュの生存時間（5分）
+});
 ```
 
 フェッチ失敗時のキャッシュ動作:
 
-* 成功キャッシュ: 成功したレスポンスは指定されたTTLまで保持され、失敗時でも削除されません。
-* 失敗キャッシュ: `cacheFailures`が`true`の場合、失敗も個別のTTL（`failureCacheTTL`）でキャッシュされます。
-* 古いデータ保護: 新しいリクエストが失敗しても、既存の成功キャッシュは影響を受けません。
+- 成功キャッシュ: 成功したレスポンスは指定されたTTLまで保持され、失敗時でも削除されません。
+- 失敗キャッシュ: `cacheFailures`が`true`の場合、失敗も個別のTTL（`failureCacheTTL`）でキャッシュされます。
+- 古いデータ保護: 新しいリクエストが失敗しても、既存の成功キャッシュは影響を受けません。
 
 キャッシュにより、同一のURLに対する重複したリクエストを削減し、パフォーマンスを向上させます。

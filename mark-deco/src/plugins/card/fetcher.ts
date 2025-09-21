@@ -18,7 +18,13 @@ export const fetchMetadata = async (
 
   try {
     // Fetch HTML content directly using the fetchText utility
-    const htmlContent = await fetchText(fetcher, url, 'text/html', signal, logger);
+    const htmlContent = await fetchText(
+      fetcher,
+      url,
+      'text/html',
+      signal,
+      logger
+    );
 
     logger.info('fetchMetadata: Successfully fetched HTML content');
 
@@ -29,29 +35,42 @@ export const fetchMetadata = async (
     if (metadata === null || Object.keys(metadata).length === 0) {
       // Return minimal metadata if no rules matched
       const domain = new URL(url).hostname.replace(/^www\./, '');
-      logger.debug('fetchMetadata: No metadata extracted, returning minimal fallback metadata');
+      logger.debug(
+        'fetchMetadata: No metadata extracted, returning minimal fallback metadata'
+      );
       return {
         siteName: domain,
-        url: url
+        url: url,
       };
     }
 
     logger.debug('fetchMetadata: Successfully extracted metadata:', {
       url,
       extractedFields: Object.keys(metadata),
-      fieldCount: Object.keys(metadata).length
+      fieldCount: Object.keys(metadata).length,
     });
 
     return metadata;
   } catch (error: unknown) {
     if (isCORSError(error)) {
       if (typeof window !== 'undefined') {
-        logger.debug('fetchMetadata: Browser CORS restrictions prevent fetching metadata for URL:', url);
+        logger.debug(
+          'fetchMetadata: Browser CORS restrictions prevent fetching metadata for URL:',
+          url
+        );
       } else {
-        logger.warn('fetchMetadata: CORS error fetching metadata for URL:', url, error);
+        logger.warn(
+          'fetchMetadata: CORS error fetching metadata for URL:',
+          url,
+          error
+        );
       }
     } else {
-      logger.warn('fetchMetadata: Error fetching or parsing metadata for URL:', url, error);
+      logger.warn(
+        'fetchMetadata: Error fetching or parsing metadata for URL:',
+        url,
+        error
+      );
     }
 
     // Re-throw the original error

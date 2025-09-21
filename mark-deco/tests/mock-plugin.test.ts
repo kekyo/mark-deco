@@ -27,10 +27,14 @@ describe('MockPlugin', () => {
       signal: new AbortController().signal,
       frontmatter: {},
       fetcher: {
-        rawFetcher: async () => { throw new Error('Not implemented'); },
-        userAgent: 'test-user-agent'
+        rawFetcher: async () => {
+          throw new Error('Not implemented');
+        },
+        userAgent: 'test-user-agent',
       },
-      getUniqueId: () => { throw new Error('Not implemented'); }
+      getUniqueId: () => {
+        throw new Error('Not implemented');
+      },
     };
     const result = await plugin.processBlock('test content', mockContext);
     expect(result).toContain('Mock plugin processed: test content');
@@ -43,10 +47,14 @@ describe('MockPlugin', () => {
       signal: new AbortController().signal,
       frontmatter: {},
       fetcher: {
-        rawFetcher: async () => { throw new Error('Not implemented'); },
-        userAgent: 'test-user-agent'
+        rawFetcher: async () => {
+          throw new Error('Not implemented');
+        },
+        userAgent: 'test-user-agent',
       },
-      getUniqueId: () => { throw new Error('Not implemented'); }
+      getUniqueId: () => {
+        throw new Error('Not implemented');
+      },
     };
     const result = await plugin.processBlock('', mockContext);
     expect(result).toContain('Mock plugin processed: ');
@@ -58,14 +66,20 @@ describe('MockPlugin', () => {
       signal: new AbortController().signal,
       frontmatter: {},
       fetcher: {
-        rawFetcher: async () => { throw new Error('Not implemented'); },
-        userAgent: 'test-user-agent'
+        rawFetcher: async () => {
+          throw new Error('Not implemented');
+        },
+        userAgent: 'test-user-agent',
       },
-      getUniqueId: () => { throw new Error('Not implemented'); }
+      getUniqueId: () => {
+        throw new Error('Not implemented');
+      },
     };
     const content = '<script>alert("xss")</script>';
     const result = await plugin.processBlock(content, mockContext);
-    expect(result).toContain('Mock plugin processed: <script>alert("xss")</script>');
+    expect(result).toContain(
+      'Mock plugin processed: <script>alert("xss")</script>'
+    );
   });
 
   it('should implement Plugin interface correctly', () => {
@@ -82,7 +96,7 @@ describe('MockPlugin', () => {
 
       return {
         name: 'test-plugin',
-        processBlock
+        processBlock,
       };
     };
 
@@ -99,10 +113,14 @@ describe('MockPlugin', () => {
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: {
-          rawFetcher: async () => { throw new Error('Not implemented'); },
-          userAgent: 'test-user-agent'
+          rawFetcher: async () => {
+            throw new Error('Not implemented');
+          },
+          userAgent: 'test-user-agent',
         },
-        getUniqueId: () => { throw new Error('Not implemented'); }
+        getUniqueId: () => {
+          throw new Error('Not implemented');
+        },
       };
       const result = await plugin.processBlock('hello world', mockContext);
 
@@ -115,7 +133,7 @@ describe('MockPlugin', () => {
       name: 'mock-test',
       processBlock: async (content: string, context: PluginContext) => {
         return `<div class="mock-plugin">${content}</div>`;
-      }
+      },
     };
 
     const mockContext: PluginContext = {
@@ -123,10 +141,12 @@ describe('MockPlugin', () => {
       signal: new AbortController().signal,
       frontmatter: {},
       fetcher: {
-        rawFetcher: async () => { throw new Error('Not implemented'); },
-        userAgent: 'test-user-agent'
+        rawFetcher: async () => {
+          throw new Error('Not implemented');
+        },
+        userAgent: 'test-user-agent',
       },
-      getUniqueId: () => 'mock-id-1'
+      getUniqueId: () => 'mock-id-1',
     };
 
     const result = await mockPlugin.processBlock('test content', mockContext);
@@ -139,10 +159,12 @@ describe('MockPlugin', () => {
       signal: new AbortController().signal,
       frontmatter: {},
       fetcher: {
-        rawFetcher: async () => { throw new Error('Not implemented'); },
-        userAgent: 'test-user-agent'
+        rawFetcher: async () => {
+          throw new Error('Not implemented');
+        },
+        userAgent: 'test-user-agent',
       },
-      getUniqueId: () => 'mock-id-2'
+      getUniqueId: () => 'mock-id-2',
     };
 
     expect(mockContext.logger).toBeDefined();
@@ -159,10 +181,12 @@ describe('MockPlugin', () => {
       signal: new AbortController().signal,
       frontmatter: {},
       fetcher: {
-        rawFetcher: async () => { throw new Error('Not implemented'); },
-        userAgent: 'test-user-agent'
+        rawFetcher: async () => {
+          throw new Error('Not implemented');
+        },
+        userAgent: 'test-user-agent',
       },
-      getUniqueId: () => 'mock-id-3'
+      getUniqueId: () => 'mock-id-3',
     };
 
     const mockPlugin: Plugin = {
@@ -170,10 +194,13 @@ describe('MockPlugin', () => {
       processBlock: async (content: string, context: PluginContext) => {
         const frontmatterKeys = Object.keys(context.frontmatter).length;
         return `<div class="mock-plugin" data-frontmatter-keys="${frontmatterKeys}">${content}</div>`;
-      }
+      },
     };
 
-    const result = await mockPlugin.processBlock('test with frontmatter', mockContext);
+    const result = await mockPlugin.processBlock(
+      'test with frontmatter',
+      mockContext
+    );
     expect(result).toContain('data-frontmatter-keys="0"');
     expect(result).toContain('test with frontmatter');
   });
@@ -188,7 +215,7 @@ describe('MockPlugin', () => {
           const userAgent = context.fetcher.userAgent;
 
           return `<div class="complex-mock" id="${uniqueId}" data-has-signal="${hasSignal}" data-user-agent="${userAgent}">${content}</div>`;
-        }
+        },
       };
 
       const mockContext: PluginContext = {
@@ -196,10 +223,12 @@ describe('MockPlugin', () => {
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: {
-          rawFetcher: async () => { throw new Error('Not implemented'); },
-          userAgent: 'test-user-agent'
+          rawFetcher: async () => {
+            throw new Error('Not implemented');
+          },
+          userAgent: 'test-user-agent',
         },
-        getUniqueId: () => 'complex-mock-id'
+        getUniqueId: () => 'complex-mock-id',
       };
 
       const result = await mockPlugin.processBlock('complex test', mockContext);

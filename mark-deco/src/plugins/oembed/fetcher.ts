@@ -30,8 +30,18 @@ export const fetchOEmbedData = async (
 
   try {
     // Resolve redirects to get the final URL
-    const finalUrl = await resolveRedirects(url, maxRedirects, timeoutEachRedirect, fetcher.userAgent, logger, signal);
-    logger.info('fetchOEmbedData: Final URL after redirect resolution:', finalUrl);
+    const finalUrl = await resolveRedirects(
+      url,
+      maxRedirects,
+      timeoutEachRedirect,
+      fetcher.userAgent,
+      logger,
+      signal
+    );
+    logger.info(
+      'fetchOEmbedData: Final URL after redirect resolution:',
+      finalUrl
+    );
 
     // Build providers cache
     const providersCache = await buildProvidersCache(context, providers);
@@ -39,7 +49,12 @@ export const fetchOEmbedData = async (
     const oembedUrl = await getOEmbedUrl(finalUrl, providersCache, context);
     logger.info('fetchOEmbedData: oEmbed API URL:', oembedUrl);
 
-    const data = await fetchJson<OEmbedResponse>(fetcher, oembedUrl, signal, logger);
+    const data = await fetchJson<OEmbedResponse>(
+      fetcher,
+      oembedUrl,
+      signal,
+      logger
+    );
     logger.info('fetchOEmbedData: Parsed JSON data:', data);
 
     // Add web_page if not provided
@@ -52,11 +67,20 @@ export const fetchOEmbedData = async (
     // Check if this is a CORS error and wrap it appropriately
     if (isCORSError(error)) {
       if (typeof window !== 'undefined') {
-        logger.debug('fetchOEmbedData: Browser CORS restrictions block oEmbed API access for URL:', url);
+        logger.debug(
+          'fetchOEmbedData: Browser CORS restrictions block oEmbed API access for URL:',
+          url
+        );
       } else {
-        logger.warn('fetchOEmbedData: CORS error detected for URL:', url, error);
+        logger.warn(
+          'fetchOEmbedData: CORS error detected for URL:',
+          url,
+          error
+        );
       }
-      throw new CORSError(`CORS restrictions prevent accessing oEmbed data for ${url}`);
+      throw new CORSError(
+        `CORS restrictions prevent accessing oEmbed data for ${url}`
+      );
     }
 
     // Re-throw other errors as-is

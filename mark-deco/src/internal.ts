@@ -8,38 +8,31 @@ export { formatErrorInfo } from './plugins/shared/error-formatter.js';
 export type { OEmbedResponse } from './plugins/oembed/types.js';
 export {
   generateHtml,
-  generateFallbackHtml
+  generateFallbackHtml,
 } from './plugins/oembed/html-generator.js';
 export {
   isValidUrl,
   escapeHtml,
   calculateAspectRatio,
-  extractAspectRatioFromHtml
+  extractAspectRatioFromHtml,
 } from './plugins/oembed/utils.js';
 
-export {
-  fetchOEmbedData,
-  CORSError
-} from './plugins/oembed/fetcher.js';
+export { fetchOEmbedData, CORSError } from './plugins/oembed/fetcher.js';
 
 // Card plugin related exports
 
 export {
   generateCardHtml,
-  generateFallbackHtml as generateCardFallbackHtml
+  generateFallbackHtml as generateCardFallbackHtml,
 } from './plugins/card/html-generator.js';
 export {
   isValidUrl as isValidCardUrl,
   escapeHtml as escapeCardHtml,
-
   extractDomain,
   resolveUrl,
   truncateText,
   cleanText,
-
-  extractEnhancedData
+  extractEnhancedData,
 } from './plugins/card/utils.js';
 
-export {
-  fetchMetadata
-} from './plugins/card/fetcher.js';
+export { fetchMetadata } from './plugins/card/fetcher.js';

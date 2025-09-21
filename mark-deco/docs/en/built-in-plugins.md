@@ -2,18 +2,21 @@
 
 MarkDeco has a plugin system. You can add the effects of these plugins during the Markdown to HTML conversion process. Here are the built-in plugins:
 
-|Plugin Name|Details|
-|:----|:----|
-|`oembed`|Accesses oEmbed API from specified URLs and renders HTML with obtained metadata|
-|`card`|Scrapes specified URL pages and renders HTML with obtained metadata|
-|`mermaid`|Enables graph drawing with code written in `mermaid.js` graph syntax|
+| Plugin Name | Details                                                                         |
+| :---------- | :------------------------------------------------------------------------------ |
+| `oembed`    | Accesses oEmbed API from specified URLs and renders HTML with obtained metadata |
+| `card`      | Scrapes specified URL pages and renders HTML with obtained metadata             |
+| `mermaid`   | Enables graph drawing with code written in `mermaid.js` graph syntax            |
 
 To use plugins, specify them as follows:
 
 ```typescript
 import {
-  createMarkdownProcessor, createCachedFetcher,
-  createOEmbedPlugin, defaultProviderList } from 'mark-deco';
+  createMarkdownProcessor,
+  createCachedFetcher,
+  createOEmbedPlugin,
+  defaultProviderList,
+} from 'mark-deco';
 
 // Create fetcher
 const fetcher = createCachedFetcher('MyApp/1.0');
@@ -22,8 +25,8 @@ const fetcher = createCachedFetcher('MyApp/1.0');
 const oembedPlugin = createOEmbedPlugin(defaultProviderList);
 
 const processor = createMarkdownProcessor({
-  plugins: [ oembedPlugin ],   // Specify plugins to use
-  fetcher                      // Specify fetcher
+  plugins: [oembedPlugin], // Specify plugins to use
+  fetcher, // Specify fetcher
 });
 
 const markdown = `# Media Embedding Test
@@ -35,7 +38,7 @@ https://youtu.be/1La4QzGeaaQ
 \`\`\``;
 
 // Embed YouTube video
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // Embedded HTML is generated
 console.log(result.html);
@@ -52,8 +55,11 @@ Using the oEmbed plugin, you can easily embed YouTube videos, Flickr photos, soc
 
 ```typescript
 import {
-  createMarkdownProcessor, createCachedFetcher,
-  createOEmbedPlugin, defaultProviderList } from 'mark-deco';
+  createMarkdownProcessor,
+  createCachedFetcher,
+  createOEmbedPlugin,
+  defaultProviderList,
+} from 'mark-deco';
 
 // Create fetcher
 const fetcher = createCachedFetcher('MyApp/1.0');
@@ -61,8 +67,8 @@ const fetcher = createCachedFetcher('MyApp/1.0');
 // Generate oEmbed plugin using default provider list
 const oembedPlugin = createOEmbedPlugin(defaultProviderList);
 const processor = createMarkdownProcessor({
-  plugins: [ oembedPlugin ],
-  fetcher
+  plugins: [oembedPlugin],
+  fetcher,
 });
 
 const markdown = `# Media Embedding Test
@@ -85,7 +91,7 @@ Short URL (automatic redirect resolution)
 https://bit.ly/example-site-page
 \`\`\``;
 
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 ```
 
 Example generated HTML (for YouTube video):
@@ -98,13 +104,20 @@ Example generated HTML (for YouTube video):
     <div class="oembed-provider">from YouTube</div>
   </div>
   <div class="oembed-content">
-    <iframe src="https://www.youtube.com/embed/[VIDEO_ID]" 
-            frameborder="0" allowfullscreen>
-            <!-- Provider-specific implementation ... -->
+    <iframe
+      src="https://www.youtube.com/embed/[VIDEO_ID]"
+      frameborder="0"
+      allowfullscreen
+    >
+      <!-- Provider-specific implementation ... -->
     </iframe>
   </div>
   <div class="oembed-footer">
-    <a href="https://youtu.be/[VIDEO_ID]" target="_blank" rel="noopener noreferrer">
+    <a
+      href="https://youtu.be/[VIDEO_ID]"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       Watch on YouTube
     </a>
   </div>
@@ -115,18 +128,18 @@ Example generated HTML (for YouTube video):
 
 The oEmbed plugin includes a "default provider list" published at `https://oembed.com/providers.json`. You can also specify your own list. Major providers include:
 
-|Provider|Supported Domains|Content|
-|:----|:----|:----|
-|YouTube|`youtube.com`, `youtu.be`|Video embedding|
-|Vimeo|`vimeo.com`|Video embedding|
-|Twitter/X|`twitter.com`, `x.com`|Tweet embedding|
-|Instagram|`instagram.com`|Post embedding|
-|Flickr|`flickr.com`|Photo embedding|
-|TikTok|`tiktok.com`|Video embedding|
-|Spotify|`spotify.com`|Music/playlist embedding|
-|SoundCloud|`soundcloud.com`|Audio embedding|
-|Reddit|`reddit.com`|Post embedding|
-|Others|Many sites|Various content embedding|
+| Provider   | Supported Domains         | Content                   |
+| :--------- | :------------------------ | :------------------------ |
+| YouTube    | `youtube.com`, `youtu.be` | Video embedding           |
+| Vimeo      | `vimeo.com`               | Video embedding           |
+| Twitter/X  | `twitter.com`, `x.com`    | Tweet embedding           |
+| Instagram  | `instagram.com`           | Post embedding            |
+| Flickr     | `flickr.com`              | Photo embedding           |
+| TikTok     | `tiktok.com`              | Video embedding           |
+| Spotify    | `spotify.com`             | Music/playlist embedding  |
+| SoundCloud | `soundcloud.com`          | Audio embedding           |
+| Reddit     | `reddit.com`              | Post embedding            |
+| Others     | Many sites                | Various content embedding |
 
 The default provider list is large. Therefore, if you want to reduce bundle size, you should prepare your own list. If you don't use `defaultProviderList`, bundlers should implicitly reduce that data.
 
@@ -136,34 +149,32 @@ The oEmbed plugin allows fine control over displayed metadata items and their di
 
 ```typescript
 // Custom display order: embedded content first, then title, finally external link
-const customOrderOEmbedPlugin = createOEmbedPlugin(
-  defaultProviderList, {
-    displayFields: {
-      'embeddedContent': 1,   // Display 1st
-      'title': 2,             // Display 2nd
-      'externalLink': 3,      // Display 3rd
-    }  // Other items won't be output
-  });
+const customOrderOEmbedPlugin = createOEmbedPlugin(defaultProviderList, {
+  displayFields: {
+    embeddedContent: 1, // Display 1st
+    title: 2, // Display 2nd
+    externalLink: 3, // Display 3rd
+  }, // Other items won't be output
+});
 
 // Default order when displayFields is undefined
-const defaultOEmbedPlugin = createOEmbedPlugin(
-  defaultProviderList, { });
+const defaultOEmbedPlugin = createOEmbedPlugin(defaultProviderList, {});
 ```
 
-* Numbers for each field represent display item order. They don't need to be sequential, and smaller numbers are output first.
-* When `displayFields` isn't specified, all metadata items are rendered.
+- Numbers for each field represent display item order. They don't need to be sequential, and smaller numbers are output first.
+- When `displayFields` isn't specified, all metadata items are rendered.
 
 Available display control options:
 
-|Field|Description|CSS Class|Default Order|
-|:----|:----|:----|:----|
-|`title`|Content title|`.oembed-title`|`1`|
-|`author`|Author information|`.oembed-author`|`2`|
-|`provider`|Provider information|`.oembed-provider`|`3`|
-|`description`|Description text|`.oembed-description`|`4`|
-|`thumbnail`|Thumbnail image|`.oembed-thumbnail`|`5`|
-|`embeddedContent`|Embedded content (videos, etc.)|`.oembed-content`|`6`|
-|`externalLink`|External link|`a[href]`|`7`|
+| Field             | Description                     | CSS Class             | Default Order |
+| :---------------- | :------------------------------ | :-------------------- | :------------ |
+| `title`           | Content title                   | `.oembed-title`       | `1`           |
+| `author`          | Author information              | `.oembed-author`      | `2`           |
+| `provider`        | Provider information            | `.oembed-provider`    | `3`           |
+| `description`     | Description text                | `.oembed-description` | `4`           |
+| `thumbnail`       | Thumbnail image                 | `.oembed-thumbnail`   | `5`           |
+| `embeddedContent` | Embedded content (videos, etc.) | `.oembed-content`     | `6`           |
+| `externalLink`    | External link                   | `a[href]`             | `7`           |
 
 #### Link URL Control
 
@@ -171,24 +182,22 @@ The oEmbed plugin allows control over URLs used for external links in generated 
 
 ```typescript
 // Use URL written in Markdown
-const providedLinkOEmbedPlugin = createOEmbedPlugin(
-  defaultProviderList, {
-    useMetadataUrlLink: false   // Use URL written in Markdown
-  });
+const providedLinkOEmbedPlugin = createOEmbedPlugin(defaultProviderList, {
+  useMetadataUrlLink: false, // Use URL written in Markdown
+});
 
 // Use canonical URL from metadata
-const metadataLinkOEmbedPlugin = createOEmbedPlugin(
-  defaultProviderList, {
-    useMetadataUrlLink: true    // Use oEmbed metadata `web_page` URL
-  });
+const metadataLinkOEmbedPlugin = createOEmbedPlugin(defaultProviderList, {
+  useMetadataUrlLink: true, // Use oEmbed metadata `web_page` URL
+});
 ```
 
 Link URL selection priority:
 
-|`useMetadataUrlLink`|URL Source Priority|Purpose|
-|:----|:----|:----|
-|`false`|Written URL|Preserve original URL (short links, etc.) (default)|
-|`true`|oEmbed `web_page` URL --> Written URL|Use provider canonical URL|
+| `useMetadataUrlLink` | URL Source Priority                   | Purpose                                             |
+| :------------------- | :------------------------------------ | :-------------------------------------------------- |
+| `false`              | Written URL                           | Preserve original URL (short links, etc.) (default) |
+| `true`               | oEmbed `web_page` URL --> Written URL | Use provider canonical URL                          |
 
 #### Redirect Resolution
 
@@ -197,11 +206,11 @@ This is because oEmbed provider lists may only match normalized URLs:
 
 ```markdown
 \`\`\`oembed
-https://youtu.be/1La4QzGeaaQ    # --> Resolved to https://youtube.com/watch?v=1La4QzGeaaQ
+https://youtu.be/1La4QzGeaaQ # --> Resolved to https://youtube.com/watch?v=1La4QzGeaaQ
 \`\`\`
 
 \`\`\`oembed
-https://bit.ly/shortened-link   # --> Resolved to normalized URL
+https://bit.ly/shortened-link # --> Resolved to normalized URL
 \`\`\`
 ```
 
@@ -220,7 +229,11 @@ When a specified URL is from an unsupported provider, appropriate link display i
     <div class="oembed-provider">from example.com</div>
   </div>
   <div class="oembed-content">
-    <a href="https://example.com/content" target="_blank" rel="noopener noreferrer">
+    <a
+      href="https://example.com/content"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       View content on example.com
     </a>
   </div>
@@ -231,22 +244,22 @@ When a specified URL is from an unsupported provider, appropriate link display i
 
 HTML generated by the oEmbed plugin includes CSS classes for styling:
 
-|CSS Class|Applied Element|Description|
-|:----|:----|:----|
-|`.oembed-container`| Overall container | Container for entire oEmbed embedding |
-|`.oembed-video`| Container | Additional class for video content |
-|`.oembed-photo`| Container | Additional class for photo content |
-|`.oembed-link`| Container | Additional class for link content |
-|`.oembed-rich`| Container | Additional class for rich content |
-|`.oembed-header`| Header section | Container for title/author/provider info |
-|`.oembed-title`| Title element | Content title |
-|`.oembed-author`| Author element | Author/channel name, etc. |
-|`.oembed-provider`| Provider element | Service provider name |
-|`.oembed-description`| Description element | Content description |
-|`.oembed-thumbnail`| Thumbnail element | Thumbnail image |
-|`.oembed-content`| Embedded element | iframe or actual content |
-|`.oembed-footer`| Footer section | External links, etc. |
-|`.oembed-fallback`| Fallback element | Fallback display for unsupported sites |
+| CSS Class             | Applied Element     | Description                              |
+| :-------------------- | :------------------ | :--------------------------------------- |
+| `.oembed-container`   | Overall container   | Container for entire oEmbed embedding    |
+| `.oembed-video`       | Container           | Additional class for video content       |
+| `.oembed-photo`       | Container           | Additional class for photo content       |
+| `.oembed-link`        | Container           | Additional class for link content        |
+| `.oembed-rich`        | Container           | Additional class for rich content        |
+| `.oembed-header`      | Header section      | Container for title/author/provider info |
+| `.oembed-title`       | Title element       | Content title                            |
+| `.oembed-author`      | Author element      | Author/channel name, etc.                |
+| `.oembed-provider`    | Provider element    | Service provider name                    |
+| `.oembed-description` | Description element | Content description                      |
+| `.oembed-thumbnail`   | Thumbnail element   | Thumbnail image                          |
+| `.oembed-content`     | Embedded element    | iframe or actual content                 |
+| `.oembed-footer`      | Footer section      | External links, etc.                     |
+| `.oembed-fallback`    | Fallback element    | Fallback display for unsupported sites   |
 
 ### Card Plugin
 
@@ -264,8 +277,8 @@ const fetcher = createCachedFetcher('MyApp/1.0');
 const cardPlugin = createCardPlugin();
 
 const processor = createMarkdownProcessor({
-  plugins: [ cardPlugin ],
-  fetcher
+  plugins: [cardPlugin],
+  fetcher,
 });
 
 const markdown = `# Product Review
@@ -280,7 +293,7 @@ https://github.com/kekyo/async-primitives
 https://www.ebay.com/itm/167556314958
 \`\`\``;
 
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // Rich card HTML is generated
 console.log(result.html);
@@ -320,29 +333,35 @@ import { createCardPlugin } from 'mark-deco';
 const cardPlugin = createCardPlugin({
   scrapingRules: [
     {
-      pattern: '^https?://example\\.com/',  // URL pattern
+      pattern: '^https?://example\\.com/', // URL pattern
       siteName: 'Example Site',
-      fields: {   // Field configuration group
-        title: {         // `title` field configuration
-          rules: [{ selector: 'h1.main-title', method: 'text' }]
+      fields: {
+        // Field configuration group
+        title: {
+          // `title` field configuration
+          rules: [{ selector: 'h1.main-title', method: 'text' }],
         },
-        description: {   // `description` field configuration
-          rules: [{ selector: '.description', method: 'text' }]
+        description: {
+          // `description` field configuration
+          rules: [{ selector: '.description', method: 'text' }],
         },
-        image: {         // `image` field configuration
-          rules: [{ selector: '.hero-image img', method: 'attr', attr: 'src' }]
-        }
-      }
-    }
-  ]
+        image: {
+          // `image` field configuration
+          rules: [{ selector: '.hero-image img', method: 'attr', attr: 'src' }],
+        },
+      },
+    },
+  ],
 });
 ```
 
 `FieldConfig` (field configuration):
+
 - `required`: Whether this field is required (boolean)
 - `rules`: Array of extraction rules. Tried from top to bottom, and the first successful rule's result is used
 
 `FieldRule` (extraction rule):
+
 - `selector`: CSS selector (string or array)
 - `method`: Extraction method (`text`, `attr`, `html`)
 - `attr`: Attribute name when using `attr` method
@@ -357,11 +376,11 @@ Custom metadata extraction rule groups are applied before standard OGP metadata 
 
 The `method` field in extraction rules specifies how to obtain data from HTML elements. Three methods are available:
 
-|Extraction Method|Description|Usage Example|
-|:----|:----|:----|
-|`text`|Get element text content (HTML tags removed)|`<span>Hello World</span>` --> `"Hello World"`|
-|`attr`|Get element attribute value|`<img src="image.jpg">` --> `"image.jpg"` (attr: `src`)|
-|`html`|Get element inner HTML (including HTML tags)|`<div><b>Bold</b> text</div>` --> `"<b>Bold</b> text"`|
+| Extraction Method | Description                                  | Usage Example                                           |
+| :---------------- | :------------------------------------------- | :------------------------------------------------------ |
+| `text`            | Get element text content (HTML tags removed) | `<span>Hello World</span>` --> `"Hello World"`          |
+| `attr`            | Get element attribute value                  | `<img src="image.jpg">` --> `"image.jpg"` (attr: `src`) |
+| `html`            | Get element inner HTML (including HTML tags) | `<div><b>Bold</b> text</div>` --> `"<b>Bold</b> text"`  |
 
 Specific usage examples for each method:
 
@@ -392,10 +411,10 @@ When `method` is omitted, `text` is used by default. When using the `attr` metho
 
 You can use the `processor` field to perform post-processing on extracted data. It can be specified in two formats:
 
-|Format|Details|
-|:----|:----|
-|Configuration object|Choose from several fixed methods. Since it's a built-in processing method, it can be used in ways like streaming entire rules in JSON.|
-|Function|You can write custom processing with functions. Any post-processing can be handled.|
+| Format               | Details                                                                                                                                 |
+| :------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
+| Configuration object | Choose from several fixed methods. Since it's a built-in processing method, it can be used in ways like streaming entire rules in JSON. |
+| Function             | You can write custom processing with functions. Any post-processing can be handled.                                                     |
 
 ##### Configuration Object Format
 
@@ -415,13 +434,13 @@ You can use the `processor` field to perform post-processing on extracted data. 
 
 Available configuration types:
 
-|Type|Description|Parameter Example|Result Example|
-|:----|:----|:----|:----|
-|`regex`|String conversion with regular expressions|`replace: [{ pattern: '^Prefix:\\s*', replacement: '' }]`|Prefix removal|
-|`filter`|Value filtering by conditions|`contains: 'keep', excludeContains: ['exclude']`|Extract values containing/not containing specific strings|
-|`slice`|Partial array retrieval|`start: 0, end: 3`|Get only first 3 elements|
-|`first`|Get only first value|(no parameters)|`['a', 'b', 'c']` --> `'a'`|
-|`currency`|Currency formatting|`symbol: '$', locale: 'en-US'`|`'19.99'` --> `'$19.99'`|
+| Type       | Description                                | Parameter Example                                         | Result Example                                            |
+| :--------- | :----------------------------------------- | :-------------------------------------------------------- | :-------------------------------------------------------- |
+| `regex`    | String conversion with regular expressions | `replace: [{ pattern: '^Prefix:\\s*', replacement: '' }]` | Prefix removal                                            |
+| `filter`   | Value filtering by conditions              | `contains: 'keep', excludeContains: ['exclude']`          | Extract values containing/not containing specific strings |
+| `slice`    | Partial array retrieval                    | `start: 0, end: 3`                                        | Get only first 3 elements                                 |
+| `first`    | Get only first value                       | (no parameters)                                           | `['a', 'b', 'c']` --> `'a'`                               |
+| `currency` | Currency formatting                        | `symbol: '$', locale: 'en-US'`                            | `'19.99'` --> `'$19.99'`                                  |
 
 Composite processing example:
 
@@ -461,12 +480,12 @@ In function format, you receive an array of extracted values and processing cont
 
 The `context` argument passed to function format `processor` contains the following information:
 
-|Property|Type|Description|Usage Example|
-|:----|:----|:----|:----|
-|`$`|`Cheerio`|Cheerio instance for entire page|`context.$.html()` to get entire page HTML|
-|`$head`|`Cheerio`|Cheerio instance for HTML head section|`context.$head('meta[name="description"]')` to get metadata|
-|`url`|`string`|Processing page URL|`context.url` for domain extraction or ASIN extraction|
-|`locale`|`string`|Page language/region information|`context.locale` for language-specific processing|
+| Property | Type      | Description                            | Usage Example                                               |
+| :------- | :-------- | :------------------------------------- | :---------------------------------------------------------- |
+| `$`      | `Cheerio` | Cheerio instance for entire page       | `context.$.html()` to get entire page HTML                  |
+| `$head`  | `Cheerio` | Cheerio instance for HTML head section | `context.$head('meta[name="description"]')` to get metadata |
+| `url`    | `string`  | Processing page URL                    | `context.url` for domain extraction or ASIN extraction      |
+| `locale` | `string`  | Page language/region information       | `context.locale` for language-specific processing           |
 
 Practical examples using `context`:
 
@@ -475,7 +494,7 @@ Practical examples using `context`:
 processor: (values, context) => {
   const match = context.url.match(/\/dp\/([A-Z0-9]{10,})/);
   return match ? match[1] : undefined;
-}
+};
 
 // Example extracting domain name
 processor: (values, context) => {
@@ -485,15 +504,15 @@ processor: (values, context) => {
   } catch {
     return 'Unknown Site';
   }
-}
+};
 
 // Example performing language-specific processing
 processor: (values, context) => {
   const isJapanese = context.locale?.startsWith('ja');
-  return isJapanese 
+  return isJapanese
     ? values[0]?.replace(/ブランド:\s*/, '')
     : values[0]?.replace(/Brand:\s*/, '');
-}
+};
 ```
 
 #### Display Field Order Control
@@ -503,11 +522,11 @@ The card plugin allows control over displayed metadata items and their display o
 ```typescript
 const cardPlugin = createCardPlugin({
   displayFields: {
-    'image': 1,       // Display field name `image` first
-    'title': 2,       // Display field name `title` second
-    'description': 3, // Display field name `description` third
+    image: 1, // Display field name `image` first
+    title: 2, // Display field name `title` second
+    description: 3, // Display field name `description` third
     // (Other metadata items won't be displayed even if obtained)
-  }
+  },
 });
 ```
 
@@ -520,21 +539,21 @@ The card plugin allows control over URLs used for clickable links in generated c
 ```typescript
 // Use URL written in Markdown
 const providedLinkCardPlugin = createCardPlugin({
-  useMetadataUrlLink: false   // Use URL written in Markdown
+  useMetadataUrlLink: false, // Use URL written in Markdown
 });
 
 // Use metadata URL (canonical URL of retrieved page)
 const metadataLinkCardPlugin = createCardPlugin({
-  useMetadataUrlLink: true    // Use OGP metadata canonical URL
+  useMetadataUrlLink: true, // Use OGP metadata canonical URL
 });
 ```
 
 Link URL selection priority:
 
-|`useMetadataUrlLink`|URL Source Priority|Purpose|
-|:----|:----|:----|
-|`false`|Written URL|Preserve original URL with tracking parameters (default)|
-|`true`|Extended canonical URL --> OGP URL --> Source URL --> Written URL|Expect normalized URL|
+| `useMetadataUrlLink` | URL Source Priority                                               | Purpose                                                  |
+| :------------------- | :---------------------------------------------------------------- | :------------------------------------------------------- |
+| `false`              | Written URL                                                       | Preserve original URL with tracking parameters (default) |
+| `true`               | Extended canonical URL --> OGP URL --> Source URL --> Written URL | Expect normalized URL                                    |
 
 #### Fallback Processing
 
@@ -551,7 +570,12 @@ When network errors occur during scraping, the plugin provides appropriate fallb
       CORS Restriction - This site blocks cross-origin requests in browsers
     </div>
     <div class="card-content">
-      <a href="[URL]" target="_blank" rel="noopener noreferrer" class="card-external-link">
+      <a
+        href="[URL]"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="card-external-link"
+      >
         → Open example.com in new tab
       </a>
     </div>
@@ -563,22 +587,22 @@ When network errors occur during scraping, the plugin provides appropriate fallb
 
 HTML generated by the card plugin includes CSS classes for styling:
 
-|CSS Class|Applied Element|Description|
-|:----|:----|:----|
-|`.card-container`| Overall container | Container for entire card |
-|`.card-amazon`| Container | Additional class for Amazon products |
-|`.card-fallback`| Container | Additional class for fallback display |
-|`.card-link`| Link element | Clickable link for entire card |
-|`.card-image`| Image container | Image display area |
-|`.card-body`| Body section | Card main content area |
-|`.card-header`| Header section | Container for title/provider info |
-|`.card-title`| Title element | Card title |
-|`.card-provider`| Provider element | Site name/favicon area |
-|`.card-favicon`| Favicon element | Site favicon image |
-|`.card-description`| Description element | Card description |
-|`.card-content`| Content element | Additional content for fallback |
-|`.card-external-link`| External link element | External link for fallback |
-|`.card-{fieldName}`| Specific field | Classes corresponding to each field name (e.g., `.card-price`, `.card-rating`) |
+| CSS Class             | Applied Element       | Description                                                                    |
+| :-------------------- | :-------------------- | :----------------------------------------------------------------------------- |
+| `.card-container`     | Overall container     | Container for entire card                                                      |
+| `.card-amazon`        | Container             | Additional class for Amazon products                                           |
+| `.card-fallback`      | Container             | Additional class for fallback display                                          |
+| `.card-link`          | Link element          | Clickable link for entire card                                                 |
+| `.card-image`         | Image container       | Image display area                                                             |
+| `.card-body`          | Body section          | Card main content area                                                         |
+| `.card-header`        | Header section        | Container for title/provider info                                              |
+| `.card-title`         | Title element         | Card title                                                                     |
+| `.card-provider`      | Provider element      | Site name/favicon area                                                         |
+| `.card-favicon`       | Favicon element       | Site favicon image                                                             |
+| `.card-description`   | Description element   | Card description                                                               |
+| `.card-content`       | Content element       | Additional content for fallback                                                |
+| `.card-external-link` | External link element | External link for fallback                                                     |
+| `.card-{fieldName}`   | Specific field        | Classes corresponding to each field name (e.g., `.card-price`, `.card-rating`) |
 
 Field-specific class naming convention:
 
@@ -589,7 +613,11 @@ Classes in `.card-{fieldName}` format are automatically generated based on field
 Using the Mermaid plugin, you can create diagrams and flowcharts using [mermaid.js](https://mermaid.js.org/) notation:
 
 ```typescript
-import { createMarkdownProcessor, createMermaidPlugin, createCachedFetcher } from 'mark-deco';
+import {
+  createMarkdownProcessor,
+  createMermaidPlugin,
+  createCachedFetcher,
+} from 'mark-deco';
 
 // Create fetcher
 const fetcher = createCachedFetcher('MyApp/1.0');
@@ -599,7 +627,7 @@ const mermaidPlugin = createMermaidPlugin();
 
 const processor = createMarkdownProcessor({
   plugins: [mermaidPlugin],
-  fetcher
+  fetcher,
 });
 
 const markdown = `# Diagram Example
@@ -613,7 +641,7 @@ graph TD
   D --> E
 \`\`\``;
 
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // Contains <div class="mermaid">...</div>
 console.log(result.html);
@@ -623,13 +651,13 @@ HTML like this is generated:
 
 ```html
 <div class="mermaid-wrapper">
-  <style> { ... } </style>
-  <div class="mermaid" id="id-1">graph TD
-  A[Start] --&gt; B{Decision}
-  B --&gt;|Yes| C[Action1]
-  B --&gt;|No| D[Action2]
-  C --&gt; E[End]
-  D --&gt; E</div>
+  <style>
+    { ... }
+  </style>
+  <div class="mermaid" id="id-1">
+    graph TD A[Start] --&gt; B{Decision} B --&gt;|Yes| C[Action1] B --&gt;|No|
+    D[Action2] C --&gt; E[End] D --&gt; E
+  </div>
 </div>
 ```
 
@@ -637,32 +665,32 @@ Note that the Mermaid plugin doesn't generate actual SVG graphics, but creates H
 
 Generated HTML has the following characteristics:
 
-* Diagram code is properly HTML-escaped to prevent XSS attacks.
-* Wrapped with `mermaid-wrapper` class and includes styles that override SVG size constraints.
-* Unique IDs are assigned by default, allowing proper identification when multiple diagrams exist.
+- Diagram code is properly HTML-escaped to prevent XSS attacks.
+- Wrapped with `mermaid-wrapper` class and includes styles that override SVG size constraints.
+- Unique IDs are assigned by default, allowing proper identification when multiple diagrams exist.
 
 For introducing the Mermaid script itself, refer to Mermaid documentation. Here's a simple example:
 
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Mermaid Rendering</title>
-  <!-- Mermaid.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-</head>
-<body>
-  <div id="content">
-    <!-- Insert processor converted result HTML here -->
-  </div>
-  <script>
-    // Initialize Mermaid
-    mermaid.initialize({ 
-      startOnLoad: true,
-      theme: 'default'
-    });
-  </script>
-</body>
+  <head>
+    <title>Mermaid Rendering</title>
+    <!-- Mermaid.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  </head>
+  <body>
+    <div id="content">
+      <!-- Insert processor converted result HTML here -->
+    </div>
+    <script>
+      // Initialize Mermaid
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+      });
+    </script>
+  </body>
 </html>
 ```
 
@@ -679,11 +707,11 @@ const processAndUpdate = async () => {
   // ...
 
   // Execute MarkDeco processor
-  const result = await processor.process(markdown, "id");
-  
+  const result = await processor.process(markdown, 'id');
+
   // Update DOM
   document.getElementById('output').innerHTML = result.html;
-  
+
   // If Mermaid diagrams exist
   if (result.html.includes('class="mermaid"')) {
     // Wait for DOM update completion (100ms)
@@ -691,7 +719,8 @@ const processAndUpdate = async () => {
       // Initialize Mermaid to generate SVG
       window.mermaid.init(
         undefined,
-        document.querySelectorAll('.mermaid:not([data-processed="true"])'));
+        document.querySelectorAll('.mermaid:not([data-processed="true"])')
+      );
     }, 100);
   }
 };

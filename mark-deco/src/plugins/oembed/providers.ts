@@ -10,7 +10,8 @@ import type { PluginContext } from '../../types.js';
  * Export this if you want to use the built-in provider list,
  * or provide your own custom providers to buildProvidersCache.
  */
-export const defaultProviderList: OEmbedProvider[] = downloadedProvidersJson as OEmbedProvider[];
+export const defaultProviderList: OEmbedProvider[] =
+  downloadedProvidersJson as OEmbedProvider[];
 
 /**
  * Decode HTML entities in a string
@@ -26,10 +27,13 @@ const decodeHtmlEntities = (str: string): string => {
     '&#x27;': "'",
     '&#x3D;': '=',
     '&#x2F;': '/',
-    '&#x60;': '`'
+    '&#x60;': '`',
   };
 
-  return str.replace(/&(?:amp|lt|gt|quot|#x27|#x3D|#x2F|#x60);/g, (match) => entities[match] || match);
+  return str.replace(
+    /&(?:amp|lt|gt|quot|#x27|#x3D|#x2F|#x60);/g,
+    (match) => entities[match] || match
+  );
 };
 
 /**
@@ -41,8 +45,8 @@ const decodeHtmlEntities = (str: string): string => {
 const matchesScheme = (url: string, scheme: string): boolean => {
   // Convert scheme to regex pattern
   const regexPattern = scheme
-    .replace(/\./g, '\\.')  // Escape dots
-    .replace(/\*/g, '.*')   // * matches anything including slash
+    .replace(/\./g, '\\.') // Escape dots
+    .replace(/\*/g, '.*') // * matches anything including slash
     .replace(/\?\*$/, '.*'); // Handle query parameters
 
   const regex = new RegExp(`^${regexPattern}$`, 'i');
@@ -61,7 +65,9 @@ export const buildProvidersCache = async (
 ): Promise<Map<string, string>> => {
   const cache = new Map<string, string>();
 
-  logger.info('buildProvidersCache: Using providers, length=' + providers.length);
+  logger.info(
+    'buildProvidersCache: Using providers, length=' + providers.length
+  );
 
   for (const provider of providers) {
     for (const endpoint of provider.endpoints) {
@@ -100,19 +106,30 @@ export const getOEmbedUrl = async (
       oembedUrl.searchParams.set('url', url);
       oembedUrl.searchParams.set('format', 'json');
 
-      logger.info('getOEmbedUrl: Found matching endpoint for', hostname, ':', endpointUrl);
+      logger.info(
+        'getOEmbedUrl: Found matching endpoint for',
+        hostname,
+        ':',
+        endpointUrl
+      );
       return oembedUrl.toString();
     }
   }
 
   // If no provider found, try oEmbed discovery
-  logger.info('getOEmbedUrl: No provider found for', hostname, ', attempting discovery');
+  logger.info(
+    'getOEmbedUrl: No provider found for',
+    hostname,
+    ', attempting discovery'
+  );
 
   try {
     const html = await fetchText(fetcher, url, 'text/html', signal, logger);
 
     // Look for oEmbed discovery links
-    const oembedLinkMatch = html.match(/<link[^>]*type=['"]application\/json\+oembed['"][^>]*>/i);
+    const oembedLinkMatch = html.match(
+      /<link[^>]*type=['"]application\/json\+oembed['"][^>]*>/i
+    );
     if (oembedLinkMatch) {
       const hrefMatch = oembedLinkMatch[0].match(/href=['"]([^'"]+)['"]/i);
       if (hrefMatch && hrefMatch[1]) {
@@ -126,7 +143,10 @@ export const getOEmbedUrl = async (
     }
   } catch (error) {
     if (isCORSError(error)) {
-      logger.debug('getOEmbedUrl: Discovery blocked by CORS restrictions for', url);
+      logger.debug(
+        'getOEmbedUrl: Discovery blocked by CORS restrictions for',
+        url
+      );
     } else {
       logger.warn('getOEmbedUrl: Discovery failed for', url, ':', error);
     }

@@ -10,9 +10,11 @@ import type { FetcherType, Logger } from './types.js';
 export const isCORSError = (error: unknown): boolean => {
   if (error instanceof TypeError) {
     const message = error.message.toLowerCase();
-    return message.includes('cors') ||
-           message.includes('network') ||
-           message.includes('fetch');
+    return (
+      message.includes('cors') ||
+      message.includes('network') ||
+      message.includes('fetch')
+    );
   }
   return false;
 };
@@ -22,7 +24,7 @@ export const isCORSError = (error: unknown): boolean => {
  * @param timeout - Timeout in milliseconds
  * @returns AbortSignal that will abort after the timeout
  */
-export const createTimeoutSignal = (timeout: number) : AbortSignal => {
+export const createTimeoutSignal = (timeout: number): AbortSignal => {
   const controller = new AbortController();
   setTimeout(() => {
     controller.abort();
@@ -39,7 +41,7 @@ export const combineAbortSignals = (...signals: AbortSignal[]): AbortSignal => {
   const controller = new AbortController();
 
   // If any signal is already aborted, abort immediately
-  if (signals.some(signal => signal.aborted)) {
+  if (signals.some((signal) => signal.aborted)) {
     controller.abort();
     return controller.signal;
   }
@@ -48,12 +50,12 @@ export const combineAbortSignals = (...signals: AbortSignal[]): AbortSignal => {
   const handler = () => {
     controller.abort();
     // Clean up listeners
-    signals.forEach(signal => {
+    signals.forEach((signal) => {
       signal.removeEventListener('abort', handler);
     });
   };
 
-  signals.forEach(signal => {
+  signals.forEach((signal) => {
     signal.addEventListener('abort', handler);
   });
 
@@ -70,17 +72,26 @@ export const combineAbortSignals = (...signals: AbortSignal[]): AbortSignal => {
  * @param logger - Optional logger instance
  * @returns Promise resolving to the Response object
  */
-export const fetchData = async (url: string, accept: string, userAgent: string, timeout: number, signal: AbortSignal | undefined, logger?: Logger): Promise<Response> => {
+export const fetchData = async (
+  url: string,
+  accept: string,
+  userAgent: string,
+  timeout: number,
+  signal: AbortSignal | undefined,
+  logger?: Logger
+): Promise<Response> => {
   const headersInit: HeadersInit = {
-    'Accept': accept,
-    'User-Agent': userAgent
+    Accept: accept,
+    'User-Agent': userAgent,
   };
   const requestInit: RequestInit = {
     method: 'GET',
-    headers: headersInit
+    headers: headersInit,
   };
   const timeoutSignal = createTimeoutSignal(timeout);
-  requestInit.signal = signal ? combineAbortSignals(signal, timeoutSignal) : timeoutSignal;
+  requestInit.signal = signal
+    ? combineAbortSignals(signal, timeoutSignal)
+    : timeoutSignal;
 
   logger?.debug(`Fetching data from URL: ${url}`);
   const response = await fetch(url, requestInit);
@@ -102,7 +113,13 @@ export const fetchData = async (url: string, accept: string, userAgent: string, 
  * @param logger - Optional logger instance
  * @returns Promise resolving to the text content
  */
-export const fetchText = async (fetcherInstance: FetcherType, url: string, accept: string, signal: AbortSignal | undefined, logger?: Logger): Promise<string> => {
+export const fetchText = async (
+  fetcherInstance: FetcherType,
+  url: string,
+  accept: string,
+  signal: AbortSignal | undefined,
+  logger?: Logger
+): Promise<string> => {
   const data = await fetcherInstance.rawFetcher(url, accept, signal, logger);
   return await data.text();
 };
@@ -115,9 +132,19 @@ export const fetchText = async (fetcherInstance: FetcherType, url: string, accep
  * @param logger - Optional logger instance
  * @returns Promise resolving to the parsed JSON data
  */
-export const fetchJson = async <T>(fetcherInstance: FetcherType, url: string, signal: AbortSignal | undefined, logger?: Logger): Promise<T> => {
-  const data = await fetcherInstance.rawFetcher(url, "application/json", signal, logger);
-  return await data.json() as T;
+export const fetchJson = async <T>(
+  fetcherInstance: FetcherType,
+  url: string,
+  signal: AbortSignal | undefined,
+  logger?: Logger
+): Promise<T> => {
+  const data = await fetcherInstance.rawFetcher(
+    url,
+    'application/json',
+    signal,
+    logger
+  );
+  return (await data.json()) as T;
 };
 
 /**
@@ -153,7 +180,11 @@ export const isBrowser = (): boolean => {
  * @returns True if running in a Node.js environment
  */
 export const isNode = (): boolean => {
-  return typeof process !== 'undefined' && process.versions && !!process.versions.node;
+  return (
+    typeof process !== 'undefined' &&
+    process.versions &&
+    !!process.versions.node
+  );
 };
 
 /**
@@ -183,10 +214,10 @@ export const isNode = (): boolean => {
 export const generateHeadingId = (text: string): string | undefined => {
   // Step 1: Unicode normalization and accent removal
   let processed = text
-    .normalize('NFD')                       // Unicode normalization (decomposition)
-    .replace(/[\u0300-\u036f]/g, '')        // Remove combining characters (accents, etc.)
+    .normalize('NFD') // Unicode normalization (decomposition)
+    .replace(/[\u0300-\u036f]/g, '') // Remove combining characters (accents, etc.)
     .toLowerCase()
-    .replace(/\\[nrtbfv0]/g, '-')           // Replace escape sequence strings with hyphens
+    .replace(/\\[nrtbfv0]/g, '-') // Replace escape sequence strings with hyphens
     .replace(/[\x00-\x1F\x7F-\x9F]/g, '-'); // Replace actual control characters with hyphens
 
   // Step 2: Extract ASCII characters only
@@ -194,10 +225,10 @@ export const generateHeadingId = (text: string): string | undefined => {
 
   // Step 3: Generate valid ID from ASCII characters
   const finalId = asciiOnly
-    .replace(/[^\w\s-]/g, '')               // Remove non-word characters except spaces and hyphens
-    .replace(/\s+/g, '-')                   // Replace spaces with hyphens
-    .replace(/-+/g, '-')                    // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, '');                 // Remove leading/trailing hyphens
+    .replace(/[^\w\s-]/g, '') // Remove non-word characters except spaces and hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
 
   // Step 4: Return undefined if valid ID cannot be created (minimum 3 characters)
   if (finalId.length >= 3) {

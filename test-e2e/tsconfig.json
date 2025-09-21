@@ -25,13 +25,6 @@
       "mark-deco": ["../mark-deco/src/index.ts"]
     }
   },
-  "include": [
-    "*.ts",
-    "../test-shared/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "test-results"
-  ]
+  "include": ["*.ts", "../test-shared/**/*"],
+  "exclude": ["node_modules", "dist", "test-results"]
 }

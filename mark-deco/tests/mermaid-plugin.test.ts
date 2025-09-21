@@ -29,9 +29,9 @@ describe('MermaidPlugin', () => {
       frontmatter: {},
       fetcher: {
         rawFetcher: vi.fn(),
-        userAgent: 'test-user-agent'
+        userAgent: 'test-user-agent',
       },
-      getUniqueId: mockGetUniqueId
+      getUniqueId: mockGetUniqueId,
     };
   });
 
@@ -43,7 +43,10 @@ describe('MermaidPlugin', () => {
     });
 
     it('should create plugin with custom options', () => {
-      plugin = createMermaidPlugin({ className: 'custom-mermaid', includeId: true });
+      plugin = createMermaidPlugin({
+        className: 'custom-mermaid',
+        includeId: true,
+      });
       expect(plugin.name).toBe('mermaid');
     });
   });
@@ -134,7 +137,10 @@ describe('MermaidPlugin', () => {
     A --> B`;
       const contentWithWhitespace = `   \n${mermaidCode}\n   `;
 
-      const result = await plugin.processBlock(contentWithWhitespace, mockContext);
+      const result = await plugin.processBlock(
+        contentWithWhitespace,
+        mockContext
+      );
 
       const expectedHtml = `<div class="mermaid-wrapper">
   <style>
@@ -152,9 +158,15 @@ describe('MermaidPlugin', () => {
 
   describe('Custom Options', () => {
     it('should use custom className', async () => {
-      plugin = createMermaidPlugin({ className: 'custom-diagram', includeId: false });
+      plugin = createMermaidPlugin({
+        className: 'custom-diagram',
+        includeId: false,
+      });
 
-      const result = await plugin.processBlock('graph LR\nA --> B', mockContext);
+      const result = await plugin.processBlock(
+        'graph LR\nA --> B',
+        mockContext
+      );
 
       const expectedHtml = `<div class="custom-diagram-wrapper">
   <style>
@@ -172,7 +184,10 @@ describe('MermaidPlugin', () => {
     it('should include ID when includeId is true', async () => {
       plugin = createMermaidPlugin({ includeId: true });
 
-      const result = await plugin.processBlock('graph LR\nA --> B', mockContext);
+      const result = await plugin.processBlock(
+        'graph LR\nA --> B',
+        mockContext
+      );
 
       const expectedHtml = `<div class="mermaid-wrapper">
   <style>
@@ -191,7 +206,10 @@ describe('MermaidPlugin', () => {
     it('should not include ID when includeId is false', async () => {
       plugin = createMermaidPlugin({ includeId: false });
 
-      const result = await plugin.processBlock('graph LR\nA --> B', mockContext);
+      const result = await plugin.processBlock(
+        'graph LR\nA --> B',
+        mockContext
+      );
 
       const expectedHtml = `<div class="mermaid-wrapper">
   <style>
@@ -208,9 +226,15 @@ describe('MermaidPlugin', () => {
     });
 
     it('should combine custom className and includeId', async () => {
-      plugin = createMermaidPlugin({ className: 'my-mermaid', includeId: true });
+      plugin = createMermaidPlugin({
+        className: 'my-mermaid',
+        includeId: true,
+      });
 
-      const result = await plugin.processBlock('graph TD\nA --> B', mockContext);
+      const result = await plugin.processBlock(
+        'graph TD\nA --> B',
+        mockContext
+      );
 
       const expectedHtml = `<div class="my-mermaid-wrapper">
   <style>
@@ -310,13 +334,16 @@ describe('MermaidPlugin', () => {
     it('should process with frontmatter data present', async () => {
       const frontmatter: FrontmatterData = {
         title: 'Test Document',
-        mermaidTheme: 'dark'
+        mermaidTheme: 'dark',
       };
 
       // Update context with frontmatter
       const contextWithFrontmatter = { ...mockContext, frontmatter };
 
-      const result = await plugin.processBlock('graph LR\nA --> B', contextWithFrontmatter);
+      const result = await plugin.processBlock(
+        'graph LR\nA --> B',
+        contextWithFrontmatter
+      );
 
       const expectedHtml = `<div class="mermaid-wrapper">
   <style>
@@ -381,7 +408,10 @@ describe('MermaidPlugin', () => {
     it('should include ID attributes when includeId is true by default', async () => {
       plugin = createMermaidPlugin(); // Default includeId is true
 
-      const result = await plugin.processBlock('graph LR\nA --> B', mockContext);
+      const result = await plugin.processBlock(
+        'graph LR\nA --> B',
+        mockContext
+      );
 
       const expectedHtml = `<div class="mermaid-wrapper">
   <style>
@@ -402,7 +432,10 @@ describe('MermaidPlugin', () => {
     it('should not include ID attributes when includeId is false', async () => {
       plugin = createMermaidPlugin({ includeId: false });
 
-      const result = await plugin.processBlock('graph LR\nA --> B', mockContext);
+      const result = await plugin.processBlock(
+        'graph LR\nA --> B',
+        mockContext
+      );
 
       // Check that ID is not included
       expect(result).not.toContain('id=');
@@ -411,10 +444,18 @@ describe('MermaidPlugin', () => {
 
     it('should generate unique IDs for multiple diagrams', async () => {
       plugin = createMermaidPlugin({ includeId: true });
-      mockGetUniqueId.mockReturnValueOnce('first-id').mockReturnValueOnce('second-id');
+      mockGetUniqueId
+        .mockReturnValueOnce('first-id')
+        .mockReturnValueOnce('second-id');
 
-      const result1 = await plugin.processBlock('graph LR\nA --> B', mockContext);
-      const result2 = await plugin.processBlock('graph TD\nC --> D', mockContext);
+      const result1 = await plugin.processBlock(
+        'graph LR\nA --> B',
+        mockContext
+      );
+      const result2 = await plugin.processBlock(
+        'graph TD\nC --> D',
+        mockContext
+      );
 
       expect(result1).toContain('id="first-id"');
       expect(result2).toContain('id="second-id"');

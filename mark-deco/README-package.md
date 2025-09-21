@@ -11,10 +11,10 @@ A high-performance Markdown to HTML conversion library written in TypeScript.
 It interprets GitHub Flavored Markdown (GFM) and outputs HTML.
 Supports frontmatter parsing, heading analysis, source code formatting, oEmbed/card/Mermaid graph rendering, and custom code block processing through plugin extensions.
 
-* Can be used to render HTML from Markdown input.
-* Simple interface makes it very easy to use.
-* Highly independent with minimal runtime requirements. Works in both Node.js and browser environments.
-* Built-in plugins support oEmbed, cards, and Mermaid.js.
+- Can be used to render HTML from Markdown input.
+- Simple interface makes it very easy to use.
+- Highly independent with minimal runtime requirements. Works in both Node.js and browser environments.
+- Built-in plugins support oEmbed, cards, and Mermaid.js.
 
 ## Installation
 
@@ -34,7 +34,7 @@ const fetcher = createCachedFetcher('MyApp/1.0');
 
 // Create MarkDeco processor
 const processor = createMarkdownProcessor({
-  fetcher
+  fetcher,
 });
 
 // Markdown to convert
@@ -48,9 +48,7 @@ author: John Doe
 This is a test article.`;
 
 // Render HTML from Markdown input
-const result = await processor.process(
-  markdown,
-  "id");     // ID prefix for HTML elements (described later)
+const result = await processor.process(markdown, 'id'); // ID prefix for HTML elements (described later)
 
 // Generated HTML
 console.log(result.html);
@@ -85,11 +83,10 @@ const abortController = new AbortController();
 // ...
 
 // Convert Markdown to HTML
-const result = await processor.process(
-  markdown, "id",
-  { // Specify processor options
-    signal: abortController.signal,   // Cancellation support
-  });
+const result = await processor.process(markdown, 'id', {
+  // Specify processor options
+  signal: abortController.signal, // Cancellation support
+});
 ```
 
 For usage of `AbortController` and `AbortSignal`, refer to ECMAScript documentation.
@@ -99,8 +96,8 @@ For usage of `AbortController` and `AbortSignal`, refer to ECMAScript documentat
 Although MarkDeco is a library, a CLI interface is also available in the package that allows you to easily try out MarkDeco. This allows you to try out conversions without having to write code in TypeScript, or call it as an independent application from another code.
 
 ```bash
-# Take Markdown from standard input and output HTML 
-echo "# Hello World" | mark-deco-cli 
+# Take Markdown from standard input and output HTML
+echo "# Hello World" | mark-deco-cli
 ```
 
 ## Documentation
@@ -108,6 +105,7 @@ echo "# Hello World" | mark-deco-cli
 For detailed documentation and advanced features, please visit our [GitHub repository](https://github.com/kekyo/mark-deco).
 
 Key features include:
+
 - Frontmatter Information Extraction - Parse YAML frontmatter from Markdown files
 - Heading ID Generation and Heading Information Extraction - Automatically generate unique IDs for headings
 - Fetcher and Cache System - External HTTP request management with configurable caching
@@ -117,4 +115,4 @@ Key features include:
 
 ## License
 
-Under MIT. 
+Under MIT.

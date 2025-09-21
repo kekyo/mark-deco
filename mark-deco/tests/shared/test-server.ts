@@ -51,7 +51,8 @@ const isPortAvailable = (port: number): Promise<boolean> => {
  */
 const findAvailablePort = async (startPort: number): Promise<number> => {
   let port = startPort;
-  while (port < startPort + 100) { // Try up to 100 ports
+  while (port < startPort + 100) {
+    // Try up to 100 ports
     if (await isPortAvailable(port)) {
       return port;
     }
@@ -67,7 +68,7 @@ export function createTestServer(config: TestServerConfig): TestServer {
   const {
     preferredPort = 12345,
     contentsDir,
-    enableTemplateReplacement = true
+    enableTemplateReplacement = true,
   } = config;
 
   let server: http.Server | null = null;
@@ -119,7 +120,10 @@ export function createTestServer(config: TestServerConfig): TestServer {
     }
   };
 
-  const requestHandler = (req: http.IncomingMessage, res: http.ServerResponse) => {
+  const requestHandler = (
+    req: http.IncomingMessage,
+    res: http.ServerResponse
+  ) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -154,15 +158,27 @@ export function createTestServer(config: TestServerConfig): TestServer {
       let responseFile: string | null = null;
 
       // Determine which mock response to use based on URL
-      if (urlParam.includes('localhost') && urlParam.includes('/content/video-1')) {
+      if (
+        urlParam.includes('localhost') &&
+        urlParam.includes('/content/video-1')
+      ) {
         responseFile = 'oembed/test-video.json';
-      } else if (urlParam.includes('localhost') && urlParam.includes('/content/photo-1')) {
+      } else if (
+        urlParam.includes('localhost') &&
+        urlParam.includes('/content/photo-1')
+      ) {
         responseFile = 'oembed/test-photo.json';
       } else if (urlParam.includes('flickr.com/photos/bees/2362225867')) {
         responseFile = 'oembed/flickr-photo.json';
-      } else if (urlParam.includes('youtu.be/1La4QzGeaaQ') || urlParam.includes('youtube.com/watch?v=1La4QzGeaaQ')) {
+      } else if (
+        urlParam.includes('youtu.be/1La4QzGeaaQ') ||
+        urlParam.includes('youtube.com/watch?v=1La4QzGeaaQ')
+      ) {
         responseFile = 'oembed/youtube-video-short.json';
-      } else if (urlParam.includes('youtu.be/lwuMTMhY85c') || urlParam.includes('youtube.com/watch?v=lwuMTMhY85c')) {
+      } else if (
+        urlParam.includes('youtu.be/lwuMTMhY85c') ||
+        urlParam.includes('youtube.com/watch?v=lwuMTMhY85c')
+      ) {
         responseFile = 'oembed/youtube-video-43.json';
       } else {
         // Return a generic 404 for unsupported URLs
@@ -276,7 +292,7 @@ export function createTestServer(config: TestServerConfig): TestServer {
 
     get url() {
       return `http://localhost:${actualPort}`;
-    }
+    },
   };
 }
 
@@ -289,22 +305,27 @@ export function createViteServer(preferredPort: number = 63783): ViteServer {
 
   const checkServerReady = async (): Promise<boolean> => {
     try {
-      const response = await fetch(`http://localhost:${actualPort}/test-page.html`, {
-        method: 'HEAD',
-        signal: AbortSignal.timeout(5000)
-      });
+      const response = await fetch(
+        `http://localhost:${actualPort}/test-page.html`,
+        {
+          method: 'HEAD',
+          signal: AbortSignal.timeout(5000),
+        }
+      );
       return response.ok;
     } catch {
       return false;
     }
   };
 
-  const waitForServerReady = async (maxAttempts: number = 30): Promise<void> => {
+  const waitForServerReady = async (
+    maxAttempts: number = 30
+  ): Promise<void> => {
     for (let i = 0; i < maxAttempts; i++) {
       if (await checkServerReady()) {
         return;
       }
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
     throw new Error('Server failed to become ready within timeout');
   };
@@ -322,12 +343,19 @@ export function createViteServer(preferredPort: number = 63783): ViteServer {
       return new Promise((resolve, reject) => {
         // Start Vite development server with dynamic port
         // From tests/shared, go up to project root, then into test-e2e
-        const e2eDir = path.join(path.dirname(path.dirname(__dirname)), 'test-e2e');
-        viteProcess = spawn('npx', ['vite', '--port', actualPort.toString(), '--host', 'localhost'], {
-          cwd: e2eDir,
-          stdio: ['pipe', 'pipe', 'pipe'],
-          env: { ...process.env, NODE_ENV: 'development' }
-        });
+        const e2eDir = path.join(
+          path.dirname(path.dirname(__dirname)),
+          'test-e2e'
+        );
+        viteProcess = spawn(
+          'npx',
+          ['vite', '--port', actualPort.toString(), '--host', 'localhost'],
+          {
+            cwd: e2eDir,
+            stdio: ['pipe', 'pipe', 'pipe'],
+            env: { ...process.env, NODE_ENV: 'development' },
+          }
+        );
 
         let resolved = false;
 
@@ -337,10 +365,16 @@ export function createViteServer(preferredPort: number = 63783): ViteServer {
             try {
               // Wait for server to be ready
               await waitForServerReady();
-              console.log(`Vite development server started and ready on port ${actualPort}`);
+              console.log(
+                `Vite development server started and ready on port ${actualPort}`
+              );
               resolve();
             } catch (error) {
-              reject(new Error(`Vite server started but failed to become ready: ${error}`));
+              reject(
+                new Error(
+                  `Vite server started but failed to become ready: ${error}`
+                )
+              );
             }
           }
         };
@@ -356,9 +390,11 @@ export function createViteServer(preferredPort: number = 63783): ViteServer {
           viteProcess.stdout.on('data', (data) => {
             const output = data.toString();
             // Look for Vite startup messages indicating server is starting
-            if (output.includes('Local:') ||
-                output.includes(`localhost:${actualPort}`) ||
-                output.includes('ready in')) {
+            if (
+              output.includes('Local:') ||
+              output.includes(`localhost:${actualPort}`) ||
+              output.includes('ready in')
+            ) {
               // Wait a bit and then check if server is ready
               setTimeout(resolveOnce, 2000);
             }
@@ -369,7 +405,10 @@ export function createViteServer(preferredPort: number = 63783): ViteServer {
           viteProcess.stderr.on('data', (data) => {
             const output = data.toString();
             // Only reject on severe errors
-            if (output.includes('Error') && (output.includes('EADDRINUSE') || output.includes('EACCES'))) {
+            if (
+              output.includes('Error') &&
+              (output.includes('EADDRINUSE') || output.includes('EACCES'))
+            ) {
               rejectOnce(new Error(`Vite server error: ${output}`));
             }
           });
@@ -382,7 +421,11 @@ export function createViteServer(preferredPort: number = 63783): ViteServer {
 
         viteProcess.on('exit', (code, signal) => {
           if (!resolved) {
-            rejectOnce(new Error(`Vite process exited with code ${code}, signal ${signal}`));
+            rejectOnce(
+              new Error(
+                `Vite process exited with code ${code}, signal ${signal}`
+              )
+            );
           }
         });
 
@@ -414,6 +457,6 @@ export function createViteServer(preferredPort: number = 63783): ViteServer {
           resolve();
         }
       });
-    }
+    },
   };
 }

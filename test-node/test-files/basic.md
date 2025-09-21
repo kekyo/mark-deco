@@ -1,6 +1,6 @@
 ---
-title: "Basic Test"
-author: "Test User"
+title: 'Basic Test'
+author: 'Test User'
 ---
 
 # Basic Title

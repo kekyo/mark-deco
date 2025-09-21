@@ -21,7 +21,7 @@ This is an H2 heading subsection.
 
 This is the conclusion section.`;
 
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // Output heading information (described later)
 console.log(result.headingTree);
@@ -46,29 +46,28 @@ There's a feature to generate IDs that reflect heading hierarchy. When the `useH
 
 This feature generates heading IDs in the following format:
 
-| Heading Level | ID Format | Example |
-|------------|--------|-----|
-| H1 | `id-N` | `id-1`, `id-2`, `id-3` |
-| H2 | `id-N-M` | `id-1-1`, `id-1-2`, `id-2-1` |
-| H3 | `id-N-M-L` | `id-1-1-1`, `id-1-1-2`, `id-1-2-1` |
+| Heading Level | ID Format  | Example                            |
+| ------------- | ---------- | ---------------------------------- |
+| H1            | `id-N`     | `id-1`, `id-2`, `id-3`             |
+| H2            | `id-N-M`   | `id-1-1`, `id-1-2`, `id-2-1`       |
+| H3            | `id-N-M-L` | `id-1-1-1`, `id-1-1-2`, `id-1-2-1` |
 
 This makes heading structure clear and useful for navigation and table of contents generation.
 
 When `useHierarchicalHeadingId` is set to `false`, ID numbers are assigned sequentially rather than hierarchically:
 
 ```typescript
-const result = await processor.process(
-  markdown, "id", {
-    // Disable hierarchical heading IDs
-    useHierarchicalHeadingId: false
-  });
+const result = await processor.process(markdown, 'id', {
+  // Disable hierarchical heading IDs
+  useHierarchicalHeadingId: false,
+});
 ```
 
 Example heading ID generation with sequential numbering:
 
-| Heading Level | ID Format | Example |
-|------------|--------|-----|
-| All headings | `id-N` | `id-1`, `id-2`, `id-3`, `id-4`, `id-5` |
+| Heading Level | ID Format | Example                                |
+| ------------- | --------- | -------------------------------------- |
+| All headings  | `id-N`    | `id-1`, `id-2`, `id-3`, `id-4`, `id-5` |
 
 Note: In sequential mode, all headings in the document are assigned numbers sequentially regardless of heading level.
 
@@ -79,20 +78,21 @@ You can customize the prefix used for IDs. These can be used to generate unique 
 ```typescript
 // Specify ID prefix as the second argument
 // Generated IDs: "id-1", "id-2", "id-3", etc.
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // Generated IDs: "section-1", "section-2", "section-3", etc.
-const result = await processor.process(markdown, "section");
+const result = await processor.process(markdown, 'section');
 
 // Content-based IDs (<h?> tags only, described later)
-const result = await processor.process(markdown, "id", {
-  useContentStringHeaderId: true
+const result = await processor.process(markdown, 'id', {
+  useContentStringHeaderId: true,
 });
 
 // Example of making IDs completely unique when generating multiple HTMLs:
 // "id1-1", "id1-2", "id2-1", "id2-2", "id3-1" ...
 const results = await Promise.all(
-  markdowns.map((markdown, index) => processor.process(markdown, `id${index}`)));
+  markdowns.map((markdown, index) => processor.process(markdown, `id${index}`))
+);
 ```
 
 ### Content-Based IDs
@@ -107,8 +107,8 @@ const markdown = `# Hello world
 
 ### Subsection`;
 
-const result = await processor.process(markdown, "id", {
-  useContentStringHeaderId: true
+const result = await processor.process(markdown, 'id', {
+  useContentStringHeaderId: true,
 });
 ```
 
@@ -126,56 +126,56 @@ When using content-based IDs, the processor employs sophisticated fallback strat
 
 Normalizes European language accents to ASCII equivalent characters:
 
-* Input: "Café Naïve"
-* Output: "cafe-naive"
+- Input: "Café Naïve"
+- Output: "cafe-naive"
 
-* Input: "Résumé"
-* Output: "resume"
+- Input: "Résumé"
+- Output: "resume"
 
 #### Step 2: Control Character Processing
 
 Converts escape sequences and control characters to hyphens:
 
-* Input: "Section\n\nTitle"
-* Output: "section-title"
+- Input: "Section\n\nTitle"
+- Output: "section-title"
 
-* Input: "Hello\tWorld"
-* Output: "hello-world"
+- Input: "Hello\tWorld"
+- Output: "hello-world"
 
 #### Step 3: ASCII Character Extraction
 
 Removes non-ASCII characters (Japanese, Chinese, emojis, etc.):
 
-* Input: "Hello 世界 World"
-* Output: "hello-world"
+- Input: "Hello 世界 World"
+- Output: "hello-world"
 
-* Input: "🎉 lucky time!"
-* Output: "lucky-time"
+- Input: "🎉 lucky time!"
+- Output: "lucky-time"
 
 #### Step 4: Invalid ID Fallback
 
 When the resulting ID is too short (less than 3 characters) or empty, the processor falls back to unique IDs:
 
-* Input: "こんにちは" (Japanese only)
-* Output: "id-1" (fallback)
+- Input: "こんにちは" (Japanese only)
+- Output: "id-1" (fallback)
 
-* Input: "🎉" (emoji only)
-* Output: "id-2" (fallback)
+- Input: "🎉" (emoji only)
+- Output: "id-2" (fallback)
 
-* Input: "A" (too short)
-* Output: "id-3" (fallback)
+- Input: "A" (too short)
+- Output: "id-3" (fallback)
 
 ### ID Generation Examples
 
-|Input Heading|Generated ID|Processing|
-|:----|:----|:----|
-|`"Hello World"`|`"hello-world"`|Standard processing|
-|`"Café Naïve"`|`"cafe-naive"`|Unicode normalization|
-|`"Section\n\nTwo"`|`"section-two"`|Control character processing|
-|`"Hello 世界"`|`"hello"`|Non-ASCII removal|
-|`"こんにちは"`|`"id-1"`|Fallback (non-ASCII only)|
-|`"🎉 パーティー"`|`"id-2"`|Fallback (emoji + Japanese)|
-|`"A"`|`"id-3"`|Fallback (too short)|
+| Input Heading      | Generated ID    | Processing                   |
+| :----------------- | :-------------- | :--------------------------- |
+| `"Hello World"`    | `"hello-world"` | Standard processing          |
+| `"Café Naïve"`     | `"cafe-naive"`  | Unicode normalization        |
+| `"Section\n\nTwo"` | `"section-two"` | Control character processing |
+| `"Hello 世界"`     | `"hello"`       | Non-ASCII removal            |
+| `"こんにちは"`     | `"id-1"`        | Fallback (non-ASCII only)    |
+| `"🎉 パーティー"`  | `"id-2"`        | Fallback (emoji + Japanese)  |
+| `"A"`              | `"id-3"`        | Fallback (too short)         |
 
 Note: While many sites adopt such content-based IDs, MarkDeco doesn't use them by default.
 The reason is that building IDs with non-English characters makes them very difficult to recognize and manage, and search systems don't particularly value them highly nowadays.

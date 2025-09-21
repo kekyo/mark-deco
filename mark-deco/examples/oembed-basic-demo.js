@@ -1,15 +1,20 @@
-import { createMarkdownProcessor, createOEmbedPlugin, createCachedFetcher, defaultProviderList } from '../dist/index.js';
+import {
+  createMarkdownProcessor,
+  createOEmbedPlugin,
+  createCachedFetcher,
+  defaultProviderList,
+} from '../dist/index.js';
 
 // Create fetcher with user agent
 const fetchData = createCachedFetcher({
-  userAgent: 'oembed-basic-demo/1.0.0'
+  userAgent: 'oembed-basic-demo/1.0.0',
 });
 
 // Create oEmbed plugin
 const oembedPlugin = createOEmbedPlugin(defaultProviderList);
 const processor = createMarkdownProcessor({
   fetcher: fetchData,
-  plugins: [oembedPlugin]
+  plugins: [oembedPlugin],
 });
 
 // Test Markdown content
@@ -43,21 +48,20 @@ console.log('Hello World');
 async function main() {
   try {
     console.log('Starting oEmbed plugin test...\n');
-    
-    const result = await processor.process(markdown, "demo");
-    
+
+    const result = await processor.process(markdown, 'demo');
+
     console.log('=== Generated HTML ===');
     console.log(result.html);
-    
+
     console.log('\n=== Frontmatter ===');
     console.log(result.frontmatter);
-    
+
     console.log('\n=== Heading Tree ===');
     console.log(JSON.stringify(result.headingTree, null, 2));
-    
   } catch (error) {
     console.error('An error occurred:', error);
   }
 }
 
-main(); 
+main();

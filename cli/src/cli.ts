@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import { loadConfig } from './config.js';
 import { readInput, writeOutput, writeJsonOutput } from './io.js';
 import { setupProcessor } from './processor.js';
@@ -24,21 +24,58 @@ const program = new Command();
 async function main() {
   program
     .name('mark-deco-cli')
-    .description('MarkDeco - Markdown to HTML conversion processor.\nCopyright (c) Kouji Matsui (@kekyo@mi.kekyo.net)')
+    .summary(
+      'MarkDeco - Markdown to HTML conversion processor.\nCopyright (c) Kouji Matsui (@kekyo@mi.kekyo.net)'
+    )
     .version(__VERSION__);
 
   program
-    .option('-i, --input <file>', 'Input markdown file (default: stdin)')
-    .option('-o, --output <file>', 'Output HTML file (default: stdout)')
-    .option('-c, --config <file>', 'Configuration file path')
-    .option('-p, --plugins [plugins...]', 'Enable specific plugins (oembed, card, mermaid)')
-    .option('--no-plugins', 'Disable all default plugins')
-    .option('--unique-id-prefix <prefix>', 'Prefix for unique IDs', 'section')
-    .option('--hierarchical-heading-id', 'Use hierarchical heading IDs', true)
-    .option('--content-based-heading-id', 'Use content-based heading IDs', false)
-    .option('--frontmatter-output <file>', 'Output frontmatter as JSON to specified file')
-    .option('--heading-tree-output <file>', 'Output heading tree as JSON to specified file')
-    .action(async (options: CLIOptions) => {
+    .addOption(
+      new Option('-i, --input <file>', 'Input markdown file (default: stdin)')
+    )
+    .addOption(
+      new Option('-o, --output <file>', 'Output HTML file (default: stdout)')
+    )
+    .addOption(new Option('-c, --config <file>', 'Configuration file path'))
+    .addOption(
+      new Option(
+        '-p, --plugins [plugins...]',
+        'Enable specific plugins (oembed, card, mermaid)'
+      )
+    )
+    .addOption(new Option('--no-plugins', 'Disable all default plugins'))
+    .addOption(
+      new Option(
+        '--unique-id-prefix <prefix>',
+        'Prefix for unique IDs'
+      ).default('section')
+    )
+    .addOption(
+      new Option(
+        '--hierarchical-heading-id',
+        'Use hierarchical heading IDs'
+      ).default(true)
+    )
+    .addOption(
+      new Option(
+        '--content-based-heading-id',
+        'Use content-based heading IDs'
+      ).default(false)
+    )
+    .addOption(
+      new Option(
+        '--frontmatter-output <file>',
+        'Output frontmatter as JSON to specified file'
+      )
+    )
+    .addOption(
+      new Option(
+        '--heading-tree-output <file>',
+        'Output heading tree as JSON to specified file'
+      )
+    )
+    .action(async () => {
+      const options = program.opts<CLIOptions>();
       try {
         // Load configuration
         const config = await loadConfig(options.config);
@@ -53,10 +90,14 @@ async function main() {
         const processor = setupProcessor(mergedOptions);
 
         // Process markdown
-        const result = await processor.process(markdown, options.uniqueIdPrefix || 'section', {
-          useHierarchicalHeadingId: options.hierarchicalHeadingId ?? true,
-          useContentStringHeaderId: options.contentBasedHeadingId ?? false
-        });
+        const result = await processor.process(
+          markdown,
+          options.uniqueIdPrefix || 'section',
+          {
+            useHierarchicalHeadingId: options.hierarchicalHeadingId ?? true,
+            useContentStringHeaderId: options.contentBasedHeadingId ?? false,
+          }
+        );
 
         // Write output
         await writeOutput(result.html, options.output);
@@ -70,9 +111,11 @@ async function main() {
         if (options.headingTreeOutput) {
           await writeJsonOutput(result.headingTree, options.headingTreeOutput);
         }
-
       } catch (error) {
-        console.error('Error:', error instanceof Error ? error.message : String(error));
+        console.error(
+          'Error:',
+          error instanceof Error ? error.message : String(error)
+        );
         process.exit(1);
       }
     });
@@ -89,6 +132,14 @@ async function main() {
   });
 
   // Parse command line arguments
+  const userArgs = process.argv.slice(2);
+  if (
+    userArgs.length === 0 ||
+    userArgs.includes('--help') ||
+    userArgs.includes('-h')
+  ) {
+    console.log('Enhanced markdown processor with plugin support');
+  }
   program.parse();
 }
 

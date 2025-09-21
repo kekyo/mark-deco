@@ -1,5 +1,15 @@
-import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest';
-import { generateCacheKey, createMemoryCacheStorage } from '../src/cache/index.js';
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  vi,
+  type MockedFunction,
+} from 'vitest';
+import {
+  generateCacheKey,
+  createMemoryCacheStorage,
+} from '../src/cache/index.js';
 import { createCachedFetcher } from '../src/fetcher.js';
 
 // Mock fetch globally
@@ -29,23 +39,28 @@ describe('createCachedFetcher', () => {
     const url = 'https://api.example.com/data';
     const accept = 'application/json';
 
-    mockFetch.mockResolvedValueOnce(new Response('{"test": "data"}', {
-      status: 200,
-      headers: { 'Content-Type': accept }
-    }));
+    mockFetch.mockResolvedValueOnce(
+      new Response('{"test": "data"}', {
+        status: 200,
+        headers: { 'Content-Type': accept },
+      })
+    );
 
     const fetcherInterface = createCachedFetcher(userAgent, timeout);
     const response = await fetcherInterface.rawFetcher(url, accept, undefined);
 
     expect(mockFetch).toHaveBeenCalledOnce();
-    expect(mockFetch).toHaveBeenCalledWith(url, expect.objectContaining({
-      method: 'GET',
-      headers: expect.objectContaining({
-        'Accept': accept,
-        'User-Agent': userAgent
-      }),
-      signal: expect.any(AbortSignal)
-    }));
+    expect(mockFetch).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Accept: accept,
+          'User-Agent': userAgent,
+        }),
+        signal: expect.any(AbortSignal),
+      })
+    );
     expect(response).toBeInstanceOf(Response);
   });
 
@@ -55,23 +70,28 @@ describe('createCachedFetcher', () => {
     const url = 'https://api.example.com/data';
     const accept = 'application/json';
 
-    mockFetch.mockResolvedValueOnce(new Response('{"test": "data"}', {
-      status: 200,
-      headers: { 'Content-Type': accept }
-    }));
+    mockFetch.mockResolvedValueOnce(
+      new Response('{"test": "data"}', {
+        status: 200,
+        headers: { 'Content-Type': accept },
+      })
+    );
 
     const fetcherInterface = createCachedFetcher(userAgent, timeout);
     const response = await fetcherInterface.rawFetcher(url, accept, undefined);
 
     expect(mockFetch).toHaveBeenCalledOnce();
-    expect(mockFetch).toHaveBeenCalledWith(url, expect.objectContaining({
-      method: 'GET',
-      headers: expect.objectContaining({
-        'Accept': accept,
-        'User-Agent': userAgent
-      }),
-      signal: expect.any(AbortSignal)
-    }));
+    expect(mockFetch).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Accept: accept,
+          'User-Agent': userAgent,
+        }),
+        signal: expect.any(AbortSignal),
+      })
+    );
     expect(response).toBeInstanceOf(Response);
     // Should have the specified userAgent
     expect(fetcherInterface.userAgent).toBe(userAgent);
@@ -90,9 +110,12 @@ describe('createCachedFetcher', () => {
     await fetcherInterface.rawFetcher(url, accept, abortController.signal);
 
     expect(mockFetch).toHaveBeenCalledOnce();
-    expect(mockFetch).toHaveBeenCalledWith(url, expect.objectContaining({
-      signal: expect.any(AbortSignal)
-    }));
+    expect(mockFetch).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        signal: expect.any(AbortSignal),
+      })
+    );
   });
 
   it('should handle HTTP errors correctly', async () => {
@@ -105,7 +128,9 @@ describe('createCachedFetcher', () => {
 
     const fetcherInterface = createCachedFetcher(userAgent, timeout);
 
-    await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('HTTP error, status: 404');
+    await expect(
+      fetcherInterface.rawFetcher(url, accept, undefined)
+    ).rejects.toThrow('HTTP error, status: 404');
     expect(mockFetch).toHaveBeenCalledOnce();
   });
 
@@ -119,7 +144,9 @@ describe('createCachedFetcher', () => {
 
     const fetcherInterface = createCachedFetcher(userAgent, timeout);
 
-    await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('Network error');
+    await expect(
+      fetcherInterface.rawFetcher(url, accept, undefined)
+    ).rejects.toThrow('Network error');
     expect(mockFetch).toHaveBeenCalledOnce();
   });
 
@@ -149,7 +176,9 @@ describe('createCachedFetcher', () => {
 
     const fetcherInterface = createCachedFetcher(userAgent, timeout);
 
-    await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow();
+    await expect(
+      fetcherInterface.rawFetcher(url, accept, undefined)
+    ).rejects.toThrow();
     expect(mockFetch).toHaveBeenCalledOnce();
   });
 
@@ -172,20 +201,30 @@ describe('createCachedFetcher', () => {
       const accept = 'application/json';
       const responseData = '{"cached": true}';
 
-      mockFetch.mockResolvedValue(new Response(responseData, {
-        status: 200,
-        headers: { 'Content-Type': accept }
-      }));
+      mockFetch.mockResolvedValue(
+        new Response(responseData, {
+          status: 200,
+          headers: { 'Content-Type': accept },
+        })
+      );
 
       const fetcherInterface = createCachedFetcher(userAgent, timeout);
 
       // First request - should hit network
-      const response1 = await fetcherInterface.rawFetcher(url, accept, undefined);
+      const response1 = await fetcherInterface.rawFetcher(
+        url,
+        accept,
+        undefined
+      );
       expect(mockFetch).toHaveBeenCalledOnce();
       expect(await response1.text()).toBe(responseData);
 
       // Second request - should hit cache
-      const response2 = await fetcherInterface.rawFetcher(url, accept, undefined);
+      const response2 = await fetcherInterface.rawFetcher(
+        url,
+        accept,
+        undefined
+      );
       expect(mockFetch).toHaveBeenCalledOnce(); // Still only one call
       expect(await response2.text()).toBe(responseData);
       expect(response2.headers.get('X-Cache')).toBe('HIT');
@@ -197,16 +236,27 @@ describe('createCachedFetcher', () => {
       const url = 'https://api.example.com/not-cached-error';
       const accept = 'application/json';
 
-      mockFetch.mockResolvedValue(new Response('Server Error', { status: 500 }));
+      mockFetch.mockResolvedValue(
+        new Response('Server Error', { status: 500 })
+      );
 
-      const fetcherInterface = createCachedFetcher(userAgent, timeout, undefined, {
-        cache: true,
-        cacheFailures: false // Disable failure caching
-      });
+      const fetcherInterface = createCachedFetcher(
+        userAgent,
+        timeout,
+        undefined,
+        {
+          cache: true,
+          cacheFailures: false, // Disable failure caching
+        }
+      );
 
       // Both requests should hit network
-      await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('HTTP error, status: 500');
-      await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('HTTP error, status: 500');
+      await expect(
+        fetcherInterface.rawFetcher(url, accept, undefined)
+      ).rejects.toThrow('HTTP error, status: 500');
+      await expect(
+        fetcherInterface.rawFetcher(url, accept, undefined)
+      ).rejects.toThrow('HTTP error, status: 500');
 
       expect(mockFetch).toHaveBeenCalledTimes(2); // Both requests hit network
     });
@@ -223,24 +273,37 @@ describe('createCachedFetcher', () => {
         debug: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
-        error: vi.fn()
+        error: vi.fn(),
       };
 
-      const fetcherInterface = createCachedFetcher(userAgent, timeout, undefined, {
-        cache: true,
-        cacheFailures: true,
-        failureCacheTTL: 1000
-      });
+      const fetcherInterface = createCachedFetcher(
+        userAgent,
+        timeout,
+        undefined,
+        {
+          cache: true,
+          cacheFailures: true,
+          failureCacheTTL: 1000,
+        }
+      );
 
       // First request should hit network and fail
-      await expect(fetcherInterface.rawFetcher(url, accept, undefined, mockLogger)).rejects.toThrow('HTTP error, status: 404');
+      await expect(
+        fetcherInterface.rawFetcher(url, accept, undefined, mockLogger)
+      ).rejects.toThrow('HTTP error, status: 404');
       expect(mockFetch).toHaveBeenCalledOnce();
-      expect(mockLogger.info).toHaveBeenCalledWith('Cache MISS for URL: https://api.example.com/error-cached');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Cache MISS for URL: https://api.example.com/error-cached'
+      );
 
       // Second request should use cached failure
-      await expect(fetcherInterface.rawFetcher(url, accept, undefined, mockLogger)).rejects.toThrow('Cached error');
+      await expect(
+        fetcherInterface.rawFetcher(url, accept, undefined, mockLogger)
+      ).rejects.toThrow('Cached error');
       expect(mockFetch).toHaveBeenCalledOnce(); // Still only one call
-      expect(mockLogger.info).toHaveBeenCalledWith('Cache HIT (error) for URL: https://api.example.com/error-cached');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Cache HIT (error) for URL: https://api.example.com/error-cached'
+      );
     });
 
     it('should cache network errors when cacheFailures is enabled', async () => {
@@ -251,18 +314,27 @@ describe('createCachedFetcher', () => {
 
       mockFetch.mockRejectedValue(new Error('Network error'));
 
-      const fetcherInterface = createCachedFetcher(userAgent, timeout, undefined, {
-        cache: true,
-        cacheFailures: true,
-        failureCacheTTL: 1000
-      });
+      const fetcherInterface = createCachedFetcher(
+        userAgent,
+        timeout,
+        undefined,
+        {
+          cache: true,
+          cacheFailures: true,
+          failureCacheTTL: 1000,
+        }
+      );
 
       // First request should hit network and fail
-      await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('Network error');
+      await expect(
+        fetcherInterface.rawFetcher(url, accept, undefined)
+      ).rejects.toThrow('Network error');
       expect(mockFetch).toHaveBeenCalledOnce();
 
       // Second request should use cached failure
-      await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('Cached error');
+      await expect(
+        fetcherInterface.rawFetcher(url, accept, undefined)
+      ).rejects.toThrow('Cached error');
       expect(mockFetch).toHaveBeenCalledOnce(); // Still only one call
     });
 
@@ -272,24 +344,35 @@ describe('createCachedFetcher', () => {
       const url = 'https://api.example.com/ttl-error';
       const accept = 'application/json';
 
-      mockFetch.mockResolvedValue(new Response('Service Unavailable', { status: 503 }));
+      mockFetch.mockResolvedValue(
+        new Response('Service Unavailable', { status: 503 })
+      );
 
       const failureCacheTTL = 50; // 50ms
-      const fetcherInterface = createCachedFetcher(userAgent, timeout, undefined, {
-        cache: true,
-        cacheFailures: true,
-        failureCacheTTL
-      });
+      const fetcherInterface = createCachedFetcher(
+        userAgent,
+        timeout,
+        undefined,
+        {
+          cache: true,
+          cacheFailures: true,
+          failureCacheTTL,
+        }
+      );
 
       // First request should hit network and fail
-      await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('HTTP error, status: 503');
+      await expect(
+        fetcherInterface.rawFetcher(url, accept, undefined)
+      ).rejects.toThrow('HTTP error, status: 503');
       expect(mockFetch).toHaveBeenCalledOnce();
 
       // Wait for cache to expire
-      await new Promise(resolve => setTimeout(resolve, failureCacheTTL + 10));
+      await new Promise((resolve) => setTimeout(resolve, failureCacheTTL + 10));
 
       // Third request should hit network again after TTL expiry
-      await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('HTTP error, status: 503');
+      await expect(
+        fetcherInterface.rawFetcher(url, accept, undefined)
+      ).rejects.toThrow('HTTP error, status: 503');
       expect(mockFetch).toHaveBeenCalledTimes(2);
     });
 
@@ -300,16 +383,23 @@ describe('createCachedFetcher', () => {
       const accept = 'application/json';
       const responseData = '{"ttl": "test"}';
 
-      mockFetch.mockResolvedValue(new Response(responseData, {
-        status: 200,
-        headers: { 'Content-Type': accept }
-      }));
+      mockFetch.mockResolvedValue(
+        new Response(responseData, {
+          status: 200,
+          headers: { 'Content-Type': accept },
+        })
+      );
 
       const cacheTTL = 50; // 50ms
-      const fetcherInterface = createCachedFetcher(userAgent, timeout, undefined, {
-        cache: true,
-        cacheTTL
-      });
+      const fetcherInterface = createCachedFetcher(
+        userAgent,
+        timeout,
+        undefined,
+        {
+          cache: true,
+          cacheTTL,
+        }
+      );
 
       // First request
       await fetcherInterface.rawFetcher(url, accept, undefined);
@@ -320,7 +410,7 @@ describe('createCachedFetcher', () => {
       expect(mockFetch).toHaveBeenCalledOnce();
 
       // Wait for cache to expire
-      await new Promise(resolve => setTimeout(resolve, cacheTTL + 10));
+      await new Promise((resolve) => setTimeout(resolve, cacheTTL + 10));
 
       // Third request should hit network again
       await fetcherInterface.rawFetcher(url, accept, undefined);
@@ -334,14 +424,21 @@ describe('createCachedFetcher', () => {
       const accept = 'application/json';
       const responseData = '{"cache": false}';
 
-      mockFetch.mockResolvedValue(new Response(responseData, {
-        status: 200,
-        headers: { 'Content-Type': accept }
-      }));
+      mockFetch.mockResolvedValue(
+        new Response(responseData, {
+          status: 200,
+          headers: { 'Content-Type': accept },
+        })
+      );
 
-      const fetcherInterface = createCachedFetcher(userAgent, timeout, undefined, {
-        cache: false // Disable caching
-      });
+      const fetcherInterface = createCachedFetcher(
+        userAgent,
+        timeout,
+        undefined,
+        {
+          cache: false, // Disable caching
+        }
+      );
 
       // Both requests should hit network
       await fetcherInterface.rawFetcher(url, accept, undefined);
@@ -361,18 +458,30 @@ describe('createCachedFetcher', () => {
       const cacheKey = generateCacheKey(url, accept, userAgent);
 
       // Pre-populate cache
-      await customCache.set(cacheKey, JSON.stringify({
-        type: 'success',
-        data: responseData,
-        timestamp: Date.now()
-      }));
+      await customCache.set(
+        cacheKey,
+        JSON.stringify({
+          type: 'success',
+          data: responseData,
+          timestamp: Date.now(),
+        })
+      );
 
-      const fetcherInterface = createCachedFetcher(userAgent, timeout, customCache, {
-        cache: true
-      });
+      const fetcherInterface = createCachedFetcher(
+        userAgent,
+        timeout,
+        customCache,
+        {
+          cache: true,
+        }
+      );
 
       // Should return cached data without hitting network
-      const response = await fetcherInterface.rawFetcher(url, accept, undefined);
+      const response = await fetcherInterface.rawFetcher(
+        url,
+        accept,
+        undefined
+      );
       expect(mockFetch).not.toHaveBeenCalled();
       expect(await response.text()).toBe(responseData);
       expect(response.headers.get('X-Cache')).toBe('HIT');

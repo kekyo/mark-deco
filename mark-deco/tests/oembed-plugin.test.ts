@@ -14,7 +14,10 @@ describe('OEmbedPlugin', () => {
     mockPlugin = createMockOEmbedPlugin();
     plugin = mockPlugin;
     const testFetcher = createCachedFetcher('test-userAgent', 5000);
-    processor = createMarkdownProcessor({ plugins: [plugin], fetcher: testFetcher });
+    processor = createMarkdownProcessor({
+      plugins: [plugin],
+      fetcher: testFetcher,
+    });
   });
 
   it('should create plugin with correct name', () => {
@@ -34,21 +37,28 @@ describe('OEmbedPlugin', () => {
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: testFetcher,
-        getUniqueId: () => { throw new Error('Not implemented'); }
+        getUniqueId: () => {
+          throw new Error('Not implemented');
+        },
       };
       // Direct plugin call should throw error for invalid URL
-      await expect(mockPlugin.processBlock('invalid-url', context)).rejects.toThrow('Invalid URL: invalid-url');
+      await expect(
+        mockPlugin.processBlock('invalid-url', context)
+      ).rejects.toThrow('Invalid URL: invalid-url');
     });
 
     it('should handle unsupported providers gracefully in Node.js environment', async () => {
-      const markdown = '```oembed\nhttps://unsupported-provider.mock/some-content\n```';
-      const result = await processor.process(markdown, "id");
+      const markdown =
+        '```oembed\nhttps://unsupported-provider.mock/some-content\n```';
+      const result = await processor.process(markdown, 'id');
 
       // In Node.js environment, should return fallback HTML
       expect(result.html).toContain('oembed-container oembed-fallback');
       expect(result.html).toContain('External Content');
       expect(result.html).toContain('unsupported-provider.mock');
-      expect(result.html).toContain('https://unsupported-provider.mock/some-content');
+      expect(result.html).toContain(
+        'https://unsupported-provider.mock/some-content'
+      );
     });
 
     it('should return fallback HTML for unsupported provider when called directly in Node.js', async () => {
@@ -58,10 +68,15 @@ describe('OEmbedPlugin', () => {
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: testFetcher,
-        getUniqueId: () => { throw new Error('Not implemented'); }
+        getUniqueId: () => {
+          throw new Error('Not implemented');
+        },
       };
       // In Node.js environment, should return fallback HTML instead of throwing
-      const result = await mockPlugin.processBlock('https://unsupported-provider.com/content', context);
+      const result = await mockPlugin.processBlock(
+        'https://unsupported-provider.com/content',
+        context
+      );
       expect(result).toContain('oembed-container oembed-fallback');
       expect(result).toContain('External Content');
       expect(result).toContain('unsupported-provider.com');
@@ -71,14 +86,16 @@ describe('OEmbedPlugin', () => {
       const markdown = '```oembed\ninvalid-url\n```';
 
       // Should propagate the plugin error
-      await expect(processor.process(markdown, "id")).rejects.toThrow('Failed to process markdown: Invalid URL: invalid-url');
+      await expect(processor.process(markdown, 'id')).rejects.toThrow(
+        'Failed to process markdown: Invalid URL: invalid-url'
+      );
     });
   });
 
   describe('Node.js environment behavior', () => {
     it('should return mock video HTML for YouTube URLs', async () => {
       const markdown = '```oembed\nhttps://youtu.be/1La4QzGeaaQ\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       expect(result.html).toContain('oembed-container oembed-video');
       expect(result.html).toContain('Peru 8K HDR 60FPS');
@@ -86,8 +103,9 @@ describe('OEmbedPlugin', () => {
     });
 
     it('should return mock photo HTML for Flickr URLs', async () => {
-      const markdown = '```oembed\nhttps://flickr.com/photos/bees/2362225867/\n```';
-      const result = await processor.process(markdown, "id");
+      const markdown =
+        '```oembed\nhttps://flickr.com/photos/bees/2362225867/\n```';
+      const result = await processor.process(markdown, 'id');
 
       expect(result.html).toContain('oembed-container oembed-photo');
       expect(result.html).toContain('Bacon Lollys');
@@ -107,7 +125,7 @@ Some text in between.
 https://flickr.com/photos/bees/2362225867/
 \`\`\``;
 
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // Should contain both mock embeds
       expect(result.html).toContain('oembed-video');
@@ -119,14 +137,17 @@ https://flickr.com/photos/bees/2362225867/
     it('should process multiple oEmbed URLs in one block', async () => {
       const plugin = createMockOEmbedPlugin();
       const testFetcher = createCachedFetcher('test-userAgent', 5000);
-      const processor = createMarkdownProcessor({ plugins: [plugin], fetcher: testFetcher });
+      const processor = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: testFetcher,
+      });
 
       const markdown = `\`\`\`oembed
 https://www.youtube.com/watch?v=dQw4w9WgXcQ
 https://vimeo.com/123456789
 \`\`\``;
 
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // When multiple URLs exist, only the first URL is processed
       expect(result.html).toContain('Peru 8K HDR 60FPS');
@@ -140,7 +161,10 @@ https://vimeo.com/123456789
     it('should process oEmbed blocks correctly', async () => {
       const plugin = createMockOEmbedPlugin();
       const testFetcher = createCachedFetcher('test-userAgent', 5000);
-      const processor = createMarkdownProcessor({ plugins: [plugin], fetcher: testFetcher });
+      const processor = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: testFetcher,
+      });
 
       const markdown = `# Test
 
@@ -148,7 +172,10 @@ https://vimeo.com/123456789
 https://www.youtube.com/watch?v=dQw4w9WgXcQ
 \`\`\``;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-test">Test</h1>');
       expect(result.html).toContain('Peru 8K HDR 60FPS');
@@ -166,9 +193,12 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: testFetcher,
-        getUniqueId: () => { throw new Error('Not implemented'); }
+        getUniqueId: () => {
+          throw new Error('Not implemented');
+        },
       };
-      const url = 'https://test-provider.mock/test?param=<script>alert("xss")</script>';
+      const url =
+        'https://test-provider.mock/test?param=<script>alert("xss")</script>';
       const html = await mockPlugin.processBlock(url, context);
 
       expect(html).toContain('oembed-container oembed-fallback');
@@ -185,9 +215,14 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: testFetcher,
-        getUniqueId: () => { throw new Error('Not implemented'); }
+        getUniqueId: () => {
+          throw new Error('Not implemented');
+        },
       };
-      const html = await mockPlugin.processBlock('https://test-provider.mock/test', context);
+      const html = await mockPlugin.processBlock(
+        'https://test-provider.mock/test',
+        context
+      );
 
       expect(html).toContain('oembed-container oembed-fallback');
       expect(html).toContain('oembed-header');
@@ -201,8 +236,9 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
   describe('Error handling', () => {
     it('should return fallback HTML when provider is not supported in Node.js', async () => {
-      const markdown = '```oembed\nhttps://unsupported-provider.com/content\n```';
-      const result = await processor.process(markdown, "id");
+      const markdown =
+        '```oembed\nhttps://unsupported-provider.com/content\n```';
+      const result = await processor.process(markdown, 'id');
 
       // Should return fallback HTML instead of code block in Node.js
       expect(result.html).toContain('oembed-container oembed-fallback');
@@ -211,7 +247,7 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
     it('should handle network errors gracefully', async () => {
       const markdown = '```oembed\nhttps://network-error.mock/content\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // Should return fallback HTML for network errors
       expect(result.html).toContain('oembed-container oembed-fallback');
@@ -223,10 +259,13 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
     it('should handle CORS errors in browser environment', async () => {
       const plugin = createMockOEmbedPlugin();
       const testFetcher = createCachedFetcher('test-userAgent', 5000);
-      const processor = createMarkdownProcessor({ plugins: [plugin], fetcher: testFetcher });
+      const processor = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: testFetcher,
+      });
 
       const markdown = '```oembed\nhttps://cors-error.mock/content\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // Should return fallback HTML for CORS errors
       expect(result.html).toContain('oembed-container oembed-fallback');
@@ -236,10 +275,13 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
     it('should handle browser environment gracefully', async () => {
       const plugin = createMockOEmbedPlugin();
       const testFetcher = createCachedFetcher('test-userAgent', 5000);
-      const processor = createMarkdownProcessor({ plugins: [plugin], fetcher: testFetcher });
+      const processor = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: testFetcher,
+      });
 
       const markdown = '```oembed\nhttps://browser-test.mock/content\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // Should return fallback HTML in browser environment
       expect(result.html).toContain('oembed-container oembed-fallback');
@@ -251,10 +293,13 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
     it('should use metadata URL when useMetadataUrlLink is true', async () => {
       const plugin = createMockOEmbedPlugin({ useMetadataUrlLink: true });
       const testFetcher = createCachedFetcher('test-userAgent', 5000);
-      const processor = createMarkdownProcessor({ plugins: [plugin], fetcher: testFetcher });
+      const processor = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: testFetcher,
+      });
 
       const markdown = '```oembed\nhttps://youtu.be/1La4QzGeaaQ\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // Should contain proper mock video HTML
       expect(result.html).toContain('oembed-container oembed-video');
@@ -264,10 +309,13 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
     it('should use original URL when useMetadataUrlLink is false', async () => {
       const plugin = createMockOEmbedPlugin({ useMetadataUrlLink: false });
       const testFetcher = createCachedFetcher('test-userAgent', 5000);
-      const processor = createMarkdownProcessor({ plugins: [plugin], fetcher: testFetcher });
+      const processor = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: testFetcher,
+      });
 
       const markdown = '```oembed\nhttps://youtu.be/1La4QzGeaaQ\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // Should contain proper mock video HTML
       expect(result.html).toContain('oembed-container oembed-video');
@@ -277,10 +325,13 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
     it('should default to true when useMetadataUrlLink is not specified', async () => {
       const plugin = createMockOEmbedPlugin();
       const testFetcher = createCachedFetcher('test-userAgent', 5000);
-      const processor = createMarkdownProcessor({ plugins: [plugin], fetcher: testFetcher });
+      const processor = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: testFetcher,
+      });
 
       const markdown = '```oembed\nhttps://youtu.be/1La4QzGeaaQ\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // Should contain proper mock video HTML (default behavior)
       expect(result.html).toContain('oembed-container oembed-video');

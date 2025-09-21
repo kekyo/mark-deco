@@ -8,7 +8,6 @@ import {
   resolveUrl,
   truncateText,
   cleanText,
-
 } from '../src/internal.js';
 import { getNoOpLogger } from '../src/logger.js';
 import { amazonRules } from '../src/plugins/card/amazon-rules.js';
@@ -17,13 +16,23 @@ import { createCardPlugin } from '../src/plugins/card/index.js';
 import { extractEnhancedData } from '../src/plugins/card/utils.js';
 import { createMarkdownProcessor } from '../src/processor.js';
 import type { ExtractedMetadata } from '../src/plugins/card/types.js';
-import type { Plugin, PluginContext, Logger, FetcherType } from '../src/types.js';
+import type {
+  Plugin,
+  PluginContext,
+  Logger,
+  FetcherType,
+} from '../src/types.js';
 
 /**
  * Create a mock card plugin for testing purposes
  */
-const createMockCardPlugin = (options: Record<string, unknown> = {}): Plugin => {
-  const processBlock = async (content: string, _context: PluginContext): Promise<string> => {
+const createMockCardPlugin = (
+  options: Record<string, unknown> = {}
+): Plugin => {
+  const processBlock = async (
+    content: string,
+    _context: PluginContext
+  ): Promise<string> => {
     const url = content.trim();
 
     if (!isValidCardUrl(url)) {
@@ -41,7 +50,7 @@ const createMockCardPlugin = (options: Record<string, unknown> = {}): Plugin => 
 
   return {
     name: 'card',
-    processBlock
+    processBlock,
   };
 };
 
@@ -56,12 +65,13 @@ const getMockMetadata = (url: string): ExtractedMetadata | null => {
   if (hostname === 'github.com') {
     const mockMetadata: ExtractedMetadata = {
       title: 'GitHub Repository',
-      description: 'A popular code hosting and collaboration platform for developers.',
+      description:
+        'A popular code hosting and collaboration platform for developers.',
       image: 'https://github.com/images/og-image.png',
       url: url,
       siteName: 'GitHub',
       type: 'website',
-      favicon: 'https://github.com/favicon.ico'
+      favicon: 'https://github.com/favicon.ico',
     };
     return mockMetadata;
   }
@@ -70,12 +80,13 @@ const getMockMetadata = (url: string): ExtractedMetadata | null => {
   if (hostname === 'dev.to') {
     const mockMetadata: ExtractedMetadata = {
       title: 'Understanding React Hooks: A Complete Guide',
-      description: 'Learn everything you need to know about React Hooks with practical examples.',
+      description:
+        'Learn everything you need to know about React Hooks with practical examples.',
       image: 'https://dev.to/images/og-image.png',
       url: url,
       siteName: 'DEV Community',
       type: 'article',
-      favicon: 'https://dev.to/favicon.ico'
+      favicon: 'https://dev.to/favicon.ico',
     };
     return mockMetadata;
   }
@@ -84,12 +95,13 @@ const getMockMetadata = (url: string): ExtractedMetadata | null => {
   if (hostname === 'medium.com') {
     const mockMetadata: ExtractedMetadata = {
       title: 'The Future of Web Development',
-      description: 'Exploring the latest trends and technologies shaping web development.',
+      description:
+        'Exploring the latest trends and technologies shaping web development.',
       image: 'https://medium.com/images/article-image.png',
       url: url,
       siteName: 'Medium',
       type: 'article',
-      favicon: 'https://medium.com/favicon.ico'
+      favicon: 'https://medium.com/favicon.ico',
     };
     return mockMetadata;
   }
@@ -108,9 +120,11 @@ describe('CardPlugin', () => {
     processor = createMarkdownProcessor({
       plugins: [plugin],
       fetcher: {
-        rawFetcher: async () => { throw new Error('Not implemented in test'); },
-        userAgent: 'test-userAgent'
-      }
+        rawFetcher: async () => {
+          throw new Error('Not implemented in test');
+        },
+        userAgent: 'test-userAgent',
+      },
     });
   });
 
@@ -130,18 +144,24 @@ describe('CardPlugin', () => {
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: {
-          rawFetcher: async () => { throw new Error('Not implemented'); },
-          userAgent: 'test-userAgent'
+          rawFetcher: async () => {
+            throw new Error('Not implemented');
+          },
+          userAgent: 'test-userAgent',
         },
-        getUniqueId: () => { throw new Error('Not implemented'); }
+        getUniqueId: () => {
+          throw new Error('Not implemented');
+        },
       };
       // Direct plugin call should throw error for invalid URL
-      await expect(mockPlugin.processBlock('invalid-url', context)).rejects.toThrow('Invalid URL: invalid-url');
+      await expect(
+        mockPlugin.processBlock('invalid-url', context)
+      ).rejects.toThrow('Invalid URL: invalid-url');
     });
 
     it('should handle unsupported providers gracefully in Node.js environment', async () => {
       const markdown = '```card\nhttps://example.com/some-content\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // In Node.js environment, should return fallback HTML
       expect(result.html).toContain('card-container card-fallback');
@@ -156,13 +176,20 @@ describe('CardPlugin', () => {
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: {
-          rawFetcher: async (url, accept, signal) => { throw new Error('Not implemented'); },
-          userAgent: "test-userAgent"
+          rawFetcher: async (url, accept, signal) => {
+            throw new Error('Not implemented');
+          },
+          userAgent: 'test-userAgent',
         },
-        getUniqueId: () => { throw new Error('Not implemented'); }
+        getUniqueId: () => {
+          throw new Error('Not implemented');
+        },
       };
       // In Node.js environment, should return fallback HTML instead of throwing
-      const result = await mockPlugin.processBlock('https://unsupported-provider.com/content', context);
+      const result = await mockPlugin.processBlock(
+        'https://unsupported-provider.com/content',
+        context
+      );
       expect(result).toContain('card-container card-fallback');
       expect(result).toContain('External Content');
       expect(result).toContain('unsupported-provider.com');
@@ -172,34 +199,41 @@ describe('CardPlugin', () => {
       const markdown = '```card\ninvalid-url\n```';
 
       // Should propagate the plugin error
-      await expect(processor.process(markdown, "id")).rejects.toThrow('Failed to process markdown: Invalid URL: invalid-url');
+      await expect(processor.process(markdown, 'id')).rejects.toThrow(
+        'Failed to process markdown: Invalid URL: invalid-url'
+      );
     });
   });
 
   describe('Node.js environment behavior with mock data', () => {
     it('should return mock card HTML for GitHub URLs', async () => {
       const markdown = '```card\nhttps://github.com/user/repo\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       expect(result.html).toContain('card-container');
       expect(result.html).toContain('GitHub Repository');
       expect(result.html).toContain('GitHub');
-      expect(result.html).toContain('A popular code hosting and collaboration platform');
+      expect(result.html).toContain(
+        'A popular code hosting and collaboration platform'
+      );
     });
 
     it('should return mock card HTML for Dev.to URLs', async () => {
       const markdown = '```card\nhttps://dev.to/article/react-hooks\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       expect(result.html).toContain('card-container');
       expect(result.html).toContain('Understanding React Hooks');
       expect(result.html).toContain('DEV Community');
-      expect(result.html).toContain('Learn everything you need to know about React Hooks');
+      expect(result.html).toContain(
+        'Learn everything you need to know about React Hooks'
+      );
     });
 
     it('should return mock card HTML for Medium URLs', async () => {
-      const markdown = '```card\nhttps://medium.com/@author/web-development\n```';
-      const result = await processor.process(markdown, "id");
+      const markdown =
+        '```card\nhttps://medium.com/@author/web-development\n```';
+      const result = await processor.process(markdown, 'id');
 
       expect(result.html).toContain('card-container');
       expect(result.html).toContain('The Future of Web Development');
@@ -220,7 +254,7 @@ Some text in between.
 https://dev.to/article/react-hooks
 \`\`\``;
 
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // Should contain both mock cards
       expect(result.html).toContain('GitHub Repository');
@@ -237,12 +271,17 @@ https://dev.to/article/react-hooks
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: {
-          rawFetcher: async (url, accept, signal) => { throw new Error('Not implemented'); },
-          userAgent: "test-userAgent"
+          rawFetcher: async (url, accept, signal) => {
+            throw new Error('Not implemented');
+          },
+          userAgent: 'test-userAgent',
         },
-        getUniqueId: () => { throw new Error('Not implemented'); }
+        getUniqueId: () => {
+          throw new Error('Not implemented');
+        },
       };
-      const url = 'https://example.com/test?param=<script>alert("xss")</script>';
+      const url =
+        'https://example.com/test?param=<script>alert("xss")</script>';
       const html = await mockPlugin.processBlock(url, context);
 
       expect(html).toContain('card-container card-fallback');
@@ -258,12 +297,19 @@ https://dev.to/article/react-hooks
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: {
-          rawFetcher: async (url, accept, signal) => { throw new Error('Not implemented'); },
-          userAgent: "test-userAgent"
+          rawFetcher: async (url, accept, signal) => {
+            throw new Error('Not implemented');
+          },
+          userAgent: 'test-userAgent',
         },
-        getUniqueId: () => { throw new Error('Not implemented'); }
+        getUniqueId: () => {
+          throw new Error('Not implemented');
+        },
       };
-      const html = await mockPlugin.processBlock('https://github.com/user/repo', context);
+      const html = await mockPlugin.processBlock(
+        'https://github.com/user/repo',
+        context
+      );
 
       expect(html).toContain('card-container');
       expect(html).toContain('card-link');
@@ -279,7 +325,7 @@ https://dev.to/article/react-hooks
   describe('Error handling', () => {
     it('should return fallback HTML when provider is not supported in Node.js', async () => {
       const markdown = '```card\nhttps://unsupported-provider.com/content\n```';
-      const result = await processor.process(markdown, "id");
+      const result = await processor.process(markdown, 'id');
 
       // Should return fallback HTML instead of code block in Node.js
       expect(result.html).toContain('card-container card-fallback');
@@ -296,7 +342,9 @@ https://dev.to/article/react-hooks
     });
 
     it('should escape HTML properly', () => {
-      expect(escapeCardHtml('<script>alert("xss")</script>')).toBe('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+      expect(escapeCardHtml('<script>alert("xss")</script>')).toBe(
+        '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;'
+      );
       expect(escapeCardHtml('Safe text')).toBe('Safe text');
     });
 
@@ -307,19 +355,29 @@ https://dev.to/article/react-hooks
     });
 
     it('should resolve URLs correctly', () => {
-      expect(resolveUrl('https://example.com/image.jpg', 'https://base.com')).toBe('https://example.com/image.jpg');
-      expect(resolveUrl('/image.jpg', 'https://example.com/page')).toBe('https://example.com/image.jpg');
-      expect(resolveUrl('//cdn.example.com/image.jpg', 'https://example.com')).toBe('https://cdn.example.com/image.jpg');
+      expect(
+        resolveUrl('https://example.com/image.jpg', 'https://base.com')
+      ).toBe('https://example.com/image.jpg');
+      expect(resolveUrl('/image.jpg', 'https://example.com/page')).toBe(
+        'https://example.com/image.jpg'
+      );
+      expect(
+        resolveUrl('//cdn.example.com/image.jpg', 'https://example.com')
+      ).toBe('https://cdn.example.com/image.jpg');
     });
 
     it('should truncate text correctly', () => {
       expect(truncateText('Short text', 50)).toBe('Short text');
-      expect(truncateText('This is a very long text that should be truncated', 20)).toBe('This is a very lo...');
+      expect(
+        truncateText('This is a very long text that should be truncated', 20)
+      ).toBe('This is a very lo...');
     });
 
     it('should clean text properly', () => {
       expect(cleanText('  Multiple   spaces  \n  ')).toBe('Multiple spaces');
-      expect(cleanText('Text\nwith\r\nline breaks')).toBe('Text with line breaks');
+      expect(cleanText('Text\nwith\r\nline breaks')).toBe(
+        'Text with line breaks'
+      );
     });
   });
 });
@@ -592,17 +650,25 @@ describe('Metadata Extraction with Rule Engine', () => {
       `;
 
       const $ = cheerio.load(amazonHtml);
-      const result = extractEnhancedData($, 'https://www.amazon.co.jp/dp/B0DG8Z9Y1R', amazonRules);
+      const result = extractEnhancedData(
+        $,
+        'https://www.amazon.co.jp/dp/B0DG8Z9Y1R',
+        amazonRules
+      );
 
       expect(result).toBeDefined();
       expect(result?.siteName).toBe('Amazon Japan');
-      expect(result?.title).toBe('UGREEN 30W USB-C 充電器 type c 【PSE技術基準適合/PD3.0対応/30W急速充電】');
+      expect(result?.title).toBe(
+        'UGREEN 30W USB-C 充電器 type c 【PSE技術基準適合/PD3.0対応/30W急速充電】'
+      );
       expect(result?.price).toBe('¥1,680');
       expect(result?.reviewCount).toBe('71個の評価');
       expect(result?.rating).toBe('5つ星のうち4.6');
       expect(result?.brand).toBe('UGREEN');
       expect(result?.identifier).toBe('B0DG8Z9Y1R');
-      expect(result?.features).toEqual(expect.arrayContaining(['PSE技術基準適合']));
+      expect(result?.features).toEqual(
+        expect.arrayContaining(['PSE技術基準適合'])
+      );
     });
 
     it('should handle missing Amazon product elements gracefully', () => {
@@ -618,7 +684,11 @@ describe('Metadata Extraction with Rule Engine', () => {
       `;
 
       const $ = cheerio.load(minimalAmazonHtml);
-      const result = extractEnhancedData($, 'https://www.amazon.com/dp/TESTPRODUCT123', amazonRules);
+      const result = extractEnhancedData(
+        $,
+        'https://www.amazon.com/dp/TESTPRODUCT123',
+        amazonRules
+      );
 
       expect(result).toBeDefined();
       expect(result?.siteName).toBe('Amazon US');

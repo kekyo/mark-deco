@@ -1,4 +1,4 @@
-import { createAsyncLock } from 'async-primitives';
+import { createMutex } from 'async-primitives';
 import type { CacheStorage, CacheEntry } from './index.js';
 
 /**
@@ -7,17 +7,21 @@ import type { CacheStorage, CacheEntry } from './index.js';
  * @returns LocalCache instance that uses localStorage
  * @throws Error if localStorage is not available
  */
-export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStorage => {
-  const asyncLock = createAsyncLock();
+export const createLocalCacheStorage = (
+  keyPrefix: string = 'cache:'
+): CacheStorage => {
+  const mutex = createMutex();
 
   /**
    * Check if localStorage is available
    */
   const isLocalStorageAvailable = (): boolean => {
     try {
-      return typeof window !== 'undefined' &&
-             typeof window.localStorage !== 'undefined' &&
-             window.localStorage !== null;
+      return (
+        typeof window !== 'undefined' &&
+        typeof window.localStorage !== 'undefined' &&
+        window.localStorage !== null
+      );
     } catch {
       return false;
     }
@@ -49,7 +53,8 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
       try {
         const entry: CacheEntry = JSON.parse(stored);
         if (entry.ttl !== undefined) {
-          const isExpired = entry.ttl === 0 || now > entry.timestamp + entry.ttl;
+          const isExpired =
+            entry.ttl === 0 || now > entry.timestamp + entry.ttl;
           if (isExpired) {
             expiredKeys.push(key);
           }
@@ -85,7 +90,7 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
       entry = JSON.parse(stored);
     } catch {
       // Invalid JSON, need to remove the corrupted entry under lock
-      const lockHandle = await asyncLock.lock();
+      const lockHandle = await mutex.lock();
       try {
         localStorage.removeItem(fullKey);
         return null;
@@ -96,14 +101,16 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
 
     // Check TTL expiration - only lock if we need to delete expired entry
     if (entry.ttl !== undefined) {
-      const isExpired = entry.ttl === 0 || Date.now() > entry.timestamp + entry.ttl;
+      const isExpired =
+        entry.ttl === 0 || Date.now() > entry.timestamp + entry.ttl;
       if (isExpired) {
         // Lock only for the deletion operation
-        const lockHandle = await asyncLock.lock();
+        const lockHandle = await mutex.lock();
         try {
           // Double-check expiration under lock to avoid race conditions
           const currentTime = Date.now();
-          const stillExpired = entry.ttl === 0 || currentTime > entry.timestamp + entry.ttl;
+          const stillExpired =
+            entry.ttl === 0 || currentTime > entry.timestamp + entry.ttl;
           if (stillExpired) {
             localStorage.removeItem(fullKey);
           }
@@ -117,7 +124,11 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
     return entry.data;
   };
 
-  const set = async (key: string, value: string, ttl?: number): Promise<void> => {
+  const set = async (
+    key: string,
+    value: string,
+    ttl?: number
+  ): Promise<void> => {
     // Check if localStorage is available first (no lock needed for this check)
     if (!isLocalStorageAvailable()) {
       throw new Error('localStorage is not available in this environment');
@@ -127,7 +138,7 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
     const fullKey = keyPrefix + key;
     const entry: CacheEntry = {
       data: value,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     if (ttl !== undefined) {
@@ -136,7 +147,7 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
 
     const serialized = JSON.stringify(entry);
 
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       try {
         // For cache systems, last-write-wins is often acceptable
@@ -170,7 +181,7 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
     // Pre-compute full key outside of lock
     const fullKey = keyPrefix + key;
 
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       localStorage.removeItem(fullKey);
     } finally {
@@ -197,7 +208,7 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
       return;
     }
 
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       // Remove all identified keys
       for (const key of keysToRemove) {
@@ -228,7 +239,7 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
     }
 
     // Clean up expired entries and count valid ones with lock
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       const now = Date.now();
       let validCount = 0;
@@ -244,7 +255,8 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
 
           // Check if entry is expired
           if (entry.ttl !== undefined) {
-            const isExpired = entry.ttl === 0 || now > entry.timestamp + entry.ttl;
+            const isExpired =
+              entry.ttl === 0 || now > entry.timestamp + entry.ttl;
             if (isExpired) {
               localStorage.removeItem(key);
               continue; // Don't count this entry
@@ -268,6 +280,6 @@ export const createLocalCacheStorage = (keyPrefix: string = 'cache:'): CacheStor
     set,
     delete: deleteEntry,
     clear,
-    size
+    size,
   };
 };

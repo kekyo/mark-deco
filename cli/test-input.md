@@ -1,6 +1,6 @@
 ---
-title: "Test Document"
-author: "CLI Test"
+title: 'Test Document'
+author: 'CLI Test'
 ---
 
 # Main Heading
@@ -9,13 +9,13 @@ This is a test document for the mark-deco CLI.
 
 ## Sub Heading
 
-Here's some content with **bold** and *italic* text.
+Here's some content with **bold** and _italic_ text.
 
 ### Code Example
 
 ```javascript
 function hello() {
-  console.log("Hello, World!");
+  console.log('Hello, World!');
 }
 ```
 
@@ -39,7 +39,10 @@ https://www.amazon.com/dp/B08N5WRWNW
 ## Table Example
 
 | Name | Age | City |
-|------|-----|------|
+| ---- | --- | ---- |
 | John | 30  | NYC  |
 | Jane | 25  | LA   |
-``` 
+
+```
+
+```

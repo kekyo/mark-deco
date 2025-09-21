@@ -1,4 +1,4 @@
-import { createAsyncLock } from 'async-primitives';
+import { createMutex } from 'async-primitives';
 import type { CacheStorage, CacheEntry } from './index.js';
 
 /**
@@ -8,7 +8,7 @@ import type { CacheStorage, CacheEntry } from './index.js';
  */
 export const createMemoryCacheStorage = (): CacheStorage => {
   const cache = new Map<string, CacheEntry>();
-  const asyncLock = createAsyncLock();
+  const mutex = createMutex();
 
   /**
    * Clean up expired entries (optimized version without lock)
@@ -41,16 +41,19 @@ export const createMemoryCacheStorage = (): CacheStorage => {
 
     // Check TTL expiration - only lock if we need to delete expired entry
     if (entry.ttl !== undefined) {
-      const isExpired = entry.ttl === 0 || Date.now() > entry.timestamp + entry.ttl;
+      const isExpired =
+        entry.ttl === 0 || Date.now() > entry.timestamp + entry.ttl;
       if (isExpired) {
         // Lock only for the deletion operation
-        const lockHandle = await asyncLock.lock();
+        const lockHandle = await mutex.lock();
         try {
           // Double-check expiration under lock to avoid race conditions
           const currentEntry = cache.get(key);
           if (currentEntry && currentEntry.ttl !== undefined) {
             const currentTime = Date.now();
-            const stillExpired = currentEntry.ttl === 0 || currentTime > currentEntry.timestamp + currentEntry.ttl;
+            const stillExpired =
+              currentEntry.ttl === 0 ||
+              currentTime > currentEntry.timestamp + currentEntry.ttl;
             if (stillExpired) {
               cache.delete(key);
             }
@@ -65,11 +68,15 @@ export const createMemoryCacheStorage = (): CacheStorage => {
     return entry.data;
   };
 
-  const set = async (key: string, value: string, ttl?: number): Promise<void> => {
+  const set = async (
+    key: string,
+    value: string,
+    ttl?: number
+  ): Promise<void> => {
     // Pre-compute entry object outside of any lock
     const entry: CacheEntry = {
       data: value,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     if (ttl !== undefined) {
@@ -78,7 +85,7 @@ export const createMemoryCacheStorage = (): CacheStorage => {
 
     // For memory cache, Map.set is very fast and atomic enough
     // We can use minimal locking since memory operations are fast
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       cache.set(key, entry);
     } finally {
@@ -88,7 +95,7 @@ export const createMemoryCacheStorage = (): CacheStorage => {
 
   const deleteEntry = async (key: string): Promise<void> => {
     // Simple delete operation, minimal lock time
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       cache.delete(key);
     } finally {
@@ -98,7 +105,7 @@ export const createMemoryCacheStorage = (): CacheStorage => {
 
   const clear = async (): Promise<void> => {
     // Clear is atomic and fast for Map
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       cache.clear();
     } finally {
@@ -115,7 +122,7 @@ export const createMemoryCacheStorage = (): CacheStorage => {
       return 0;
     }
 
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       // Clean up expired entries and return size in one operation
       cleanupExpiredInternal();
@@ -130,6 +137,6 @@ export const createMemoryCacheStorage = (): CacheStorage => {
     set,
     delete: deleteEntry,
     clear,
-    size
+    size,
   };
 };

@@ -1,11 +1,21 @@
-import { createResponsiveImageWithContainer, createResponsiveImageTag } from '../../utils/responsive-image.js';
-import { escapeHtml, calculateAspectRatio, extractAspectRatioFromHtml } from './utils.js';
+import {
+  createResponsiveImageWithContainer,
+  createResponsiveImageTag,
+} from '../../utils/responsive-image.js';
+import {
+  escapeHtml,
+  calculateAspectRatio,
+  extractAspectRatioFromHtml,
+} from './utils.js';
 import type { OEmbedResponse, OEmbedPluginOptions } from './types.js';
 
 /**
  * Generate fallback HTML for unsupported providers
  */
-export const generateFallbackHtml = (url: string, errorInfo?: string): string => {
+export const generateFallbackHtml = (
+  url: string,
+  errorInfo?: string
+): string => {
   const urlObj = new URL(url);
   const domain = urlObj.hostname.replace(/^www\./, '');
 
@@ -27,7 +37,11 @@ export const generateFallbackHtml = (url: string, errorInfo?: string): string =>
 /**
  * Generate HTML from oEmbed response data
  */
-export const generateHtml = (data: OEmbedResponse, originalUrl: string, options: OEmbedPluginOptions = {}): string => {
+export const generateHtml = (
+  data: OEmbedResponse,
+  originalUrl: string,
+  options: OEmbedPluginOptions = {}
+): string => {
   // Default display fields with default order when displayFields is undefined
   const defaultDisplayFields = {
     title: 1,
@@ -40,21 +54,40 @@ export const generateHtml = (data: OEmbedResponse, originalUrl: string, options:
   };
 
   // If displayFields is undefined, use default display fields, otherwise use provided displayFields
-  const displayFields = options.displayFields === undefined
-    ? defaultDisplayFields
-    : options.displayFields;
+  const displayFields =
+    options.displayFields === undefined
+      ? defaultDisplayFields
+      : options.displayFields;
 
   const urlObj = new URL(originalUrl);
   const domain = urlObj.hostname.replace(/^www\./, '');
 
   switch (data.type) {
     case 'photo':
-      return generatePhotoHtml(data, originalUrl, domain, displayFields, options);
+      return generatePhotoHtml(
+        data,
+        originalUrl,
+        domain,
+        displayFields,
+        options
+      );
     case 'video':
     case 'rich':
-      return generateVideoRichHtml(data, originalUrl, domain, displayFields, options);
+      return generateVideoRichHtml(
+        data,
+        originalUrl,
+        domain,
+        displayFields,
+        options
+      );
     case 'link':
-      return generateLinkHtml(data, originalUrl, domain, displayFields, options);
+      return generateLinkHtml(
+        data,
+        originalUrl,
+        domain,
+        displayFields,
+        options
+      );
     default:
       return generateFallbackHtml(originalUrl, undefined);
   }
@@ -93,25 +126,25 @@ const generatePhotoHtml = (
   if (displayFields.title !== undefined) {
     allItems.push({
       order: displayFields.title,
-      html: `<div class="oembed-title">${escapeHtml(title)}</div>`
+      html: `<div class="oembed-title">${escapeHtml(title)}</div>`,
     });
   }
   if (displayFields.author !== undefined) {
     allItems.push({
       order: displayFields.author,
-      html: `<div class="oembed-author">by ${escapeHtml(authorName)}</div>`
+      html: `<div class="oembed-author">by ${escapeHtml(authorName)}</div>`,
     });
   }
   if (displayFields.provider !== undefined) {
     allItems.push({
       order: displayFields.provider,
-      html: `<div class="oembed-provider">${escapeHtml(domain)}</div>`
+      html: `<div class="oembed-provider">${escapeHtml(domain)}</div>`,
     });
   }
   if (displayFields.description !== undefined && data.author_name) {
     allItems.push({
       order: displayFields.description,
-      html: `<div class="oembed-description">${escapeHtml(data.author_name)}</div>`
+      html: `<div class="oembed-description">${escapeHtml(data.author_name)}</div>`,
     });
   }
   if (displayFields.thumbnail !== undefined && data.thumbnail_url) {
@@ -121,7 +154,7 @@ const generatePhotoHtml = (
         escapeHtml(data.thumbnail_url),
         escapeHtml(title),
         'oembed-thumbnail'
-      )
+      ),
     });
   }
   if (displayFields.embeddedContent !== undefined && imageUrl) {
@@ -133,18 +166,20 @@ const generatePhotoHtml = (
         escapeHtml(title),
         undefined,
         additionalAttrs
-      )
+      ),
     });
   }
   if (displayFields.externalLink !== undefined) {
-    const linkUrl = options.useMetadataUrlLink ? (data.web_page || originalUrl) : originalUrl;
+    const linkUrl = options.useMetadataUrlLink
+      ? data.web_page || originalUrl
+      : originalUrl;
     allItems.push({
       order: displayFields.externalLink,
       html: `<div class="oembed-external-link">
       <a href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener noreferrer">
         Visit ${escapeHtml(domain)}
       </a>
-    </div>`
+    </div>`,
     });
   }
 
@@ -155,12 +190,14 @@ const generatePhotoHtml = (
   const headerItems: string[] = [];
   const contentItems: string[] = [];
 
-  sortedItems.forEach(item => {
+  sortedItems.forEach((item) => {
     // Determine if this is a header or content item based on CSS class
-    if (item.html.includes('oembed-title') ||
-        item.html.includes('oembed-author') ||
-        item.html.includes('oembed-provider') ||
-        item.html.includes('oembed-description')) {
+    if (
+      item.html.includes('oembed-title') ||
+      item.html.includes('oembed-author') ||
+      item.html.includes('oembed-provider') ||
+      item.html.includes('oembed-description')
+    ) {
       headerItems.push(item.html);
     } else {
       contentItems.push(item.html);
@@ -200,7 +237,9 @@ const generateVideoRichHtml = (
   const html = data.html || '';
 
   // Make content responsive if HTML contains iframe
-  const processedHtml = shouldMakeResponsive(html) ? makeContentResponsive(html, data) : html;
+  const processedHtml = shouldMakeResponsive(html)
+    ? makeContentResponsive(html, data)
+    : html;
 
   // Prepare all field items for sorting by display order
   interface DisplayItem {
@@ -214,25 +253,25 @@ const generateVideoRichHtml = (
   if (displayFields.title !== undefined) {
     allItems.push({
       order: displayFields.title,
-      html: `<div class="oembed-title">${escapeHtml(title)}</div>`
+      html: `<div class="oembed-title">${escapeHtml(title)}</div>`,
     });
   }
   if (displayFields.author !== undefined) {
     allItems.push({
       order: displayFields.author,
-      html: `<div class="oembed-author">by ${escapeHtml(authorName)}</div>`
+      html: `<div class="oembed-author">by ${escapeHtml(authorName)}</div>`,
     });
   }
   if (displayFields.provider !== undefined) {
     allItems.push({
       order: displayFields.provider,
-      html: `<div class="oembed-provider">${escapeHtml(domain)}</div>`
+      html: `<div class="oembed-provider">${escapeHtml(domain)}</div>`,
     });
   }
   if (displayFields.description !== undefined && data.author_name) {
     allItems.push({
       order: displayFields.description,
-      html: `<div class="oembed-description">${escapeHtml(data.author_name)}</div>`
+      html: `<div class="oembed-description">${escapeHtml(data.author_name)}</div>`,
     });
   }
   if (displayFields.thumbnail !== undefined && data.thumbnail_url) {
@@ -242,24 +281,26 @@ const generateVideoRichHtml = (
         escapeHtml(data.thumbnail_url),
         escapeHtml(title),
         'oembed-thumbnail'
-      )
+      ),
     });
   }
   if (displayFields.embeddedContent !== undefined && processedHtml) {
     allItems.push({
       order: displayFields.embeddedContent,
-      html: processedHtml
+      html: processedHtml,
     });
   }
   if (displayFields.externalLink !== undefined) {
-    const linkUrl = options.useMetadataUrlLink ? (data.web_page || originalUrl) : originalUrl;
+    const linkUrl = options.useMetadataUrlLink
+      ? data.web_page || originalUrl
+      : originalUrl;
     allItems.push({
       order: displayFields.externalLink,
       html: `<div class="oembed-external-link">
       <a href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener noreferrer">
         Visit ${escapeHtml(domain)}
       </a>
-    </div>`
+    </div>`,
     });
   }
 
@@ -270,12 +311,14 @@ const generateVideoRichHtml = (
   const headerItems: string[] = [];
   const contentItems: string[] = [];
 
-  sortedItems.forEach(item => {
+  sortedItems.forEach((item) => {
     // Determine if this is a header or content item based on CSS class
-    if (item.html.includes('oembed-title') ||
-        item.html.includes('oembed-author') ||
-        item.html.includes('oembed-provider') ||
-        item.html.includes('oembed-description')) {
+    if (
+      item.html.includes('oembed-title') ||
+      item.html.includes('oembed-author') ||
+      item.html.includes('oembed-provider') ||
+      item.html.includes('oembed-description')
+    ) {
       headerItems.push(item.html);
     } else {
       contentItems.push(item.html);
@@ -326,25 +369,25 @@ const generateLinkHtml = (
   if (displayFields.title !== undefined) {
     allItems.push({
       order: displayFields.title,
-      html: `<div class="oembed-title">${escapeHtml(title)}</div>`
+      html: `<div class="oembed-title">${escapeHtml(title)}</div>`,
     });
   }
   if (displayFields.author !== undefined) {
     allItems.push({
       order: displayFields.author,
-      html: `<div class="oembed-author">by ${escapeHtml(data.author_name || 'Unknown')}</div>`
+      html: `<div class="oembed-author">by ${escapeHtml(data.author_name || 'Unknown')}</div>`,
     });
   }
   if (displayFields.provider !== undefined) {
     allItems.push({
       order: displayFields.provider,
-      html: `<div class="oembed-provider">${escapeHtml(domain)}</div>`
+      html: `<div class="oembed-provider">${escapeHtml(domain)}</div>`,
     });
   }
   if (displayFields.description !== undefined && description) {
     allItems.push({
       order: displayFields.description,
-      html: `<div class="oembed-description">${escapeHtml(description)}</div>`
+      html: `<div class="oembed-description">${escapeHtml(description)}</div>`,
     });
   }
   if (displayFields.thumbnail !== undefined && thumbnailUrl) {
@@ -354,22 +397,24 @@ const generateLinkHtml = (
         escapeHtml(thumbnailUrl),
         escapeHtml(title),
         'oembed-thumbnail'
-      )
+      ),
     });
   }
   if (displayFields.embeddedContent !== undefined && data.html) {
     allItems.push({
       order: displayFields.embeddedContent,
-      html: data.html
+      html: data.html,
     });
   }
   if (displayFields.externalLink !== undefined) {
-    const linkUrl = options.useMetadataUrlLink ? (data.web_page || originalUrl) : originalUrl;
+    const linkUrl = options.useMetadataUrlLink
+      ? data.web_page || originalUrl
+      : originalUrl;
     allItems.push({
       order: displayFields.externalLink,
       html: `<a href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener noreferrer">
       Visit ${escapeHtml(domain)}
-    </a>`
+    </a>`,
     });
   }
 
@@ -380,12 +425,14 @@ const generateLinkHtml = (
   const headerItems: string[] = [];
   const contentItems: string[] = [];
 
-  sortedItems.forEach(item => {
+  sortedItems.forEach((item) => {
     // Determine if this is a header or content item based on CSS class
-    if (item.html.includes('oembed-title') ||
-        item.html.includes('oembed-author') ||
-        item.html.includes('oembed-provider') ||
-        item.html.includes('oembed-description')) {
+    if (
+      item.html.includes('oembed-title') ||
+      item.html.includes('oembed-author') ||
+      item.html.includes('oembed-provider') ||
+      item.html.includes('oembed-description')
+    ) {
       headerItems.push(item.html);
     } else {
       contentItems.push(item.html);
@@ -411,7 +458,10 @@ const generateLinkHtml = (
 /**
  * Make content responsive
  */
-const makeContentResponsive = (html: string, oembedData?: OEmbedResponse): string => {
+const makeContentResponsive = (
+  html: string,
+  oembedData?: OEmbedResponse
+): string => {
   if (!html) return html;
 
   // Determine aspect ratio (in priority order)
@@ -473,7 +523,10 @@ const generateResponsiveIframeStyles = (): string => {
 /**
  * Wrap content with responsive container
  */
-const wrapWithResponsiveContainer = (html: string, aspectRatio: number): string => {
+const wrapWithResponsiveContainer = (
+  html: string,
+  aspectRatio: number
+): string => {
   const hasIframe = /<iframe/i.test(html);
 
   if (hasIframe) {

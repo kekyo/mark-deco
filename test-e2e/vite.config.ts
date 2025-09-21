@@ -1,34 +1,36 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
+import prettierMax from 'prettier-max';
 
 export default defineConfig({
+  plugins: [prettierMax()],
   root: '.',
   build: {
     outDir: './dist',
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'test-page.html'),
-        app: resolve(__dirname, 'test-page.ts')
+        app: resolve(__dirname, 'test-page.ts'),
       },
       output: {
         entryFileNames: '[name].js',
         chunkFileNames: '[name].js',
-        assetFileNames: '[name].[ext]'
-      }
+        assetFileNames: '[name].[ext]',
+      },
     },
-    target: 'es2020'
+    target: 'es2020',
   },
   server: {
-    host: 'localhost'
+    host: 'localhost',
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, '.'),
       // Directly reference library source files during development
-      'mark-deco': resolve(__dirname, '../mark-deco/src/index.ts')
-    }
+      'mark-deco': resolve(__dirname, '../mark-deco/src/index.ts'),
+    },
   },
   define: {
-    'process.env.NODE_ENV': '"production"'
-  }
+    'process.env.NODE_ENV': '"production"',
+  },
 });

@@ -19,7 +19,7 @@ export const escapeHtml = (text: string): string => {
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    "'": '&#039;'
+    "'": '&#039;',
   };
   return text.replace(/[&<>"']/g, (m) => map[m] || m);
 };
@@ -27,7 +27,10 @@ export const escapeHtml = (text: string): string => {
 /**
  * Calculate aspect ratio from width and height
  */
-export const calculateAspectRatio = (width?: number, height?: number): number | null => {
+export const calculateAspectRatio = (
+  width?: number,
+  height?: number
+): number | null => {
   // When both are valid numbers
   if (width && height && width > 0 && height > 0) {
     const ratio = (height / width) * 100;
@@ -69,7 +72,8 @@ export const extractAspectRatioFromHtml = (html: string): number | null => {
   const heightMatch = firstIframe.match(/height=['"]?(\d+)['"]?/i);
 
   const width = widthMatch && widthMatch[1] ? parseInt(widthMatch[1], 10) : 0;
-  const height = heightMatch && heightMatch[1] ? parseInt(heightMatch[1], 10) : 0;
+  const height =
+    heightMatch && heightMatch[1] ? parseInt(heightMatch[1], 10) : 0;
 
   // Calculate using calculateAspectRatio (including 16:9 complement)
   // 0 is treated as undefined

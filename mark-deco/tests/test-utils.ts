@@ -1,7 +1,7 @@
 import {
   generateHtml,
   generateFallbackHtml,
-  isValidUrl
+  isValidUrl,
 } from '../src/internal.js';
 import type { OEmbedResponse } from '../src/internal.js';
 import type { Plugin, PluginContext } from '../src/types.js';
@@ -10,20 +10,25 @@ import type { Plugin, PluginContext } from '../src/types.js';
  * Create a mock plugin for testing purposes
  */
 export const createMockPlugin = (name: string): Plugin => {
-  const processBlock = async (content: string, _context: PluginContext): Promise<string> => {
+  const processBlock = async (
+    content: string,
+    _context: PluginContext
+  ): Promise<string> => {
     return `<div class="mock-plugin" data-plugin="${name}">Mock plugin processed: ${content}</div>`;
   };
 
   return {
     name,
-    processBlock
+    processBlock,
   };
 };
 
 /**
  * Create a mock oEmbed plugin for testing purposes
  */
-export const createMockOEmbedPlugin = (options: Record<string, unknown> = {}): Plugin => {
+export const createMockOEmbedPlugin = (
+  options: Record<string, unknown> = {}
+): Plugin => {
   const processBlock = async (content: string): Promise<string> => {
     const url = content.trim();
 
@@ -42,7 +47,7 @@ export const createMockOEmbedPlugin = (options: Record<string, unknown> = {}): P
 
   return {
     name: 'oembed',
-    processBlock
+    processBlock,
   };
 };
 
@@ -69,7 +74,7 @@ const getMockOEmbedData = (url: string): OEmbedResponse | null => {
       thumbnail_url: 'https://i.ytimg.com/vi/1La4QzGeaaQ/hqdefault.jpg',
       thumbnail_width: 480,
       thumbnail_height: 360,
-      web_page: 'https://example.com/web-page'
+      web_page: 'https://example.com/web-page',
     };
   }
 
@@ -89,7 +94,7 @@ const getMockOEmbedData = (url: string): OEmbedResponse | null => {
       thumbnail_url: 'https://i.vimeocdn.com/video/123456789_640.jpg',
       thumbnail_width: 640,
       thumbnail_height: 480,
-      web_page: 'https://example.com/web-page'
+      web_page: 'https://example.com/web-page',
     };
   }
 
@@ -106,7 +111,7 @@ const getMockOEmbedData = (url: string): OEmbedResponse | null => {
       url: 'https://live.staticflickr.com/3123/2362225867_954a758394_b.jpg',
       width: 1024,
       height: 768,
-      web_page: 'https://www.flickr.com/photos/bees/2362225867/'
+      web_page: 'https://www.flickr.com/photos/bees/2362225867/',
     };
   }
 

@@ -14,7 +14,7 @@ export default defineConfig({
       '../test-node/**',
       '../test-e2e/**',
       '../demo-pages/**',
-      '../cli/**'
+      '../cli/**',
     ],
     coverage: {
       provider: 'v8',
@@ -27,11 +27,11 @@ export default defineConfig({
         '../test-node/**',
         '../test-e2e/**',
         '../demo-pages/**',
-        '../cli/**'
-      ]
-    }
+        '../cli/**',
+      ],
+    },
   },
   esbuild: {
-    target: 'node18'
-  }
+    target: 'node18',
+  },
 });

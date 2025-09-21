@@ -16,4 +16,4 @@ This should embed a test video.
 https://flickr.com/photos/bees/2362225867/
 ```
 
-This should embed a test photo. 
+This should embed a test photo.

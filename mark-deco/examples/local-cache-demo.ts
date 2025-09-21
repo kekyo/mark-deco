@@ -2,12 +2,15 @@
 
 /**
  * LocalCache usage demonstration
- * Showing how to use localStorage-based cache with TTL and AsyncLock protection
+ * Showing how to use localStorage-based cache with TTL and Mutex protection
  */
 
 // import { createMarkdownProcessor } from '../src/processor.js';
 // import { createOEmbedPlugin } from '../src/plugins/oembed-plugin.js';
-import { createLocalCacheStorage, type CacheStorage } from '../src/cache/index.js';
+import {
+  createLocalCacheStorage,
+  type CacheStorage,
+} from '../src/cache/index.js';
 
 // Example 1: Basic localStorage cache usage
 async function basicLocalCacheExample() {
@@ -15,7 +18,9 @@ async function basicLocalCacheExample() {
 
   // Check if we're in a browser environment
   if (typeof window === 'undefined' || !window.localStorage) {
-    console.log('localStorage is not available - skipping browser-specific examples');
+    console.log(
+      'localStorage is not available - skipping browser-specific examples'
+    );
     return;
   }
 
@@ -24,16 +29,22 @@ async function basicLocalCacheExample() {
 
   // Store some data
   console.log('Storing data in localStorage...');
-  await cache.set('user:123', JSON.stringify({
-    id: 123,
-    name: 'John Doe',
-    email: 'john@example.com'
-  }));
+  await cache.set(
+    'user:123',
+    JSON.stringify({
+      id: 123,
+      name: 'John Doe',
+      email: 'john@example.com',
+    })
+  );
 
-  await cache.set('settings', JSON.stringify({
-    theme: 'dark',
-    language: 'ja'
-  }));
+  await cache.set(
+    'settings',
+    JSON.stringify({
+      theme: 'dark',
+      language: 'ja',
+    })
+  );
 
   // Retrieve data
   console.log('Retrieving data from localStorage...');
@@ -77,7 +88,7 @@ async function ttlLocalCacheExample() {
 
   // Wait and check again
   console.log('\nWaiting 3 seconds...');
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 
   console.log('After 3 seconds:');
   console.log('Short-lived:', await cache.get('short-lived')); // Should be null
@@ -87,7 +98,7 @@ async function ttlLocalCacheExample() {
 
   // Wait more and check again
   console.log('\nWaiting 3 more seconds...');
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 
   console.log('After 6 seconds total:');
   console.log('Medium-lived:', await cache.get('medium-lived')); // Should be null
@@ -152,7 +163,7 @@ async function maintenanceExample() {
   console.log('Cache size before expiration:', await cache.size());
 
   // Wait for expiration
-  await new Promise(resolve => setTimeout(resolve, 50));
+  await new Promise((resolve) => setTimeout(resolve, 50));
 
   console.log('Cache size after automatic cleanup:', await cache.size());
   console.log('Permanent data still exists:', await cache.get('permanent'));
@@ -163,12 +174,14 @@ async function maintenanceExample() {
   console.log('Cache size after clear:', await cache.size());
 }
 
-// Example 5: Concurrent access with AsyncLock protection
+// Example 5: Concurrent access with Mutex protection
 async function concurrentAccessExample() {
   console.log('\n=== Concurrent Access Example ===');
 
   if (typeof window === 'undefined' || !window.localStorage) {
-    console.log('localStorage is not available - skipping concurrent access example');
+    console.log(
+      'localStorage is not available - skipping concurrent access example'
+    );
     return;
   }
 
@@ -180,9 +193,7 @@ async function concurrentAccessExample() {
   const operations: Promise<void>[] = [];
 
   for (let i = 0; i < 5; i++) {
-    operations.push(
-      cache.set(`key${i}`, `value${i}`, 1000)
-    );
+    operations.push(cache.set(`key${i}`, `value${i}`, 1000));
   }
 
   // Wait for all operations to complete
@@ -206,7 +217,9 @@ async function multipleCacheExample() {
   console.log('\n=== Multiple Cache Instances Example ===');
 
   if (typeof window === 'undefined' || !window.localStorage) {
-    console.log('localStorage is not available - skipping multiple cache example');
+    console.log(
+      'localStorage is not available - skipping multiple cache example'
+    );
     return;
   }
 

@@ -36,20 +36,20 @@ export const ogpRules: ScrapingRule[] = [
           {
             selector: 'meta[property="og:title"]',
             method: 'attr',
-            attr: 'content'
+            attr: 'content',
           },
           // Then Twitter Card title
           {
             selector: 'meta[name="twitter:title"]',
             method: 'attr',
-            attr: 'content'
+            attr: 'content',
           },
           // Finally HTML title element
           {
             selector: 'title',
-            method: 'text'
-          }
-        ]
+            method: 'text',
+          },
+        ],
       },
 
       description: {
@@ -58,21 +58,21 @@ export const ogpRules: ScrapingRule[] = [
           {
             selector: 'meta[property="og:description"]',
             method: 'attr',
-            attr: 'content'
+            attr: 'content',
           },
           // Then Twitter Card description
           {
             selector: 'meta[name="twitter:description"]',
             method: 'attr',
-            attr: 'content'
+            attr: 'content',
           },
           // Finally standard meta description
           {
             selector: 'meta[name="description"]',
             method: 'attr',
-            attr: 'content'
-          }
-        ]
+            attr: 'content',
+          },
+        ],
       },
 
       image: {
@@ -83,8 +83,10 @@ export const ogpRules: ScrapingRule[] = [
             method: 'attr',
             attr: 'content',
             processor: (values, context) => {
-              return values.length > 0 && values[0] ? resolveUrl(values[0], context.url) : undefined;
-            }
+              return values.length > 0 && values[0]
+                ? resolveUrl(values[0], context.url)
+                : undefined;
+            },
           },
           // Then Twitter Card image
           {
@@ -92,8 +94,10 @@ export const ogpRules: ScrapingRule[] = [
             method: 'attr',
             attr: 'content',
             processor: (values, context) => {
-              return values.length > 0 && values[0] ? resolveUrl(values[0], context.url) : undefined;
-            }
+              return values.length > 0 && values[0]
+                ? resolveUrl(values[0], context.url)
+                : undefined;
+            },
           },
           // Then various favicon links
           {
@@ -101,26 +105,32 @@ export const ogpRules: ScrapingRule[] = [
             method: 'attr',
             attr: 'href',
             processor: (values, context) => {
-              return values.length > 0 && values[0] ? resolveUrl(values[0], context.url) : undefined;
-            }
+              return values.length > 0 && values[0]
+                ? resolveUrl(values[0], context.url)
+                : undefined;
+            },
           },
           {
             selector: 'link[rel="apple-touch-icon"]',
             method: 'attr',
             attr: 'href',
             processor: (values, context) => {
-              return values.length > 0 && values[0] ? resolveUrl(values[0], context.url) : undefined;
-            }
+              return values.length > 0 && values[0]
+                ? resolveUrl(values[0], context.url)
+                : undefined;
+            },
           },
           {
             selector: 'link[rel="shortcut icon"]',
             method: 'attr',
             attr: 'href',
             processor: (values, context) => {
-              return values.length > 0 && values[0] ? resolveUrl(values[0], context.url) : undefined;
-            }
-          }
-        ]
+              return values.length > 0 && values[0]
+                ? resolveUrl(values[0], context.url)
+                : undefined;
+            },
+          },
+        ],
       },
 
       siteName: {
@@ -129,7 +139,7 @@ export const ogpRules: ScrapingRule[] = [
           {
             selector: 'meta[property="og:site_name"]',
             method: 'attr',
-            attr: 'content'
+            attr: 'content',
           },
           // Then Twitter site
           {
@@ -138,23 +148,25 @@ export const ogpRules: ScrapingRule[] = [
             attr: 'content',
             processor: (values) => {
               // Remove @ symbol from Twitter handle if present
-              return values.length > 0 && values[0] ? values[0].replace(/^@/, '') : undefined;
-            }
+              return values.length > 0 && values[0]
+                ? values[0].replace(/^@/, '')
+                : undefined;
+            },
           },
           // Finally extract domain from URL
           {
             selector: 'html',
             method: 'text',
-            processor: (values, context) => {
+            processor: (_values, context) => {
               try {
                 const url = new URL(context.url);
                 return url.hostname.replace(/^www\./, '');
               } catch {
                 return 'Unknown Site';
               }
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
 
       url: {
@@ -163,33 +175,37 @@ export const ogpRules: ScrapingRule[] = [
           {
             selector: 'meta[property="og:url"]',
             method: 'attr',
-            attr: 'content'
+            attr: 'content',
           },
           // Fallback to current URL
           {
             selector: 'html',
             method: 'text',
-            processor: (values, context) => {
+            processor: (_values, context) => {
               return context.url;
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
 
       type: {
-        rules: [{
-          selector: 'meta[property="og:type"]',
-          method: 'attr',
-          attr: 'content'
-        }]
+        rules: [
+          {
+            selector: 'meta[property="og:type"]',
+            method: 'attr',
+            attr: 'content',
+          },
+        ],
       },
 
       locale: {
-        rules: [{
-          selector: 'meta[property="og:locale"]',
-          method: 'attr',
-          attr: 'content'
-        }]
+        rules: [
+          {
+            selector: 'meta[property="og:locale"]',
+            method: 'attr',
+            attr: 'content',
+          },
+        ],
       },
 
       favicon: {
@@ -200,8 +216,10 @@ export const ogpRules: ScrapingRule[] = [
             method: 'attr',
             attr: 'href',
             processor: (values, context) => {
-              return values.length > 0 && values[0] ? resolveUrl(values[0], context.url) : undefined;
-            }
+              return values.length > 0 && values[0]
+                ? resolveUrl(values[0], context.url)
+                : undefined;
+            },
           },
           // Then Apple touch icon
           {
@@ -209,8 +227,10 @@ export const ogpRules: ScrapingRule[] = [
             method: 'attr',
             attr: 'href',
             processor: (values, context) => {
-              return values.length > 0 && values[0] ? resolveUrl(values[0], context.url) : undefined;
-            }
+              return values.length > 0 && values[0]
+                ? resolveUrl(values[0], context.url)
+                : undefined;
+            },
           },
           // Finally shortcut icon
           {
@@ -218,13 +238,15 @@ export const ogpRules: ScrapingRule[] = [
             method: 'attr',
             attr: 'href',
             processor: (values, context) => {
-              return values.length > 0 && values[0] ? resolveUrl(values[0], context.url) : undefined;
-            }
-          }
-        ]
-      }
-    }
-  }
+              return values.length > 0 && values[0]
+                ? resolveUrl(values[0], context.url)
+                : undefined;
+            },
+          },
+        ],
+      },
+    },
+  },
 ];
 
 /**

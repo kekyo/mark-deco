@@ -1,8 +1,13 @@
-import { createMarkdownProcessor, createOEmbedPlugin, createCachedFetcher, defaultProviderList } from '../dist/index.js';
+import {
+  createMarkdownProcessor,
+  createOEmbedPlugin,
+  createCachedFetcher,
+  defaultProviderList,
+} from '../dist/index.js';
 
 // Create fetcher with user agent
 const fetchData = createCachedFetcher({
-  userAgent: 'markdown-basic-demo/1.0.0'
+  userAgent: 'markdown-basic-demo/1.0.0',
 });
 
 // Create oEmbed plugin
@@ -11,7 +16,7 @@ const oembedPlugin = createOEmbedPlugin(defaultProviderList);
 // Create processor with plugins
 const processor = createMarkdownProcessor({
   fetcher: fetchData,
-  plugins: [oembedPlugin]
+  plugins: [oembedPlugin],
 });
 
 // Sample Markdown
@@ -52,8 +57,8 @@ This completes the test.`;
 async function main() {
   try {
     console.log('🚀 Starting MarkDeco test...\n');
-    
-    const result = await processor.process(markdown, "demo", {
+
+    const result = await processor.process(markdown, 'demo', {
       // No longer has timeout option directly, can use AbortSignal if needed
     });
 
@@ -75,4 +80,4 @@ async function main() {
   }
 }
 
-main(); 
+main();

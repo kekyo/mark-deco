@@ -4,7 +4,11 @@ import * as fs from 'fs/promises';
 import { resolve } from 'path';
 import { describe, it, expect } from 'vitest';
 
-const spawnAsync = (command: string, args: string[], input?: string): Promise<{ stdout: string; stderr: string; code: number }> => {
+const spawnAsync = (
+  command: string,
+  args: string[],
+  input?: string
+): Promise<{ stdout: string; stderr: string; code: number }> => {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args);
     let stdout = '';
@@ -44,7 +48,11 @@ describe('mark-deco-cli', () => {
   });
 
   it('should process markdown from stdin', async () => {
-    const { stdout } = await spawnAsync('node', [CLI_PATH], '# Hello World\n\nThis is a test.');
+    const { stdout } = await spawnAsync(
+      'node',
+      [CLI_PATH],
+      '# Hello World\n\nThis is a test.'
+    );
     expect(stdout).toContain('<h1 id="section-1">Hello World</h1>');
     expect(stdout).toContain('<p>This is a test.</p>');
   });
@@ -85,14 +93,22 @@ author: "Test Author"
 
 Some content here.`;
 
-    const { stdout } = await spawnAsync('node', [CLI_PATH], markdownWithFrontmatter);
+    const { stdout } = await spawnAsync(
+      'node',
+      [CLI_PATH],
+      markdownWithFrontmatter
+    );
 
     expect(stdout).toContain('<h1 id="section-1">Main Content</h1>');
     // Note: frontmatter is no longer output to stderr by default
   });
 
   it('should handle custom unique-id-prefix', async () => {
-    const { stdout } = await spawnAsync('node', [CLI_PATH, '--unique-id-prefix', 'custom'], '# Test Heading');
+    const { stdout } = await spawnAsync(
+      'node',
+      [CLI_PATH, '--unique-id-prefix', 'custom'],
+      '# Test Heading'
+    );
     expect(stdout).toContain('<h1 id="custom-1">Test Heading</h1>');
   });
 
@@ -100,11 +116,17 @@ Some content here.`;
     const outputFile = resolve(__dirname, 'test-output.html');
 
     try {
-      await spawnAsync('node', [CLI_PATH, '-o', outputFile], '# Output Test\n\nThis should be written to a file.');
+      await spawnAsync(
+        'node',
+        [CLI_PATH, '-o', outputFile],
+        '# Output Test\n\nThis should be written to a file.'
+      );
 
       const outputContent = await readFile(outputFile, 'utf-8');
       expect(outputContent).toContain('<h1 id="section-1">Output Test</h1>');
-      expect(outputContent).toContain('<p>This should be written to a file.</p>');
+      expect(outputContent).toContain(
+        '<p>This should be written to a file.</p>'
+      );
     } finally {
       try {
         await unlink(outputFile);
@@ -115,7 +137,11 @@ Some content here.`;
   });
 
   it('should handle non-existent input file gracefully', async () => {
-    const { code, stderr } = await spawnAsync('node', [CLI_PATH, '-i', 'non-existent-file.md']);
+    const { code, stderr } = await spawnAsync('node', [
+      CLI_PATH,
+      '-i',
+      'non-existent-file.md',
+    ]);
     expect(code).toBe(1);
     expect(stderr).toContain('Failed to read input file');
   });
@@ -137,7 +163,11 @@ author: "Test Author"
 Some content here.`;
 
     try {
-      await spawnAsync('node', [CLI_PATH, '--frontmatter-output', frontmatterFile], markdownWithFrontmatter);
+      await spawnAsync(
+        'node',
+        [CLI_PATH, '--frontmatter-output', frontmatterFile],
+        markdownWithFrontmatter
+      );
 
       const frontmatterContent = await readFile(frontmatterFile, 'utf-8');
       const frontmatter = JSON.parse(frontmatterContent);
@@ -165,7 +195,11 @@ Some content here.`;
 More content.`;
 
     try {
-      await spawnAsync('node', [CLI_PATH, '--heading-tree-output', headingTreeFile], markdownWithHeadings);
+      await spawnAsync(
+        'node',
+        [CLI_PATH, '--heading-tree-output', headingTreeFile],
+        markdownWithHeadings
+      );
 
       const headingTreeContent = await readFile(headingTreeFile, 'utf-8');
       const headingTree = JSON.parse(headingTreeContent);
@@ -184,14 +218,22 @@ More content.`;
   });
 
   it('should process markdown with no plugins successfully', async () => {
-    const { stdout, code } = await spawnAsync('node', [CLI_PATH, '--no-plugins'], '# Hello World\n\nThis is a test.');
+    const { stdout, code } = await spawnAsync(
+      'node',
+      [CLI_PATH, '--no-plugins'],
+      '# Hello World\n\nThis is a test.'
+    );
     expect(code).toBe(0);
     expect(stdout).toContain('<h1 id="section-1">Hello World</h1>');
     expect(stdout).toContain('<p>This is a test.</p>');
   });
 
   it('should process markdown with empty plugin list successfully', async () => {
-    const { stdout, code } = await spawnAsync('node', [CLI_PATH, '-p'], '# Hello World\n\nThis is a test.');
+    const { stdout, code } = await spawnAsync(
+      'node',
+      [CLI_PATH, '-p'],
+      '# Hello World\n\nThis is a test.'
+    );
     expect(code).toBe(0);
     expect(stdout).toContain('<h1 id="section-1">Hello World</h1>');
     expect(stdout).toContain('<p>This is a test.</p>');
@@ -214,11 +256,11 @@ This is a test.`;
       // Ignore if file doesn't exist
     }
 
-    const { stdout, code } = await spawnAsync('node', [
-      CLI_PATH,
-      '--frontmatter-output', frontmatterPath,
-      '--no-plugins'
-    ], markdown);
+    const { stdout, code } = await spawnAsync(
+      'node',
+      [CLI_PATH, '--frontmatter-output', frontmatterPath, '--no-plugins'],
+      markdown
+    );
 
     expect(code).toBe(0);
     expect(stdout).toContain('<h1 id="section-1">Hello World</h1>');
@@ -251,11 +293,11 @@ This is a test.`;
       // Ignore if file doesn't exist
     }
 
-    const { stdout, code } = await spawnAsync('node', [
-      CLI_PATH,
-      '--heading-tree-output', headingTreePath,
-      '--no-plugins'
-    ], markdown);
+    const { stdout, code } = await spawnAsync(
+      'node',
+      [CLI_PATH, '--heading-tree-output', headingTreePath, '--no-plugins'],
+      markdown
+    );
 
     expect(code).toBe(0);
     expect(stdout).toContain('<h1 id="section-1">Chapter 1</h1>');
@@ -290,12 +332,18 @@ title: Combined Test
       // Ignore if files don't exist
     }
 
-    const { stdout, code } = await spawnAsync('node', [
-      CLI_PATH,
-      '--frontmatter-output', frontmatterPath,
-      '--heading-tree-output', headingTreePath,
-      '--no-plugins'
-    ], markdown);
+    const { stdout, code } = await spawnAsync(
+      'node',
+      [
+        CLI_PATH,
+        '--frontmatter-output',
+        frontmatterPath,
+        '--heading-tree-output',
+        headingTreePath,
+        '--no-plugins',
+      ],
+      markdown
+    );
 
     expect(code).toBe(0);
     expect(stdout).toContain('<h1 id="section-1">Main Title</h1>');

@@ -1,7 +1,9 @@
 import path from 'path';
 import { defineConfig } from 'vite';
+import prettierMax from 'prettier-max';
 
 export default defineConfig({
+  plugins: [prettierMax()],
   resolve: {
     alias: {
       // Directly reference library source files during development
@@ -12,8 +14,8 @@ export default defineConfig({
       events: 'events',
       path: 'path-browserify',
       url: 'url',
-      querystring: 'querystring-es3'
-    }
+      querystring: 'querystring-es3',
+    },
   },
   optimizeDeps: {
     // Exclude library source files from pre-bundling
@@ -34,15 +36,15 @@ export default defineConfig({
       'events',
       'path-browserify',
       'url',
-      'querystring-es3'
-    ]
+      'querystring-es3',
+    ],
   },
   define: {
     global: 'globalThis',
     // Provide Buffer polyfill directly
     'globalThis.Buffer': 'globalThis.Buffer',
     // Node.js environment variables for browser compatibility
-    'process.env.NODE_ENV': JSON.stringify('development')
+    'process.env.NODE_ENV': JSON.stringify('development'),
   },
   server: {
     // Do not specify port number here as it will be specified with --port option when starting from package.json scripts.
@@ -51,8 +53,8 @@ export default defineConfig({
     host: true,
     watch: {
       // Include parent directory src in watch targets
-      ignored: ['!**/src/**']
-    }
+      ignored: ['!**/src/**'],
+    },
   },
   build: {
     outDir: './dist',
@@ -64,7 +66,7 @@ export default defineConfig({
           return true; // Mark as external to prevent bundling
         }
         return false;
-      }
-    }
-  }
+      },
+    },
+  },
 });

@@ -6,7 +6,7 @@ import {
   createCachedFetcher,
   createMemoryCacheStorage,
   getConsoleLogger,
-  defaultProviderList
+  defaultProviderList,
 } from 'mark-deco';
 import type { Config } from './config.js';
 
@@ -26,7 +26,11 @@ export function setupProcessor(config: Config): MarkdownProcessor {
   );
 
   // Determine which plugins to enable
-  const enabledPlugins = config.noPlugins ? [] : (Array.isArray(config.plugins) ? config.plugins : ['oembed', 'card', 'mermaid']);
+  const enabledPlugins = config.noPlugins
+    ? []
+    : Array.isArray(config.plugins)
+      ? config.plugins
+      : ['oembed', 'card', 'mermaid'];
 
   // Add oEmbed plugin
   if (enabledPlugins.includes('oembed') && config.oembed?.enabled !== false) {
@@ -47,6 +51,6 @@ export function setupProcessor(config: Config): MarkdownProcessor {
   return createMarkdownProcessor({
     plugins,
     logger,
-    fetcher
+    fetcher,
   });
 }

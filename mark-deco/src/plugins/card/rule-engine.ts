@@ -1,11 +1,21 @@
 import * as cheerio from 'cheerio';
-import type { ScrapingRule, FieldRule, Processor, ProcessorRule, ProcessorFunction, ProcessorContext, ExtractedMetadata } from './types.js';
+import type {
+  ScrapingRule,
+  FieldRule,
+  Processor,
+  ProcessorRule,
+  ProcessorFunction,
+  ProcessorContext,
+  ExtractedMetadata,
+} from './types.js';
 import type { Logger } from '../../types.js';
 
 /**
  * Extract locale from HTML meta tags
  */
-const extractLocaleFromHTML = ($: ReturnType<typeof import('cheerio').load>): string | undefined => {
+const extractLocaleFromHTML = (
+  $: ReturnType<typeof import('cheerio').load>
+): string | undefined => {
   // <html lang="ja">
   const htmlLang = $('html').attr('lang');
   if (htmlLang) return htmlLang;
@@ -24,7 +34,11 @@ const extractLocaleFromHTML = ($: ReturnType<typeof import('cheerio').load>): st
 /**
  * Built-in processor rules
  */
-const executeProcessorRule = (rule: ProcessorRule, values: string[], _context: ProcessorContext): string | string[] | undefined => {
+const executeProcessorRule = (
+  rule: ProcessorRule,
+  values: string[],
+  _context: ProcessorContext
+): string | string[] | undefined => {
   const params = rule.params || {};
 
   switch (rule.type) {
@@ -32,20 +46,27 @@ const executeProcessorRule = (rule: ProcessorRule, values: string[], _context: P
       const replace = params.replace as any;
       const match = params.match as any;
       if (replace) {
-        return values.map(value => {
-          let result = value;
-          for (const r of Array.isArray(replace) ? replace : [replace]) {
-            result = result.replace(new RegExp(r.pattern, r.flags || 'g'), r.replacement || '');
-          }
-          return result.trim();
-        }).filter(Boolean);
+        return values
+          .map((value) => {
+            let result = value;
+            for (const r of Array.isArray(replace) ? replace : [replace]) {
+              result = result.replace(
+                new RegExp(r.pattern, r.flags || 'g'),
+                r.replacement || ''
+              );
+            }
+            return result.trim();
+          })
+          .filter(Boolean);
       }
       if (match) {
         const regex = new RegExp(match.pattern, match.flags || '');
-        return values.map(value => {
-          const matches = value.match(regex);
-          return matches?.[match.group || 0] || '';
-        }).filter(Boolean);
+        return values
+          .map((value) => {
+            const matches = value.match(regex);
+            return matches?.[match.group || 0] || '';
+          })
+          .filter(Boolean);
       }
       return values;
     }
@@ -55,12 +76,14 @@ const executeProcessorRule = (rule: ProcessorRule, values: string[], _context: P
       const excludeContains = params.excludeContains as string | string[];
       const minLength = params.minLength as number;
       const maxLength = params.maxLength as number;
-      return values.filter(value => {
+      return values.filter((value) => {
         if (minLength && value.length < minLength) return false;
         if (maxLength && value.length > maxLength) return false;
         if (contains && !value.includes(contains)) return false;
         if (excludeContains) {
-          for (const exclude of Array.isArray(excludeContains) ? excludeContains : [excludeContains]) {
+          for (const exclude of Array.isArray(excludeContains)
+            ? excludeContains
+            : [excludeContains]) {
             if (value.includes(exclude)) return false;
           }
         }
@@ -81,22 +104,24 @@ const executeProcessorRule = (rule: ProcessorRule, values: string[], _context: P
     case 'currency': {
       const symbol = (params.symbol as string) || '$';
       const locale = (params.locale as string) || 'en-US';
-      return values.map(value => {
-        const numbers = value.match(/[\d,\.]+/g);
-        if (numbers && numbers.length > 0) {
-          const cleanPrice = numbers[0].replace(/,/g, '');
-          if (/^\d+(\.\d+)?$/.test(cleanPrice)) {
-            const amount = parseFloat(cleanPrice);
-            // Use simple formatting for consistent test results
-            if (locale === 'de-DE') {
-              return `${symbol}${amount.toLocaleString('de-DE')}`;
-            } else {
-              return `${symbol}${amount.toLocaleString('en-US')}`;
+      return values
+        .map((value) => {
+          const numbers = value.match(/[\d,\.]+/g);
+          if (numbers && numbers.length > 0) {
+            const cleanPrice = numbers[0].replace(/,/g, '');
+            if (/^\d+(\.\d+)?$/.test(cleanPrice)) {
+              const amount = parseFloat(cleanPrice);
+              // Use simple formatting for consistent test results
+              if (locale === 'de-DE') {
+                return `${symbol}${amount.toLocaleString('de-DE')}`;
+              } else {
+                return `${symbol}${amount.toLocaleString('en-US')}`;
+              }
             }
           }
-        }
-        return value;
-      }).filter(Boolean);
+          return value;
+        })
+        .filter(Boolean);
     }
 
     default:
@@ -128,7 +153,9 @@ const extractField = (
   context: ProcessorContext,
   logger?: Logger
 ): string | string[] | undefined => {
-  const selectors = Array.isArray(rule.selector) ? rule.selector : [rule.selector];
+  const selectors = Array.isArray(rule.selector)
+    ? rule.selector
+    : [rule.selector];
   const method = rule.method || 'text';
   let values: string[] = [];
 
@@ -136,13 +163,15 @@ const extractField = (
     selectors,
     method,
     attr: rule.attr,
-    multiple: rule.multiple
+    multiple: rule.multiple,
   });
 
   // Extract values using selectors
   for (const selector of selectors) {
     const elements = $(selector);
-    logger?.debug(`extractField: Found ${elements.length} elements for selector "${selector}"`);
+    logger?.debug(
+      `extractField: Found ${elements.length} elements for selector "${selector}"`
+    );
 
     elements.each((_, elem) => {
       let value: string;
@@ -171,7 +200,7 @@ const extractField = (
 
   logger?.debug('extractField: Raw extraction results', {
     valuesCount: values.length,
-    hasProcessor: !!rule.processor
+    hasProcessor: !!rule.processor,
   });
 
   // Apply processor if specified
@@ -186,7 +215,7 @@ const extractField = (
       }
       values = Array.isArray(processed) ? processed : [processed];
       logger?.debug('extractField: Processor applied successfully', {
-        processedValuesCount: values.length
+        processedValuesCount: values.length,
       });
     }
   }
@@ -194,7 +223,9 @@ const extractField = (
   // Return result based on multiple flag
   if (rule.multiple) {
     const result = values.length > 0 ? values : undefined;
-    logger?.debug('extractField: Multiple mode result', { resultCount: result?.length || 0 });
+    logger?.debug('extractField: Multiple mode result', {
+      resultCount: result?.length || 0,
+    });
     return result;
   } else {
     const result = values.length > 0 ? values[0] : undefined;
@@ -213,24 +244,34 @@ const extractFieldWithRules = (
   fieldName: string,
   logger?: Logger
 ): string | string[] | undefined => {
-  logger?.debug(`extractFieldWithRules: Trying ${rules.length} rules for field "${fieldName}"`);
+  logger?.debug(
+    `extractFieldWithRules: Trying ${rules.length} rules for field "${fieldName}"`
+  );
 
   for (let i = 0; i < rules.length; i++) {
     const rule = rules[i];
     if (!rule) continue;
 
-    logger?.debug(`extractFieldWithRules: Attempting rule ${i + 1}/${rules.length} for field "${fieldName}"`);
+    logger?.debug(
+      `extractFieldWithRules: Attempting rule ${i + 1}/${rules.length} for field "${fieldName}"`
+    );
 
     const value = extractField(rule, $, context, logger);
     if (value !== undefined) {
-      logger?.debug(`extractFieldWithRules: Successfully extracted field "${fieldName}" using rule ${i + 1}`);
+      logger?.debug(
+        `extractFieldWithRules: Successfully extracted field "${fieldName}" using rule ${i + 1}`
+      );
       return value;
     } else {
-      logger?.debug(`extractFieldWithRules: Rule ${i + 1} failed for field "${fieldName}"`);
+      logger?.debug(
+        `extractFieldWithRules: Rule ${i + 1} failed for field "${fieldName}"`
+      );
     }
   }
 
-  logger?.debug(`extractFieldWithRules: All rules failed for field "${fieldName}"`);
+  logger?.debug(
+    `extractFieldWithRules: All rules failed for field "${fieldName}"`
+  );
   return undefined;
 };
 
@@ -246,7 +287,7 @@ export const applyScrapingRule = (
   logger?.debug('applyScrapingRule: Starting metadata extraction', {
     pattern: rule.pattern,
     siteName: rule.siteName,
-    fieldsCount: Object.keys(rule.fields).length
+    fieldsCount: Object.keys(rule.fields).length,
   });
 
   // Determine locale: rule locale takes precedence, otherwise extract from HTML
@@ -260,7 +301,7 @@ export const applyScrapingRule = (
     $,
     $head,
     url,
-    ...(locale && { locale })
+    ...(locale && { locale }),
   };
 
   const extractedData: ExtractedMetadata = {};
@@ -268,21 +309,31 @@ export const applyScrapingRule = (
   // Automatically add siteName if specified in rule
   if (rule.siteName) {
     extractedData.siteName = rule.siteName;
-    logger?.debug('applyScrapingRule: Added siteName from rule', { siteName: rule.siteName });
+    logger?.debug('applyScrapingRule: Added siteName from rule', {
+      siteName: rule.siteName,
+    });
   }
 
   // Extract fields using the new FieldConfig structure
   for (const [fieldName, fieldConfig] of Object.entries(rule.fields)) {
     logger?.debug(`applyScrapingRule: Processing field "${fieldName}"`, {
       isRequired: fieldConfig.required,
-      rulesCount: fieldConfig.rules.length
+      rulesCount: fieldConfig.rules.length,
     });
 
-    const value = extractFieldWithRules(fieldConfig.rules, $, context, fieldName, logger);
+    const value = extractFieldWithRules(
+      fieldConfig.rules,
+      $,
+      context,
+      fieldName,
+      logger
+    );
 
     // Check if required field is missing
     if (fieldConfig.required && value === undefined) {
-      logger?.debug(`applyScrapingRule: Required field "${fieldName}" is missing`);
+      logger?.debug(
+        `applyScrapingRule: Required field "${fieldName}" is missing`
+      );
       // For required fields, we could optionally fail the entire rule
       // For now, we continue but note the missing required field
       continue;
@@ -291,18 +342,23 @@ export const applyScrapingRule = (
     // Only add non-undefined values to metadata
     if (value !== undefined) {
       extractedData[fieldName] = value;
-      logger?.debug(`applyScrapingRule: Successfully extracted field "${fieldName}"`, {
-        valueType: Array.isArray(value) ? 'array' : 'string',
-        valueLength: Array.isArray(value) ? value.length : value.length
-      });
+      logger?.debug(
+        `applyScrapingRule: Successfully extracted field "${fieldName}"`,
+        {
+          valueType: Array.isArray(value) ? 'array' : 'string',
+          valueLength: Array.isArray(value) ? value.length : value.length,
+        }
+      );
     } else {
-      logger?.debug(`applyScrapingRule: Field "${fieldName}" extraction failed`);
+      logger?.debug(
+        `applyScrapingRule: Field "${fieldName}" extraction failed`
+      );
     }
   }
 
   logger?.debug('applyScrapingRule: Metadata extraction completed', {
     extractedFieldsCount: Object.keys(extractedData).length,
-    extractedFields: Object.keys(extractedData)
+    extractedFields: Object.keys(extractedData),
   });
 
   return extractedData;
@@ -318,7 +374,7 @@ export const findMatchingRule = (
 ): ScrapingRule | undefined => {
   logger?.debug('findMatchingRule: Testing rules against URL', {
     url,
-    rulesCount: rules.length
+    rulesCount: rules.length,
   });
 
   for (let i = 0; i < rules.length; i++) {
@@ -331,14 +387,14 @@ export const findMatchingRule = (
     logger?.debug(`findMatchingRule: Rule ${i + 1}/${rules.length}`, {
       pattern: rule.pattern,
       siteName: rule.siteName,
-      matches
+      matches,
     });
 
     if (matches) {
       logger?.debug('findMatchingRule: Found matching rule', {
         ruleIndex: i + 1,
         pattern: rule.pattern,
-        siteName: rule.siteName
+        siteName: rule.siteName,
       });
       return rule;
     }

@@ -4,12 +4,10 @@
     "provider_url": "http://localhost:{{PORT}}/",
     "endpoints": [
       {
-        "schemes": [
-          "http://localhost:{{PORT}}/content/*"
-        ],
+        "schemes": ["http://localhost:{{PORT}}/content/*"],
         "url": "http://localhost:{{PORT}}/oembed",
         "discovery": true
       }
     ]
   }
-] 
+]

@@ -9,11 +9,11 @@
 export function createTestCustomProviders(testServerPort: number) {
   return [
     {
-      "provider_name": "Test Server",
-      "provider_url": `http://localhost:${testServerPort}/`,
-      "endpoints": [
+      provider_name: 'Test Server',
+      provider_url: `http://localhost:${testServerPort}/`,
+      endpoints: [
         {
-          "schemes": [
+          schemes: [
             `https://youtu.be/*`,
             `https://www.youtube.com/watch*`,
             `https://youtube.com/watch*`,
@@ -24,13 +24,13 @@ export function createTestCustomProviders(testServerPort: number) {
             `https://www.flickr.com/photos/*/*`,
             `http://localhost:${testServerPort}/content/video-1`,
             `http://localhost:${testServerPort}/content/photo-1`,
-            `http://localhost:${testServerPort}/content/*`
+            `http://localhost:${testServerPort}/content/*`,
           ],
-          "url": `http://localhost:${testServerPort}/oembed`,
-          "discovery": true
-        }
-      ]
-    }
+          url: `http://localhost:${testServerPort}/oembed`,
+          discovery: true,
+        },
+      ],
+    },
   ];
 }
 
@@ -39,7 +39,7 @@ export function createTestCustomProviders(testServerPort: number) {
  */
 export function normalizeHtml(html: string): string {
   return html
-    .replace(/\s+/g, ' ')  // Replace multiple whitespace with single space
-    .replace(/>\s+</g, '><')  // Remove whitespace between tags
+    .replace(/\s+/g, ' ') // Replace multiple whitespace with single space
+    .replace(/>\s+</g, '><') // Remove whitespace between tags
     .trim();
 }

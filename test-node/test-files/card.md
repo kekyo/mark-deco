@@ -1,9 +1,9 @@
 ---
-title: "Card Plugin Test"
-author: "Test Suite"
+title: 'Card Plugin Test'
+author: 'Test Suite'
 date: 2024-01-03
-tags: ["card", "plugin", "test"]
-category: "plugin-testing"
+tags: ['card', 'plugin', 'test']
+category: 'plugin-testing'
 published: true
 ---
 
@@ -24,7 +24,8 @@ http://localhost:12345/photo
 ```
 
 This should display a card with:
-- Title: "Beautiful Nature Photo" 
+
+- Title: "Beautiful Nature Photo"
 - Description: "A stunning landscape photograph showcasing the beauty of nature"
 - Image: placeholder image reference
 - Type: website
@@ -36,6 +37,7 @@ http://localhost:12345/article
 ```
 
 This should display a card with:
+
 - Title: "JavaScript Best Practices"
 - Description: "Learn the essential JavaScript best practices for writing clean, maintainable code"
 - Additional metadata: author, published date, tags
@@ -48,6 +50,7 @@ http://localhost:12345/product
 ```
 
 This should display a card with:
+
 - Title: "Awesome Product - Only $99"
 - Description: "The best product you'll ever buy! High quality, affordable price."
 - Price information: $99 USD
@@ -61,6 +64,7 @@ http://localhost:12345/video
 ```
 
 This should display a card with:
+
 - Title: "Tutorial: Learn Node.js"
 - Description: "Complete Node.js tutorial for beginners - 2 hours of content"
 - Video metadata: duration, release date
@@ -73,6 +77,7 @@ http://localhost:12345/no-ogp
 ```
 
 This should display a fallback card with:
+
 - Title extracted from `<title>` tag: "Simple Page Without OGP"
 - Description from meta description
 - No image
@@ -103,4 +108,4 @@ This should display an error fallback card for 404 responses.
 - All responses include CORS headers for cross-origin testing
 - Content is static and predictable for snapshot testing
 
-This test ensures the Card plugin correctly handles various OGP scenarios and edge cases in a controlled environment. 
+This test ensures the Card plugin correctly handles various OGP scenarios and edge cases in a controlled environment.

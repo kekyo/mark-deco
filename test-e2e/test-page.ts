@@ -4,7 +4,8 @@ import {
   createCardPlugin,
   createMermaidPlugin,
   defaultProviderList,
-  type MarkdownProcessor
+  type FetcherType,
+  type MarkdownProcessor,
 } from 'mark-deco';
 import * as testHelpers from '../test-shared/test-helpers.js';
 
@@ -25,43 +26,49 @@ declare global {
 let processor: MarkdownProcessor | undefined;
 
 // プロセッサ初期化関数
-async function initializeProcessor(testServerPort: number): Promise<MarkdownProcessor> {
-  const customProviders = createTestCustomProviders(testServerPort);
+async function initializeProcessor(
+  testServerPort: number
+): Promise<MarkdownProcessor> {
+  const providerList = [
+    ...createTestCustomProviders(testServerPort),
+    ...defaultProviderList,
+  ];
 
   // 正しいオプション形式でoEmbedプラグインを初期化
-  const oembedPlugin = createOEmbedPlugin(defaultProviderList, {
-    customProviders: customProviders,
+  const oembedPlugin = createOEmbedPlugin(providerList, {
     maxRedirects: 2,
-    timeoutEachRedirect: 5000
+    timeoutEachRedirect: 5000,
   });
 
-  const cardPlugin = createCardPlugin({
-    timeout: 15000
-  });
+  const cardPlugin = createCardPlugin();
   const mermaidPlugin = createMermaidPlugin();
 
   // FetcherType形式に準拠したオブジェクトを作成
   // 既にブラウザに注入されているグローバルなモックfetchを使用
-  const fetchData = {
-    fetcher: async (url: string, accept: string, signal: AbortSignal | undefined) => {
+  const browserFetcher: FetcherType = {
+    rawFetcher: async (
+      url: string,
+      accept: string,
+      signal: AbortSignal | undefined
+    ) => {
       const headers: Record<string, string> = {
-        'Accept': accept
+        Accept: accept,
       };
 
-      // グローバルなモックfetchを使用（browser-utils.tsで注入済み）
-      const response = await window.fetch(url, {
-        headers,
-        signal: signal || null
-      });
+      const init: RequestInit = { headers };
+      if (signal) {
+        init.signal = signal;
+      }
 
-      return response;
+      // グローバルなモックfetchを使用（browser-utils.tsで注入済み）
+      return await window.fetch(url, init);
     },
-    userAgent: 'mark-deco-e2e-test/1.0.0'
+    userAgent: 'mark-deco-e2e-test/1.0.0',
   };
 
   processor = createMarkdownProcessor({
     plugins: [oembedPlugin, cardPlugin, mermaidPlugin],
-    fetcher: fetchData
+    fetcher: browserFetcher,
   });
 
   return processor;
@@ -69,8 +76,12 @@ async function initializeProcessor(testServerPort: number): Promise<MarkdownProc
 
 // DOM読み込み完了後の初期化
 document.addEventListener('DOMContentLoaded', async () => {
-  const markdownInput = document.getElementById('markdown-input') as HTMLTextAreaElement;
-  const processButton = document.getElementById('process-button') as HTMLButtonElement;
+  const markdownInput = document.getElementById(
+    'markdown-input'
+  ) as HTMLTextAreaElement;
+  const processButton = document.getElementById(
+    'process-button'
+  ) as HTMLButtonElement;
   const htmlOutput = document.getElementById('html-output') as HTMLDivElement;
 
   if (!markdownInput || !processButton || !htmlOutput) {
@@ -83,9 +94,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // プロセッサを初期化
   try {
-    await initializeProcessor(testServerPort);
+    const instance = await initializeProcessor(testServerPort);
     htmlOutput.innerHTML = 'Ready to process markdown...';
     htmlOutput.className = '';
+    window.processor = instance;
   } catch (error) {
     console.error('❌ Failed to initialize processor:', error);
     htmlOutput.innerHTML = 'Error: Failed to initialize processor';
@@ -114,17 +126,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Parse frontmatter to get idPrefix if available
       let idPrefix = 'id'; // default
-      const frontmatterMatch = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+      const frontmatterMatch = markdown.match(
+        /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/
+      );
       if (frontmatterMatch) {
         try {
           // Simple YAML parsing for idPrefix only
           const yamlContent = frontmatterMatch[1];
-          const idPrefixMatch = yamlContent.match(/^idPrefix:\s*["']?([^"'\n\r]+)["']?$/m);
+          const idPrefixMatch = yamlContent.match(
+            /^idPrefix:\s*["']?([^"'\n\r]+)["']?$/m
+          );
           if (idPrefixMatch) {
             idPrefix = idPrefixMatch[1].trim();
           }
         } catch (error) {
-          console.warn('⚠️ Failed to parse frontmatter for idPrefix, using default:', error);
+          console.warn(
+            '⚠️ Failed to parse frontmatter for idPrefix, using default:',
+            error
+          );
         }
       }
 
@@ -142,7 +161,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // グローバルアクセス用（テストから参照可能）
-  window.processor = processor;
   window.initializeProcessor = initializeProcessor;
 });
 

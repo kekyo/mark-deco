@@ -5,7 +5,7 @@ This is a simple test to verify basic markdown processing works correctly.
 ## Features
 
 - **Bold text**
-- *Italic text*  
+- _Italic text_
 - `inline code`
 
 ### Code Block
@@ -16,11 +16,11 @@ console.log('Hello, World!');
 
 ### Table
 
-| Feature | Status |
-|---------|--------|
+| Feature  | Status     |
+| -------- | ---------- |
 | Markdown | ✅ Working |
 | E2E Test | ✅ Working |
 
 ### Links
 
-[Example Link](https://example.com) 
+[Example Link](https://example.com)

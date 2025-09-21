@@ -33,7 +33,11 @@ export interface CacheStorage {
  * @param userAgent - User agent string (optional)
  * @returns Generated cache key string
  */
-export function generateCacheKey(url: string, accept: string, userAgent?: string): string {
+export function generateCacheKey(
+  url: string,
+  accept: string,
+  userAgent?: string
+): string {
   const userAgentPart = userAgent || 'default';
   return `fetch:${url}:${accept}:${userAgentPart}`;
 }

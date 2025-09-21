@@ -24,7 +24,10 @@ describe('MarkdownProcessor', () => {
   describe('Basic functionality', () => {
     it('should process simple markdown', async () => {
       const markdown = '# Hello World\n\nThis is a test.';
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-hello-world">Hello World</h1>');
       expect(result.html).toContain('<p>This is a test.</p>');
@@ -36,7 +39,9 @@ describe('MarkdownProcessor', () => {
 
     it('should process simple markdown with unique IDs', async () => {
       const markdown = '# Hello World\n\nThis is a test.';
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-1">Hello World</h1>');
       expect(result.html).toContain('<p>This is a test.</p>');
@@ -57,14 +62,17 @@ tags: ["test", "markdown"]
 
 This is the content.`;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-content">Content</h1>');
       expect(result.html).toContain('<p>This is the content.</p>');
       expect(result.frontmatter).toEqual({
-        title: "Test Document",
-        author: "Test Author",
-        tags: ["test", "markdown"]
+        title: 'Test Document',
+        author: 'Test Author',
+        tags: ['test', 'markdown'],
       });
       expect(result.headingTree).toHaveLength(1);
       expect(result.headingTree[0]?.text).toBe('Content');
@@ -82,14 +90,17 @@ tags: ["test", "markdown"]
 
 This is the content.`;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: false, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: false,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-1">Content</h1>');
       expect(result.html).toContain('<p>This is the content.</p>');
       expect(result.frontmatter).toEqual({
-        title: "Test Document",
-        author: "Test Author",
-        tags: ["test", "markdown"]
+        title: 'Test Document',
+        author: 'Test Author',
+        tags: ['test', 'markdown'],
       });
       expect(result.headingTree).toHaveLength(1);
       expect(result.headingTree[0]?.text).toBe('Content');
@@ -108,7 +119,10 @@ This is the content.`;
 
 ~~Strikethrough text~~`;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<table>');
       expect(result.html).toContain('<th>Column 1</th>');
@@ -123,7 +137,10 @@ This is the content.`;
 console.log('Hello, World!');
 \`\`\``;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<pre><code class="language-javascript">');
       expect(result.html).toContain("console.log('Hello, World!');");
@@ -152,7 +169,10 @@ Final content.
 Last content.
 `;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.headingTree).toHaveLength(2);
 
@@ -171,17 +191,17 @@ Last content.
                 level: 3,
                 text: 'First Sub-subtitle',
                 id: 'id-first-sub-subtitle',
-                children: []
-              }
-            ]
+                children: [],
+              },
+            ],
           },
           {
             level: 2,
             text: 'Second Subtitle',
             id: 'id-second-subtitle',
-            children: []
-          }
-        ]
+            children: [],
+          },
+        ],
       });
 
       // Check second H1
@@ -189,7 +209,7 @@ Last content.
         level: 1,
         text: 'Second Title',
         id: 'id-second-title',
-        children: []
+        children: [],
       });
     });
 
@@ -216,7 +236,10 @@ Final content.
 Last content.
 `;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: false, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: false,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.headingTree).toHaveLength(2);
 
@@ -235,17 +258,17 @@ Last content.
                 level: 3,
                 text: 'First Sub-subtitle',
                 id: 'id-3',
-                children: []
-              }
-            ]
+                children: [],
+              },
+            ],
           },
           {
             level: 2,
             text: 'Second Subtitle',
             id: 'id-4',
-            children: []
-          }
-        ]
+            children: [],
+          },
+        ],
       });
 
       // Check second H1
@@ -253,7 +276,7 @@ Last content.
         level: 1,
         text: 'Second Title',
         id: 'id-5',
-        children: []
+        children: [],
       });
     });
 
@@ -268,15 +291,26 @@ Last content.
 Content here.
 `;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.headingTree).toHaveLength(1);
       expect(result.headingTree[0]?.text).toBe('Title with bold and italic');
       expect(result.headingTree[0]?.id).toBe('id-title-with-bold-and-italic');
-      expect(result.headingTree[0]?.children[0]?.text).toBe('Another title with link');
-      expect(result.headingTree[0]?.children[0]?.id).toBe('id-another-title-with-link');
-      expect(result.headingTree[0]?.children[0]?.children[0]?.text).toBe('Title with code');
-      expect(result.headingTree[0]?.children[0]?.children[0]?.id).toBe('id-title-with-code');
+      expect(result.headingTree[0]?.children[0]?.text).toBe(
+        'Another title with link'
+      );
+      expect(result.headingTree[0]?.children[0]?.id).toBe(
+        'id-another-title-with-link'
+      );
+      expect(result.headingTree[0]?.children[0]?.children[0]?.text).toBe(
+        'Title with code'
+      );
+      expect(result.headingTree[0]?.children[0]?.children[0]?.id).toBe(
+        'id-title-with-code'
+      );
     });
 
     it('should collect headings with frontmatter', async () => {
@@ -293,14 +327,17 @@ Content here.
 
 More content.`;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.headingTree).toHaveLength(2);
       expect(result.headingTree[0]?.text).toBe('First Title');
       expect(result.headingTree[1]?.text).toBe('Second Title');
       expect(result.frontmatter).toEqual({
         title: 'Test Article',
-        author: 'John Doe'
+        author: 'John Doe',
       });
     });
 
@@ -312,19 +349,24 @@ More content.`;
 
         return {
           name: 'error-plugin',
-          processBlock
+          processBlock,
         };
       };
 
       const plugin = createErrorPlugin();
-      const processorWithPlugin = createMarkdownProcessor({ plugins: [plugin], fetcher: defaultTestFetcher });
+      const processorWithPlugin = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: defaultTestFetcher,
+      });
 
       const markdown = `\`\`\`error-plugin
 test content
 \`\`\``;
 
       // Should propagate the plugin error
-      await expect(processorWithPlugin.process(markdown, "id")).rejects.toThrow('Failed to process markdown: Plugin processing error');
+      await expect(processorWithPlugin.process(markdown, 'id')).rejects.toThrow(
+        'Failed to process markdown: Plugin processing error'
+      );
     });
   });
 
@@ -346,20 +388,36 @@ test content
 
 ## Another Sub Section`;
 
-      const result = await processor.process(markdown, "test", {
+      const result = await processor.process(markdown, 'test', {
         useContentStringHeaderId: true,
-        useHierarchicalHeadingId: true
+        useHierarchicalHeadingId: true,
       });
 
       // Check that hierarchical content-based IDs are generated
-      expect(result.html).toContain('<h1 id="test-my-main-section">My Main Section</h1>');
-      expect(result.html).toContain('<h2 id="test-my-main-section-sub-section-a">Sub Section A</h2>');
-      expect(result.html).toContain('<h3 id="test-my-main-section-sub-section-a-details-a1">Details A1</h3>');
-      expect(result.html).toContain('<h2 id="test-my-main-section-sub-section-b">Sub Section B</h2>');
-      expect(result.html).toContain('<h3 id="test-my-main-section-sub-section-b-details-b1">Details B1</h3>');
-      expect(result.html).toContain('<h3 id="test-my-main-section-sub-section-b-details-b2">Details B2</h3>');
-      expect(result.html).toContain('<h1 id="test-another-main-section">Another Main Section</h1>');
-      expect(result.html).toContain('<h2 id="test-another-main-section-another-sub-section">Another Sub Section</h2>');
+      expect(result.html).toContain(
+        '<h1 id="test-my-main-section">My Main Section</h1>'
+      );
+      expect(result.html).toContain(
+        '<h2 id="test-my-main-section-sub-section-a">Sub Section A</h2>'
+      );
+      expect(result.html).toContain(
+        '<h3 id="test-my-main-section-sub-section-a-details-a1">Details A1</h3>'
+      );
+      expect(result.html).toContain(
+        '<h2 id="test-my-main-section-sub-section-b">Sub Section B</h2>'
+      );
+      expect(result.html).toContain(
+        '<h3 id="test-my-main-section-sub-section-b-details-b1">Details B1</h3>'
+      );
+      expect(result.html).toContain(
+        '<h3 id="test-my-main-section-sub-section-b-details-b2">Details B2</h3>'
+      );
+      expect(result.html).toContain(
+        '<h1 id="test-another-main-section">Another Main Section</h1>'
+      );
+      expect(result.html).toContain(
+        '<h2 id="test-another-main-section-another-sub-section">Another Sub Section</h2>'
+      );
 
       // Check heading tree structure with correct IDs
       expect(result.headingTree).toHaveLength(2);
@@ -379,9 +437,9 @@ test content
                 level: 3,
                 text: 'Details A1',
                 id: 'test-my-main-section-sub-section-a-details-a1',
-                children: []
-              }
-            ]
+                children: [],
+              },
+            ],
           },
           {
             level: 2,
@@ -392,17 +450,17 @@ test content
                 level: 3,
                 text: 'Details B1',
                 id: 'test-my-main-section-sub-section-b-details-b1',
-                children: []
+                children: [],
               },
               {
                 level: 3,
                 text: 'Details B2',
                 id: 'test-my-main-section-sub-section-b-details-b2',
-                children: []
-              }
-            ]
-          }
-        ]
+                children: [],
+              },
+            ],
+          },
+        ],
       });
 
       // Second H1 section
@@ -415,9 +473,9 @@ test content
             level: 2,
             text: 'Another Sub Section',
             id: 'test-another-main-section-another-sub-section',
-            children: []
-          }
-        ]
+            children: [],
+          },
+        ],
       });
     });
 
@@ -446,26 +504,48 @@ test content
 
 ##### API Keys`;
 
-      const result = await processor.process(markdown, "docs", {
+      const result = await processor.process(markdown, 'docs', {
         useContentStringHeaderId: true,
-        useHierarchicalHeadingId: true
+        useHierarchicalHeadingId: true,
       });
 
       // Test deep nesting
       expect(result.html).toContain('<h1 id="docs-guide">Guide</h1>');
-      expect(result.html).toContain('<h2 id="docs-guide-getting-started">Getting Started</h2>');
-      expect(result.html).toContain('<h3 id="docs-guide-getting-started-installation">Installation</h3>');
-      expect(result.html).toContain('<h4 id="docs-guide-getting-started-installation-prerequisites">Prerequisites</h4>');
-      expect(result.html).toContain('<h5 id="docs-guide-getting-started-installation-prerequisites-system-requirements">System Requirements</h5>');
+      expect(result.html).toContain(
+        '<h2 id="docs-guide-getting-started">Getting Started</h2>'
+      );
+      expect(result.html).toContain(
+        '<h3 id="docs-guide-getting-started-installation">Installation</h3>'
+      );
+      expect(result.html).toContain(
+        '<h4 id="docs-guide-getting-started-installation-prerequisites">Prerequisites</h4>'
+      );
+      expect(result.html).toContain(
+        '<h5 id="docs-guide-getting-started-installation-prerequisites-system-requirements">System Requirements</h5>'
+      );
 
-      expect(result.html).toContain('<h2 id="docs-guide-advanced-usage">Advanced Usage</h2>');
-      expect(result.html).toContain('<h3 id="docs-guide-advanced-usage-configuration">Configuration</h3>');
-      expect(result.html).toContain('<h4 id="docs-guide-advanced-usage-configuration-database-setup">Database Setup</h4>');
+      expect(result.html).toContain(
+        '<h2 id="docs-guide-advanced-usage">Advanced Usage</h2>'
+      );
+      expect(result.html).toContain(
+        '<h3 id="docs-guide-advanced-usage-configuration">Configuration</h3>'
+      );
+      expect(result.html).toContain(
+        '<h4 id="docs-guide-advanced-usage-configuration-database-setup">Database Setup</h4>'
+      );
 
-      expect(result.html).toContain('<h3 id="docs-guide-advanced-usage-api-reference">API Reference</h3>');
-      expect(result.html).toContain('<h4 id="docs-guide-advanced-usage-api-reference-authentication">Authentication</h4>');
-      expect(result.html).toContain('<h5 id="docs-guide-advanced-usage-api-reference-authentication-oauth-20">OAuth 2.0</h5>');
-      expect(result.html).toContain('<h5 id="docs-guide-advanced-usage-api-reference-authentication-api-keys">API Keys</h5>');
+      expect(result.html).toContain(
+        '<h3 id="docs-guide-advanced-usage-api-reference">API Reference</h3>'
+      );
+      expect(result.html).toContain(
+        '<h4 id="docs-guide-advanced-usage-api-reference-authentication">Authentication</h4>'
+      );
+      expect(result.html).toContain(
+        '<h5 id="docs-guide-advanced-usage-api-reference-authentication-oauth-20">OAuth 2.0</h5>'
+      );
+      expect(result.html).toContain(
+        '<h5 id="docs-guide-advanced-usage-api-reference-authentication-api-keys">API Keys</h5>'
+      );
     });
 
     it('should handle skipped heading levels with hierarchical content-based IDs', async () => {
@@ -479,16 +559,24 @@ test content
 
 ### Regular H3`;
 
-      const result = await processor.process(markdown, "skip", {
+      const result = await processor.process(markdown, 'skip', {
         useContentStringHeaderId: true,
-        useHierarchicalHeadingId: true
+        useHierarchicalHeadingId: true,
       });
 
       expect(result.html).toContain('<h1 id="skip-main-title">Main Title</h1>');
-      expect(result.html).toContain('<h3 id="skip-main-title-skipped-h2-level">Skipped H2 Level</h3>');
-      expect(result.html).toContain('<h4 id="skip-main-title-skipped-h2-level-further-nested">Further Nested</h4>');
-      expect(result.html).toContain('<h2 id="skip-main-title-back-to-h2">Back to H2</h2>');
-      expect(result.html).toContain('<h3 id="skip-main-title-back-to-h2-regular-h3">Regular H3</h3>');
+      expect(result.html).toContain(
+        '<h3 id="skip-main-title-skipped-h2-level">Skipped H2 Level</h3>'
+      );
+      expect(result.html).toContain(
+        '<h4 id="skip-main-title-skipped-h2-level-further-nested">Further Nested</h4>'
+      );
+      expect(result.html).toContain(
+        '<h2 id="skip-main-title-back-to-h2">Back to H2</h2>'
+      );
+      expect(result.html).toContain(
+        '<h3 id="skip-main-title-back-to-h2-regular-h3">Regular H3</h3>'
+      );
     });
 
     it('should fall back to regular content-based IDs when useHierarchicalHeadingId is false', async () => {
@@ -498,14 +586,20 @@ test content
 
 ### Details A1`;
 
-      const result = await processor.process(markdown, "fallback", {
+      const result = await processor.process(markdown, 'fallback', {
         useContentStringHeaderId: true,
-        useHierarchicalHeadingId: false
+        useHierarchicalHeadingId: false,
       });
 
-      expect(result.html).toContain('<h1 id="fallback-my-main-section">My Main Section</h1>');
-      expect(result.html).toContain('<h2 id="fallback-sub-section-a">Sub Section A</h2>');
-      expect(result.html).toContain('<h3 id="fallback-details-a1">Details A1</h3>');
+      expect(result.html).toContain(
+        '<h1 id="fallback-my-main-section">My Main Section</h1>'
+      );
+      expect(result.html).toContain(
+        '<h2 id="fallback-sub-section-a">Sub Section A</h2>'
+      );
+      expect(result.html).toContain(
+        '<h3 id="fallback-details-a1">Details A1</h3>'
+      );
     });
 
     it('should fall back to hierarchical numbered IDs when useContentStringHeaderId is false', async () => {
@@ -515,9 +609,9 @@ test content
 
 ### Details A1`;
 
-      const result = await processor.process(markdown, "numbered", {
+      const result = await processor.process(markdown, 'numbered', {
         useContentStringHeaderId: false,
-        useHierarchicalHeadingId: true
+        useHierarchicalHeadingId: true,
       });
 
       expect(result.html).toContain('<h1 id="numbered-1">My Main Section</h1>');
@@ -532,21 +626,28 @@ test content
 
 ### Details A1`;
 
-      const result = await processor.process(markdown, "manual", {
+      const result = await processor.process(markdown, 'manual', {
         useContentStringHeaderId: true,
-        useHierarchicalHeadingId: true
+        useHierarchicalHeadingId: true,
       });
 
-      expect(result.html).toContain('<h1 id="manual-my-main-section">My Main Section</h1>');
+      expect(result.html).toContain(
+        '<h1 id="manual-my-main-section">My Main Section</h1>'
+      );
       expect(result.html).toContain('<h2 id="custom-sub-a">Sub Section A</h2>');
-      expect(result.html).toContain('<h3 id="manual-my-main-section-details-a1">Details A1</h3>');
+      expect(result.html).toContain(
+        '<h3 id="manual-my-main-section-details-a1">Details A1</h3>'
+      );
     });
   });
 
   describe('Plugin integration', () => {
     it('should process custom blocks with plugins', async () => {
       const plugin = createMockPlugin('test');
-      const processorWithPlugin = createMarkdownProcessor({ plugins: [plugin], fetcher: defaultTestFetcher });
+      const processorWithPlugin = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: defaultTestFetcher,
+      });
 
       const markdown = `# Test
 
@@ -554,7 +655,10 @@ test content
 custom content
 \`\`\``;
 
-      const result = await processorWithPlugin.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processorWithPlugin.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-test">Test</h1>');
       expect(result.html).toContain('<div class="mock-plugin"');
@@ -563,7 +667,10 @@ custom content
 
     it('should pass frontmatter to plugins', async () => {
       const createFrontmatterTestPlugin = (): Plugin => {
-        const processBlock = async (content: string, context: PluginContext): Promise<string> => {
+        const processBlock = async (
+          content: string,
+          context: PluginContext
+        ): Promise<string> => {
           const frontmatter = context.frontmatter;
           const title = frontmatter.title || 'No title';
           const author = frontmatter.author || 'Unknown author';
@@ -572,12 +679,15 @@ custom content
 
         return {
           name: 'frontmatter-test',
-          processBlock
+          processBlock,
         };
       };
 
       const plugin = createFrontmatterTestPlugin();
-      const processorWithPlugin = createMarkdownProcessor({ plugins: [plugin], fetcher: defaultTestFetcher });
+      const processorWithPlugin = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: defaultTestFetcher,
+      });
 
       const markdown = `---
 title: Test Article
@@ -591,7 +701,10 @@ tags: [test, markdown]
 test content
 \`\`\``;
 
-      const result = await processorWithPlugin.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processorWithPlugin.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-content">Content</h1>');
       expect(result.html).toContain('<div class="frontmatter-test"');
@@ -601,13 +714,16 @@ test content
       expect(result.frontmatter).toEqual({
         title: 'Test Article',
         author: 'John Doe',
-        tags: ['test', 'markdown']
+        tags: ['test', 'markdown'],
       });
     });
 
     it('should pass empty frontmatter to plugins when no frontmatter exists', async () => {
       const createFrontmatterTestPlugin = (): Plugin => {
-        const processBlock = async (content: string, context: PluginContext): Promise<string> => {
+        const processBlock = async (
+          content: string,
+          context: PluginContext
+        ): Promise<string> => {
           const frontmatter = context.frontmatter;
           const title = frontmatter.title || 'No title';
           return `<div class="frontmatter-test" data-title="${title}">${content}</div>`;
@@ -615,12 +731,15 @@ test content
 
         return {
           name: 'frontmatter-test',
-          processBlock
+          processBlock,
         };
       };
 
       const plugin = createFrontmatterTestPlugin();
-      const processorWithPlugin = createMarkdownProcessor({ plugins: [plugin], fetcher: defaultTestFetcher });
+      const processorWithPlugin = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: defaultTestFetcher,
+      });
 
       const markdown = `# Content
 
@@ -628,7 +747,10 @@ test content
 test content
 \`\`\``;
 
-      const result = await processorWithPlugin.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processorWithPlugin.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<div class="frontmatter-test"');
       expect(result.html).toContain('data-title="No title"');
@@ -639,7 +761,10 @@ test content
     it('should process multiple custom blocks', async () => {
       const plugin1 = createMockPlugin('test1');
       const plugin2 = createMockPlugin('test2');
-      const processorWithPlugins = createMarkdownProcessor({ plugins: [plugin1, plugin2], fetcher: defaultTestFetcher });
+      const processorWithPlugins = createMarkdownProcessor({
+        plugins: [plugin1, plugin2],
+        fetcher: defaultTestFetcher,
+      });
 
       const markdown = `\`\`\`test1
 content 1
@@ -649,7 +774,10 @@ content 1
 content 2
 \`\`\``;
 
-      const result = await processorWithPlugins.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processorWithPlugins.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('content 1');
       expect(result.html).toContain('content 2');
@@ -658,7 +786,10 @@ content 2
     it('should get list of registered plugins', () => {
       const plugin1 = createMockPlugin('test1');
       const plugin2 = createMockPlugin('test2');
-      const processorWithPlugins = createMarkdownProcessor({ plugins: [plugin1, plugin2], fetcher: defaultTestFetcher });
+      const processorWithPlugins = createMarkdownProcessor({
+        plugins: [plugin1, plugin2],
+        fetcher: defaultTestFetcher,
+      });
 
       // Verify that plugins are registered correctly by performing actual processing
       expect(processorWithPlugins).toBeDefined();
@@ -675,7 +806,10 @@ description: "This is a test"
 # Content`;
 
       // Should process successfully with valid frontmatter
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
       expect(result.html).toContain('<h1 id="id-content">Content</h1>');
       expect(result.frontmatter.title).toBe('Test');
     });
@@ -689,7 +823,12 @@ invalid yaml: [
 # Content`;
 
       // Should throw error for malformed YAML
-      await expect(processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false })).rejects.toThrow();
+      await expect(
+        processor.process(markdown, 'id', {
+          useContentStringHeaderId: true,
+          useHierarchicalHeadingId: false,
+        })
+      ).rejects.toThrow();
     });
 
     it('should throw specific error for malformed YAML frontmatter', async () => {
@@ -702,20 +841,31 @@ another: {unclosed object
 # Content`;
 
       // Should throw error with YAML parsing details
-      await expect(processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false })).rejects.toThrow(/Failed to process markdown/);
+      await expect(
+        processor.process(markdown, 'id', {
+          useContentStringHeaderId: true,
+          useHierarchicalHeadingId: false,
+        })
+      ).rejects.toThrow(/Failed to process markdown/);
     });
   });
 
   describe('Options handling', () => {
     it('should accept and pass options to plugins', async () => {
       const plugin = createMockPlugin('test');
-      const processorWithPlugin = createMarkdownProcessor({ plugins: [plugin], fetcher: defaultTestFetcher });
+      const processorWithPlugin = createMarkdownProcessor({
+        plugins: [plugin],
+        fetcher: defaultTestFetcher,
+      });
 
       const markdown = `\`\`\`test
 content
 \`\`\``;
 
-      const result = await processorWithPlugin.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processorWithPlugin.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
       expect(result.html).toContain('Mock plugin processed');
     });
   });
@@ -727,7 +877,10 @@ content
       const fetcherInterface = createDirectFetcher(userAgent, timeout);
 
       const createFetchTestPlugin = (): Plugin => {
-        const processBlock = async (content: string, context: PluginContext): Promise<string> => {
+        const processBlock = async (
+          content: string,
+          context: PluginContext
+        ): Promise<string> => {
           // Verify that the context has the correct fetcher properties
           expect(context.fetcher.userAgent).toBe(userAgent);
           expect(typeof context.fetcher.rawFetcher).toBe('function');
@@ -738,21 +891,24 @@ content
 
         return {
           name: 'direct-fetch-test',
-          processBlock
+          processBlock,
         };
       };
 
       const plugin = createFetchTestPlugin();
       const processor = createMarkdownProcessor({
         plugins: [plugin],
-        fetcher: fetcherInterface
+        fetcher: fetcherInterface,
       });
 
       const markdown = `\`\`\`direct-fetch-test
 test content
 \`\`\``;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<div class="direct-fetch-test"');
       expect(result.html).toContain(`data-user-agent="${userAgent}"`);
@@ -784,10 +940,18 @@ test content
     it('should use createCachedFetcher as fetcher', async () => {
       const userAgent = 'test-markdown-processor/1.0';
       const timeout = 5000;
-      const fetcherInterface = createCachedFetcher(userAgent, timeout, undefined, { cache: false }); // Disable cache for testing
+      const fetcherInterface = createCachedFetcher(
+        userAgent,
+        timeout,
+        undefined,
+        { cache: false }
+      ); // Disable cache for testing
 
       const createFetchTestPlugin = (): Plugin => {
-        const processBlock = async (content: string, context: PluginContext): Promise<string> => {
+        const processBlock = async (
+          content: string,
+          context: PluginContext
+        ): Promise<string> => {
           // Verify that the context has the correct fetcher properties
           expect(context.fetcher.userAgent).toBe(userAgent);
           expect(typeof context.fetcher.rawFetcher).toBe('function');
@@ -798,14 +962,14 @@ test content
 
         return {
           name: 'fetch-test',
-          processBlock
+          processBlock,
         };
       };
 
       const plugin = createFetchTestPlugin();
       const processor = createMarkdownProcessor({
         plugins: [plugin],
-        fetcher: fetcherInterface
+        fetcher: fetcherInterface,
         // userAgent is now extracted from fetcherInterface
       });
 
@@ -813,7 +977,10 @@ test content
 test content
 \`\`\``;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<div class="fetch-test"');
       expect(result.html).toContain(`data-user-agent="${userAgent}"`);
@@ -824,7 +991,12 @@ test content
       // Test with a proper userAgent instead of undefined since it's now required
       const userAgent = 'default-test-agent/1.0.0';
       const timeout = 5000;
-      const fetcherInterface = createCachedFetcher(userAgent, timeout, undefined, { cache: false }); // Disable cache for testing
+      const fetcherInterface = createCachedFetcher(
+        userAgent,
+        timeout,
+        undefined,
+        { cache: false }
+      ); // Disable cache for testing
 
       const plugin: Plugin = {
         name: 'undefined-context-test',
@@ -835,17 +1007,20 @@ test content
           expect(context.fetcher.userAgent).toBe(userAgent);
 
           return `<div class="fetch-test" data-user-agent="${context.fetcher.userAgent || 'none'}">${content}</div>`;
-        }
+        },
       };
 
       // Create processor with fetcherInterface (which contains userAgent)
       const processor = createMarkdownProcessor({
         plugins: [plugin],
-        fetcher: fetcherInterface
+        fetcher: fetcherInterface,
       });
 
       const markdown = '```undefined-context-test\ntest content\n```';
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       // userAgent is now extracted from fetcherInterface
       expect(result.html).toContain(`data-user-agent="${userAgent}"`);
@@ -875,7 +1050,7 @@ test content
       const plugin = createMockPlugin('no-fetcher-test');
       const processor = createMarkdownProcessor({
         plugins: [plugin],
-        fetcher: defaultTestFetcher
+        fetcher: defaultTestFetcher,
         // No fetcher provided - should use default
       });
 
@@ -883,7 +1058,10 @@ test content
 test content
 \`\`\``;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<div class="mock-plugin"');
       expect(result.html).toContain('test content');
@@ -894,7 +1072,7 @@ test content
     it('should use custom htmlOptions when provided', async () => {
       const processor = createMarkdownProcessor({
         fetcher: defaultTestFetcher,
-        plugins: []
+        plugins: [],
       });
 
       const markdown = `# Test\n\nThis is a simple paragraph.`;
@@ -904,14 +1082,15 @@ test content
         indent_size: 0,
         indent_char: '',
         preserve_newlines: false,
-        max_preserve_newlines: 0
+        max_preserve_newlines: 0,
       };
 
-      const result = await processor.process(markdown, "id", {
-        useContentStringHeaderId: true, useHierarchicalHeadingId: false,
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
         advancedOptions: {
-          htmlOptions: customOptions
-        }
+          htmlOptions: customOptions,
+        },
       });
 
       // The HTML should have no indentation due to custom options
@@ -923,12 +1102,15 @@ test content
     it('should use default htmlOptions when not provided', async () => {
       const processor = createMarkdownProcessor({
         fetcher: defaultTestFetcher,
-        plugins: []
+        plugins: [],
       });
 
       const markdown = `# Test\n\nThis is a simple paragraph.\n\n* Item 1\n* Item 2`;
 
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       // The HTML should be indented with default options (2 spaces)
       expect(result.html).toContain('  '); // Should contain indentation in nested elements
@@ -941,7 +1123,7 @@ test content
     it('should handle complex HTML structures with custom options', async () => {
       const processor = createMarkdownProcessor({
         fetcher: defaultTestFetcher,
-        plugins: []
+        plugins: [],
       });
 
       const markdown = `# Heading\n\n* Item 1\n* Item 2\n\n> Blockquote`;
@@ -950,14 +1132,15 @@ test content
         indent_size: 4,
         indent_char: ' ',
         preserve_newlines: true,
-        max_preserve_newlines: 2
+        max_preserve_newlines: 2,
       };
 
-      const result = await processor.process(markdown, "id", {
-        useContentStringHeaderId: true, useHierarchicalHeadingId: false,
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
         advancedOptions: {
-          htmlOptions: customOptions
-        }
+          htmlOptions: customOptions,
+        },
       });
 
       // The HTML should use 4-space indentation
@@ -973,18 +1156,18 @@ test content
     it('should apply gfmOptions for strikethrough configuration', async () => {
       const processor = createMarkdownProcessor({
         fetcher: defaultTestFetcher,
-        plugins: []
+        plugins: [],
       });
 
       const markdown = `# Test\n\n~single~ and ~~double~~ tildes`;
 
       // Test with singleTilde disabled - only double tildes should work
-      const result = await processor.process(markdown, "id", {
+      const result = await processor.process(markdown, 'id', {
         advancedOptions: {
           gfmOptions: {
-            singleTilde: false
-          }
-        }
+            singleTilde: false,
+          },
+        },
       });
 
       // Single tilde should be kept as text
@@ -996,7 +1179,7 @@ test content
     it('should accept custom remark plugins', async () => {
       const processor = createMarkdownProcessor({
         fetcher: defaultTestFetcher,
-        plugins: []
+        plugins: [],
       });
 
       // Mock remark plugin that wraps paragraphs with custom class
@@ -1013,10 +1196,10 @@ test content
 
       const markdown = `This is a paragraph.`;
 
-      const result = await processor.process(markdown, "id", {
+      const result = await processor.process(markdown, 'id', {
         advancedOptions: {
-          remarkPlugins: [customPlugin]
-        }
+          remarkPlugins: [customPlugin],
+        },
       });
 
       expect(result.html).toContain('class="custom-paragraph"');
@@ -1025,14 +1208,18 @@ test content
     it('should accept custom rehype plugins', async () => {
       const processor = createMarkdownProcessor({
         fetcher: defaultTestFetcher,
-        plugins: []
+        plugins: [],
       });
 
       // Mock rehype plugin that adds data attributes to all elements
       const customRehypePlugin = () => {
         return (tree: unknown) => {
           const visit = (node: unknown): void => {
-            const typedNode = node as { type?: string; properties?: Record<string, unknown>; children?: unknown[] };
+            const typedNode = node as {
+              type?: string;
+              properties?: Record<string, unknown>;
+              children?: unknown[];
+            };
             if (typedNode.type === 'element') {
               typedNode.properties = typedNode.properties || {};
               typedNode.properties['data-processed'] = 'true';
@@ -1047,10 +1234,10 @@ test content
 
       const markdown = `# Heading\n\nParagraph text.`;
 
-      const result = await processor.process(markdown, "id", {
+      const result = await processor.process(markdown, 'id', {
         advancedOptions: {
-          rehypePlugins: [customRehypePlugin]
-        }
+          rehypePlugins: [customRehypePlugin],
+        },
       });
 
       expect(result.html).toContain('data-processed="true"');
@@ -1059,7 +1246,7 @@ test content
     it('should work with plugin parameters', async () => {
       const processor = createMarkdownProcessor({
         fetcher: defaultTestFetcher,
-        plugins: []
+        plugins: [],
       });
 
       // Mock plugin with options
@@ -1068,9 +1255,17 @@ test content
           const typedTree = tree as { children?: unknown[] };
           if (typedTree.children) {
             typedTree.children.forEach((node: unknown) => {
-              const typedNode = node as { type?: string; depth?: number; children?: { type?: string; value?: string }[] };
+              const typedNode = node as {
+                type?: string;
+                depth?: number;
+                children?: { type?: string; value?: string }[];
+              };
               if (typedNode.type === 'heading' && typedNode.depth === 1) {
-                if (typedNode.children && typedNode.children[0] && typedNode.children[0].type === 'text') {
+                if (
+                  typedNode.children &&
+                  typedNode.children[0] &&
+                  typedNode.children[0].type === 'text'
+                ) {
                   typedNode.children[0].value = `${options.prefix}${typedNode.children[0].value}`;
                 }
               }
@@ -1081,10 +1276,10 @@ test content
 
       const markdown = `# Test Heading`;
 
-      const result = await processor.process(markdown, "id", {
+      const result = await processor.process(markdown, 'id', {
         advancedOptions: {
-          remarkPlugins: [[pluginWithOptions, { prefix: 'PREFIX: ' }]]
-        }
+          remarkPlugins: [[pluginWithOptions, { prefix: 'PREFIX: ' }]],
+        },
       });
 
       expect(result.html).toContain('PREFIX: Test Heading');
@@ -1096,11 +1291,14 @@ test content
     const customLogger = getConsoleLogger();
     const processor = createMarkdownProcessor({
       logger: customLogger,
-      fetcher: testFetcher
+      fetcher: testFetcher,
     });
 
     const markdown = '# Test';
-    const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+    const result = await processor.process(markdown, 'id', {
+      useContentStringHeaderId: true,
+      useHierarchicalHeadingId: false,
+    });
 
     expect(result.html).toContain('<h1 id="id-test">Test</h1>');
   });
@@ -1108,17 +1306,25 @@ test content
   describe('Heading ID options', () => {
     it('should generate content-based IDs when useContentStringHeaderId is true', async () => {
       const markdown = '# Hello World\n\n## Another Title\n\nContent.';
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-hello-world">Hello World</h1>');
-      expect(result.html).toContain('<h2 id="id-another-title">Another Title</h2>');
+      expect(result.html).toContain(
+        '<h2 id="id-another-title">Another Title</h2>'
+      );
       expect(result.headingTree[0]?.id).toBe('id-hello-world');
       expect(result.headingTree[0]?.children[0]?.id).toBe('id-another-title');
     });
 
     it('should generate unique IDs when useContentStringHeaderId is false', async () => {
       const markdown = '# Hello World\n\n## Another Title\n\nContent.';
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: false, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: false,
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-1">Hello World</h1>');
       expect(result.html).toContain('<h2 id="id-2">Another Title</h2>');
@@ -1128,7 +1334,9 @@ test content
 
     it('should default to unique IDs when useContentStringHeaderId is not specified', async () => {
       const markdown = '# Hello World\n\n## Another Title\n\nContent.';
-      const result = await processor.process(markdown, "id", { useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useHierarchicalHeadingId: false,
+      });
 
       expect(result.html).toContain('<h1 id="id-1">Hello World</h1>');
       expect(result.html).toContain('<h2 id="id-2">Another Title</h2>');
@@ -1139,7 +1347,10 @@ test content
     it('should handle control characters in headings when generating content-based IDs', async () => {
       // Test headings that contain actual control characters within the heading text
       const markdown = `# ABC\fDEF\n\n## Hello\tWorld\vTest\n\n### A\bB\x07C\n\nContent.`;
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       // Test form feed character should be replaced with hyphen
       expect(result.html).toContain('<h1 id="id-abc-def">ABC');
@@ -1147,17 +1358,24 @@ test content
 
       // Test tab and vertical tab characters should be replaced with hyphens
       expect(result.html).toContain('<h2 id="id-hello-world-test">Hello');
-      expect(result.headingTree[0]?.children[0]?.id).toBe('id-hello-world-test');
+      expect(result.headingTree[0]?.children[0]?.id).toBe(
+        'id-hello-world-test'
+      );
 
       // Test backspace and bell characters should be replaced with hyphens (backspace erases B, so A+C remains)
-      expect(result.html).toContain('<h3 id="id-a-b-c">');  // The actual output is "a-b-c" because both backspace and bell are converted to hyphens
-      expect(result.headingTree[0]?.children[0]?.children[0]?.id).toBe('id-a-b-c');
+      expect(result.html).toContain('<h3 id="id-a-b-c">'); // The actual output is "a-b-c" because both backspace and bell are converted to hyphens
+      expect(result.headingTree[0]?.children[0]?.children[0]?.id).toBe(
+        'id-a-b-c'
+      );
     });
 
     it('should handle various other control characters in headings', async () => {
       // Test different control characters in heading text
       const markdown = `# Test\x01Form\x02Feed\n\n## Bell\x03Sound\x04End\n\nContent.`;
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       // Test SOH and STX characters should be replaced with hyphens
       expect(result.html).toContain('<h1 id="id-test-form-feed">Test');
@@ -1171,7 +1389,10 @@ test content
     it('should handle control characters mixed with special characters', async () => {
       // Test control characters mixed with special characters that should be removed
       const markdown = `# Test\f@#$%DEF\n\n## Hello\t[World]\vTest\n\nContent.`;
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       // Test control character with special characters - special chars should be removed, control chars become hyphens
       expect(result.html).toContain('<h1 id="id-test-def">Test');
@@ -1179,13 +1400,18 @@ test content
 
       // Test tab with brackets and vertical tab - brackets removed, control chars become hyphens
       expect(result.html).toContain('<h2 id="id-hello-world-test">Hello');
-      expect(result.headingTree[0]?.children[0]?.id).toBe('id-hello-world-test');
+      expect(result.headingTree[0]?.children[0]?.id).toBe(
+        'id-hello-world-test'
+      );
     });
 
     it('should handle escape sequence strings in headings', async () => {
       // Test escape sequence strings like \n, \t that appear as literal strings
       const markdown = `# Test\\n\\nContent\n\n## Hello\\tWorld\\rTest\n\nContent.`;
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       // Test that literal \n strings are converted to hyphens
       expect(result.html).toContain('<h1 id="id-test-content">Test');
@@ -1193,13 +1419,18 @@ test content
 
       // Test that literal \t and \r strings are converted to hyphens
       expect(result.html).toContain('<h2 id="id-hello-world-test">Hello');
-      expect(result.headingTree[0]?.children[0]?.id).toBe('id-hello-world-test');
+      expect(result.headingTree[0]?.children[0]?.id).toBe(
+        'id-hello-world-test'
+      );
     });
 
     it('should handle non-ASCII characters with fallback strategy', async () => {
       // Test Unicode normalization and accent removal
       const markdown = `# Café Naïve\n\n## こんにちは世界\n\n### Ñoël\n\nContent.`;
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       // Test that accented characters are normalized
       expect(result.html).toContain('<h1 id="id-cafe-naive">Café');
@@ -1211,13 +1442,18 @@ test content
 
       // Test that Spanish characters are normalized
       expect(result.html).toContain('<h3 id="id-noel">Ñoël');
-      expect(result.headingTree[0]?.children[0]?.children[0]?.id).toBe('id-noel');
+      expect(result.headingTree[0]?.children[0]?.children[0]?.id).toBe(
+        'id-noel'
+      );
     });
 
     it('should use fallback for very short or invalid IDs', async () => {
       // Test headings that result in very short IDs
       const markdown = `# 🎉\n\n## ♥\n\n### A\n\nContent.`;
-      const result = await processor.process(markdown, "id", { useContentStringHeaderId: true, useHierarchicalHeadingId: false });
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+      });
 
       // Test that emoji falls back to unique ID
       expect(result.html).toMatch(/<h1 id="id-\d+">🎉/);
@@ -1229,7 +1465,9 @@ test content
 
       // Test that single ASCII character falls back to unique ID (less than 3 chars)
       expect(result.html).toMatch(/<h3 id="id-\d+">A/);
-      expect(result.headingTree[0]?.children[0]?.children[0]?.id).toMatch(/^id-\d+$/);
+      expect(result.headingTree[0]?.children[0]?.children[0]?.id).toMatch(
+        /^id-\d+$/
+      );
     });
 
     it('should generate hierarchical heading IDs when useHierarchicalHeadingId is true', async () => {
@@ -1263,8 +1501,8 @@ Even more content.
 Last content.
 `;
 
-      const result = await processor.process(markdown, "id", {
-        useHierarchicalHeadingId: true
+      const result = await processor.process(markdown, 'id', {
+        useHierarchicalHeadingId: true,
       });
 
       expect(result.headingTree).toHaveLength(2);
@@ -1279,15 +1517,15 @@ Last content.
             level: 2,
             text: 'First Subtitle',
             id: 'id-1-1',
-            children: []
+            children: [],
           },
           {
             level: 2,
             text: 'Second Subtitle',
             id: 'id-1-2',
-            children: []
-          }
-        ]
+            children: [],
+          },
+        ],
       });
 
       // Check second H1 and its children
@@ -1300,21 +1538,21 @@ Last content.
             level: 2,
             text: 'Third Subtitle',
             id: 'id-2-1',
-            children: []
+            children: [],
           },
           {
             level: 2,
             text: 'Fourth Subtitle',
             id: 'id-2-2',
-            children: []
+            children: [],
           },
           {
             level: 2,
             text: 'Fifth Subtitle',
             id: 'id-2-3',
-            children: []
-          }
-        ]
+            children: [],
+          },
+        ],
       });
 
       // Check HTML contains the correct IDs
@@ -1352,8 +1590,8 @@ Last content.
 ## Section 3
 `;
 
-      const result = await processor.process(markdown, "test", {
-        useHierarchicalHeadingId: true
+      const result = await processor.process(markdown, 'test', {
+        useHierarchicalHeadingId: true,
       });
 
       // Verify some key IDs in the hierarchical structure
@@ -1363,8 +1601,12 @@ Last content.
       expect(result.html).toContain('<h3 id="test-1-1-2">Subsection 1.2</h3>');
       expect(result.html).toContain('<h2 id="test-1-2">Section 2</h2>');
       expect(result.html).toContain('<h3 id="test-1-2-1">Subsection 2.1</h3>');
-      expect(result.html).toContain('<h4 id="test-1-2-1-1">Subsection 2.1.1</h4>');
-      expect(result.html).toContain('<h4 id="test-1-2-1-2">Subsection 2.1.2</h4>');
+      expect(result.html).toContain(
+        '<h4 id="test-1-2-1-1">Subsection 2.1.1</h4>'
+      );
+      expect(result.html).toContain(
+        '<h4 id="test-1-2-1-2">Subsection 2.1.2</h4>'
+      );
       expect(result.html).toContain('<h3 id="test-1-2-2">Subsection 2.2</h3>');
       expect(result.html).toContain('<h1 id="test-2">Second Main Title</h1>');
       expect(result.html).toContain('<h2 id="test-2-1">Section 3</h2>');
@@ -1374,7 +1616,7 @@ Last content.
   it('should process markdown with empty plugin arrays in advancedOptions', async () => {
     const processor = createMarkdownProcessor({
       fetcher: defaultTestFetcher,
-      plugins: []
+      plugins: [],
     });
 
     const markdown = `# Test Heading
@@ -1382,13 +1624,13 @@ Last content.
 This is a test paragraph.`;
 
     // This should work without throwing "empty preset" error
-    const result = await processor.process(markdown, "id", {
+    const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
       useHierarchicalHeadingId: false,
       advancedOptions: {
         remarkPlugins: [],
-        rehypePlugins: []
-      }
+        rehypePlugins: [],
+      },
     });
 
     expect(result.html).toContain('<h1 id="id-test-heading">Test Heading</h1>');
@@ -1398,7 +1640,7 @@ This is a test paragraph.`;
   it('should process markdown with undefined plugin arrays in advancedOptions', async () => {
     const processor = createMarkdownProcessor({
       fetcher: defaultTestFetcher,
-      plugins: []
+      plugins: [],
     });
 
     const markdown = `# Test Heading
@@ -1406,12 +1648,12 @@ This is a test paragraph.`;
 This is a test paragraph.`;
 
     // This should work without throwing "empty preset" error
-    const result = await processor.process(markdown, "id", {
+    const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
       useHierarchicalHeadingId: false,
       advancedOptions: {
         // Test with completely empty advancedOptions object
-      }
+      },
     });
 
     expect(result.html).toContain('<h1 id="id-test-heading">Test Heading</h1>');
@@ -1421,7 +1663,7 @@ This is a test paragraph.`;
   it('should process markdown with no advancedOptions at all', async () => {
     const processor = createMarkdownProcessor({
       fetcher: defaultTestFetcher,
-      plugins: []
+      plugins: [],
     });
 
     const markdown = `# Test Heading
@@ -1429,9 +1671,9 @@ This is a test paragraph.`;
 This is a test paragraph.`;
 
     // This should work without throwing "empty preset" error
-    const result = await processor.process(markdown, "id", {
+    const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
-      useHierarchicalHeadingId: false
+      useHierarchicalHeadingId: false,
       // No advancedOptions specified - should use defaults
     });
 

@@ -27,13 +27,6 @@
     "noImplicitAny": true,
     "strictFunctionTypes": true
   },
-  "include": [
-    "*.ts",
-    "*.js",
-    "../mark-deco/src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "./dist"
-  ]
+  "include": ["*.ts", "*.js", "../mark-deco/src/**/*"],
+  "exclude": ["node_modules", "./dist"]
 }

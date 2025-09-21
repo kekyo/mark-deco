@@ -2,8 +2,15 @@
 
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
-import { Command } from 'commander';
-import { createMarkdownProcessor, createOEmbedPlugin, createCardPlugin, createMermaidPlugin, createCachedFetcher, defaultProviderList } from 'mark-deco';
+import { Command, InvalidArgumentError, Option } from 'commander';
+import {
+  createMarkdownProcessor,
+  createOEmbedPlugin,
+  createCardPlugin,
+  createMermaidPlugin,
+  createCachedFetcher,
+  defaultProviderList,
+} from 'mark-deco';
 
 interface ProcessorOptions {
   enableOembed: boolean;
@@ -25,7 +32,10 @@ function countHeadings(headingTree: any[]): number {
   return count;
 }
 
-async function processMarkdownFile(filePath: string, options: ProcessorOptions): Promise<void> {
+async function processMarkdownFile(
+  filePath: string,
+  options: ProcessorOptions
+): Promise<void> {
   try {
     // Read markdown file
     const markdownContent = await readFile(filePath, 'utf-8');
@@ -37,16 +47,14 @@ async function processMarkdownFile(filePath: string, options: ProcessorOptions):
     if (options.enableOembed) {
       const oembedPlugin = createOEmbedPlugin(defaultProviderList, {
         maxRedirects: 3,
-        timeoutEachRedirect: options.timeout
+        timeoutEachRedirect: options.timeout,
       });
       plugins.push(oembedPlugin);
       console.log('🎬 oEmbed plugin enabled');
     }
 
     if (options.enableCard) {
-      const cardPlugin = createCardPlugin({
-        timeout: options.timeout
-      });
+      const cardPlugin = createCardPlugin();
       plugins.push(cardPlugin);
       console.log('📋 Card plugin enabled');
     }
@@ -60,12 +68,14 @@ async function processMarkdownFile(filePath: string, options: ProcessorOptions):
     // Create processor
     const processor = createMarkdownProcessor({
       plugins,
-      fetcher: createCachedFetcher('mark-deco-demo/1.0.0', options.timeout)
+      fetcher: createCachedFetcher('mark-deco-demo/1.0.0', options.timeout),
     });
 
     // Process markdown
     console.log('⚙️ Processing markdown...');
-    const result = await processor.process(markdownContent, 'id', { useContentStringHeaderId: true });
+    const result = await processor.process(markdownContent, 'id', {
+      useContentStringHeaderId: true,
+    });
 
     // Ensure output directory exists
     await mkdir(options.outputDir, { recursive: true });
@@ -77,20 +87,29 @@ async function processMarkdownFile(filePath: string, options: ProcessorOptions):
 
     // Write frontmatter output
     const frontmatterPath = path.join(options.outputDir, 'frontmatter.json');
-    await writeFile(frontmatterPath, JSON.stringify(result.frontmatter, null, 2), 'utf-8');
+    await writeFile(
+      frontmatterPath,
+      JSON.stringify(result.frontmatter, null, 2),
+      'utf-8'
+    );
     console.log(`✅ Frontmatter written to: ${frontmatterPath}`);
 
     // Write heading tree output
     const headingTreePath = path.join(options.outputDir, 'heading-tree.json');
-    await writeFile(headingTreePath, JSON.stringify(result.headingTree, null, 2), 'utf-8');
+    await writeFile(
+      headingTreePath,
+      JSON.stringify(result.headingTree, null, 2),
+      'utf-8'
+    );
     console.log(`✅ Heading tree written to: ${headingTreePath}`);
 
     console.log('\n🎉 Processing complete!');
     console.log(`📊 Statistics:`);
-    console.log(`  - Frontmatter keys: ${Object.keys(result.frontmatter).length}`);
+    console.log(
+      `  - Frontmatter keys: ${Object.keys(result.frontmatter).length}`
+    );
     console.log(`  - Total headings: ${countHeadings(result.headingTree)}`);
     console.log(`  - HTML size: ${result.html.length} characters`);
-
   } catch (error) {
     console.error('❌ Error processing markdown file:', error);
     process.exit(1);
@@ -102,21 +121,49 @@ async function main(): Promise<void> {
 
   program
     .name('md-processor')
-    .description('Enhanced markdown processor with plugin support')
+    .summary('Enhanced markdown processor with plugin support')
     .version('1.0.0')
     .argument('<file>', 'Path to markdown file to process')
-    .option('-o, --output <dir>', 'Output directory', `./output-${process.pid}-${Date.now()}`)
-    .option('--enable-oembed', 'Enable oEmbed plugin', false)
-    .option('--enable-card', 'Enable card plugin', false)
-    .option('--enable-mermaid', 'Enable mermaid plugin', false)
-    .option('-t, --timeout <ms>', 'Request timeout in milliseconds', '5000')
-    .action(async (file: string, options: { enableOembed: boolean; enableCard: boolean; enableMermaid: boolean; output: string; timeout: string }) => {
+    .addOption(
+      new Option('-o, --output <dir>', 'Output directory').default(
+        `./output-${process.pid}-${Date.now()}`
+      )
+    )
+    .addOption(
+      new Option('--enable-oembed', 'Enable oEmbed plugin').default(false)
+    )
+    .addOption(new Option('--enable-card', 'Enable card plugin').default(false))
+    .addOption(
+      new Option('--enable-mermaid', 'Enable mermaid plugin').default(false)
+    )
+    .addOption(
+      new Option('-t, --timeout <ms>', 'Request timeout in milliseconds')
+        .argParser((value: string) => {
+          const parsed = Number.parseInt(value, 10);
+          if (!Number.isFinite(parsed) || parsed < 0) {
+            throw new InvalidArgumentError(
+              'timeout must be a non-negative number'
+            );
+          }
+          return parsed;
+        })
+        .default(5000)
+    )
+    .action(async (file: string) => {
+      const runtimeOptions = program.opts<{
+        enableOembed: boolean;
+        enableCard: boolean;
+        enableMermaid: boolean;
+        output: string;
+        timeout: number;
+      }>();
+
       const processorOptions: ProcessorOptions = {
-        enableOembed: options.enableOembed,
-        enableCard: options.enableCard,
-        enableMermaid: options.enableMermaid,
-        outputDir: path.resolve(options.output),
-        timeout: parseInt(options.timeout, 10)
+        enableOembed: runtimeOptions.enableOembed,
+        enableCard: runtimeOptions.enableCard,
+        enableMermaid: runtimeOptions.enableMermaid,
+        outputDir: path.resolve(runtimeOptions.output),
+        timeout: runtimeOptions.timeout,
       };
 
       console.log('🚀 MarkDeco Demo');
@@ -124,6 +171,11 @@ async function main(): Promise<void> {
 
       await processMarkdownFile(path.resolve(file), processorOptions);
     });
+
+  const args = process.argv.slice(2);
+  if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
+    console.log('Enhanced markdown processor with plugin support');
+  }
 
   await program.parseAsync();
 }

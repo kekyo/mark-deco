@@ -22,7 +22,7 @@ const createDetailedLogger = (): Logger => ({
   },
   error: (message: string, ...args: unknown[]) => {
     console.error(`[ERROR] ${message}`, ...args);
-  }
+  },
 });
 
 // Example of custom scraping rules
@@ -35,14 +35,25 @@ const customScrapingRules = [
         rules: [
           { selector: 'h1.entry-title strong a', method: 'text' as const },
           { selector: 'h1[itemprop="name"] strong a', method: 'text' as const },
-          { selector: '.js-repo-nav-item[data-selected-links="repo_source"]', method: 'text' as const }
-        ]
+          {
+            selector: '.js-repo-nav-item[data-selected-links="repo_source"]',
+            method: 'text' as const,
+          },
+        ],
       },
       description: {
         rules: [
-          { selector: 'meta[property="og:description"]', method: 'attr' as const, attr: 'content' },
-          { selector: 'meta[name="description"]', method: 'attr' as const, attr: 'content' }
-        ]
+          {
+            selector: 'meta[property="og:description"]',
+            method: 'attr' as const,
+            attr: 'content',
+          },
+          {
+            selector: 'meta[name="description"]',
+            method: 'attr' as const,
+            attr: 'content',
+          },
+        ],
       },
       language: {
         rules: [
@@ -50,21 +61,21 @@ const customScrapingRules = [
             selector: '.BorderGrid-cell .ml-3 span[class*="color-fg-default"]',
             method: 'text' as const,
             processor: {
-              type: 'first' as const
-            }
-          }
-        ]
-      }
-    }
-  }
+              type: 'first' as const,
+            },
+          },
+        ],
+      },
+    },
+  },
 ];
 
 // Create processor
 const processor = createMarkdownProcessor({
   plugins: [
     createCardPlugin({
-      scrapingRules: customScrapingRules
-    })
+      scrapingRules: customScrapingRules,
+    }),
   ],
   fetcher: {
     fetcher: async (url: string) => {
@@ -97,9 +108,9 @@ const processor = createMarkdownProcessor({
 
       return new Response('Not found', { status: 404 });
     },
-    userAgent: 'card-logging-example/1.0'
+    userAgent: 'card-logging-example/1.0',
   },
-  logger: createDetailedLogger()
+  logger: createDetailedLogger(),
 });
 
 async function demonstrateCardLogging() {
@@ -120,7 +131,6 @@ async function demonstrateCardLogging() {
     console.log('\n--- Log output end ---\n');
     console.log('Processing result HTML:');
     console.log(result.html);
-
   } catch (error) {
     console.error('An error occurred:', error);
   }

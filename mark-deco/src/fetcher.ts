@@ -1,5 +1,9 @@
-import { createMemoryCacheStorage, generateCacheKey, type CacheStorage } from "./cache/index.js";
-import { Logger, type FetcherType } from "./types";
+import {
+  createMemoryCacheStorage,
+  generateCacheKey,
+  type CacheStorage,
+} from './cache/index.js';
+import { Logger, type FetcherType } from './types';
 import { fetchData } from './utils.js';
 
 /**
@@ -47,12 +51,19 @@ export const createCachedFetcher = (
     cache = true,
     cacheTTL = 60 * 60 * 1000, // 1 hour default
     cacheFailures = true,
-    failureCacheTTL = 5 * 60 * 1000 // 5 minutes default for failures
+    failureCacheTTL = 5 * 60 * 1000, // 5 minutes default for failures
   } = options || {};
 
-  const finalCacheStorage = cache ? (cacheStorage || createMemoryCacheStorage()) : undefined;
+  const finalCacheStorage = cache
+    ? cacheStorage || createMemoryCacheStorage()
+    : undefined;
 
-  const fetcherFunction = async (url: string, accept: string, signal: AbortSignal | undefined, logger?: Logger): Promise<Response> => {
+  const fetcherFunction = async (
+    url: string,
+    accept: string,
+    signal: AbortSignal | undefined,
+    logger?: Logger
+  ): Promise<Response> => {
     // Check cache first if caching is enabled
     if (cache && finalCacheStorage) {
       const cacheKey = generateCacheKey(url, accept, userAgent);
@@ -70,8 +81,8 @@ export const createCachedFetcher = (
               statusText: 'OK',
               headers: {
                 'Content-Type': accept,
-                'X-Cache': 'HIT'
-              }
+                'X-Cache': 'HIT',
+              },
             });
           } else if (cacheEntry.type === 'error' && cacheFailures) {
             // Return cached error
@@ -79,11 +90,16 @@ export const createCachedFetcher = (
             const error = new Error('Cached error');
             throw error;
           } else {
-            logger?.debug(`Cache entry type ${cacheEntry.type} not eligible for use, cacheFailures: ${cacheFailures}`);
+            logger?.debug(
+              `Cache entry type ${cacheEntry.type} not eligible for use, cacheFailures: ${cacheFailures}`
+            );
           }
         } catch (parseError) {
           // If parsing fails, treat as cache miss and continue
-          logger?.warn(`Failed to parse cached entry for URL ${url}:`, parseError);
+          logger?.warn(
+            `Failed to parse cached entry for URL ${url}:`,
+            parseError
+          );
           // Check if this is JSON parse error or error thrown from cached error handling
           if (parseError instanceof SyntaxError) {
             // JSON parse error - continue to fetch from network
@@ -103,7 +119,14 @@ export const createCachedFetcher = (
 
     try {
       // Fetch from network
-      fetchResponse = await fetchData(url, accept, userAgent, timeout, signal, logger);
+      fetchResponse = await fetchData(
+        url,
+        accept,
+        userAgent,
+        timeout,
+        signal,
+        logger
+      );
     } catch (error) {
       fetchError = error as Error;
 
@@ -117,13 +140,19 @@ export const createCachedFetcher = (
             error: {
               message: fetchError.message,
               ...(fetchError.message.includes('HTTP error, status:') && {
-                status: parseInt(fetchError.message.match(/status: (\d+)/)?.[1] || '0')
-              })
+                status: parseInt(
+                  fetchError.message.match(/status: (\d+)/)?.[1] || '0'
+                ),
+              }),
             },
-            timestamp: Date.now()
+            timestamp: Date.now(),
           };
 
-          await finalCacheStorage.set(cacheKey, JSON.stringify(errorEntry), failureCacheTTL);
+          await finalCacheStorage.set(
+            cacheKey,
+            JSON.stringify(errorEntry),
+            failureCacheTTL
+          );
           logger?.debug(`Cached error for URL: ${url}`);
         } catch (cacheError) {
           // Log cache error but don't fail the request
@@ -144,10 +173,14 @@ export const createCachedFetcher = (
         const successEntry: CacheEntry = {
           type: 'success',
           data: responseText,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
-        await finalCacheStorage.set(cacheKey, JSON.stringify(successEntry), cacheTTL);
+        await finalCacheStorage.set(
+          cacheKey,
+          JSON.stringify(successEntry),
+          cacheTTL
+        );
         logger?.debug(`Cached successful response for URL: ${url}`);
       } catch (error) {
         // Log cache error but don't fail the request
@@ -161,7 +194,7 @@ export const createCachedFetcher = (
 
   return {
     rawFetcher: fetcherFunction,
-    userAgent: userAgent
+    userAgent: userAgent,
   };
 };
 
@@ -175,7 +208,12 @@ export const createDirectFetcher = (
   userAgent: string,
   timeout: number = 60000
 ): FetcherType => {
-  const fetcherFunction = async (url: string, accept: string, signal: AbortSignal | undefined, logger?: Logger): Promise<Response> => {
+  const fetcherFunction = async (
+    url: string,
+    accept: string,
+    signal: AbortSignal | undefined,
+    logger?: Logger
+  ): Promise<Response> => {
     // Direct network access without any caching
     logger?.debug(`Direct fetch for URL: ${url}`);
     return await fetchData(url, accept, userAgent, timeout, signal, logger);
@@ -183,6 +221,6 @@ export const createDirectFetcher = (
 
   return {
     rawFetcher: fetcherFunction,
-    userAgent: userAgent
+    userAgent: userAgent,
   };
 };

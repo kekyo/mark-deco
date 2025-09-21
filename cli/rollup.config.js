@@ -8,23 +8,32 @@ export default {
   output: {
     file: 'dist-rollup/cli.js',
     format: 'cjs',
-    banner: '#!/usr/bin/env node'
+    banner: '#!/usr/bin/env node',
   },
   external: [
     // Node.js built-ins
-    'fs', 'fs/promises', 'path', 'process', 'url', 'util', 'stream', 'events', 'buffer', 'os',
+    'fs',
+    'fs/promises',
+    'path',
+    'process',
+    'url',
+    'util',
+    'stream',
+    'events',
+    'buffer',
+    'os',
     // Keep these as external to reduce bundle size
-    'fsevents'
+    'fsevents',
   ],
   plugins: [
     resolve({
-      preferBuiltins: true
+      preferBuiltins: true,
     }),
     commonjs(),
     typescript({
       tsconfig: './tsconfig.json',
-      outDir: 'dist-rollup'
+      outDir: 'dist-rollup',
     }),
-    json()
-  ]
-}; 
+    json(),
+  ],
+};

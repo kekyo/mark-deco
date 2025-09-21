@@ -1,133 +1,192 @@
 <h1>Card Plugin Test</h1>
 <p>This file tests the Card plugin functionality using a local test server.</p>
 <h2>Overview</h2>
-<p>The Card plugin extracts Open Graph Protocol (OGP) metadata from web pages and displays them as cards. This test uses a local HTTP server to provide consistent, predictable content for testing.</p>
+<p>
+  The Card plugin extracts Open Graph Protocol (OGP) metadata from web pages and
+  displays them as cards. This test uses a local HTTP server to provide
+  consistent, predictable content for testing.
+</p>
 <h2>Test Cases</h2>
 <h3>Photo/Image Content</h3>
 <div class="card-container">
-  <a href="http://localhost:12345/photo" target="_blank" rel="noopener noreferrer" class="card-link">
+  <a
+    href="http://localhost:12345/photo"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="card-link"
+  >
     <div class="card-image">
-      <img src="http://localhost:12345/images/nature.jpg" alt="Beautiful Nature Photo" loading="lazy" />
+      <img
+        src="http://localhost:12345/images/nature.jpg"
+        alt="Beautiful Nature Photo"
+        loading="lazy"
+      />
     </div>
     <div class="card-body">
       <div class="card-header">
         <div class="card-title">Beautiful Nature Photo</div>
         <div class="card-provider">
-
           <span>localhost</span>
         </div>
       </div>
-      <div class="card-description">A stunning landscape photograph showcasing the beauty of nature</div>
-
+      <div class="card-description">
+        A stunning landscape photograph showcasing the beauty of nature
+      </div>
     </div>
   </a>
 </div>
 <p>This should display a card with:</p>
 <ul>
   <li>Title: "Beautiful Nature Photo"</li>
-  <li>Description: "A stunning landscape photograph showcasing the beauty of nature"</li>
+  <li>
+    Description: "A stunning landscape photograph showcasing the beauty of
+    nature"
+  </li>
   <li>Image: placeholder image reference</li>
   <li>Type: website</li>
 </ul>
 <h3>Article Content</h3>
 <div class="card-container">
-  <a href="http://localhost:12345/article" target="_blank" rel="noopener noreferrer" class="card-link">
+  <a
+    href="http://localhost:12345/article"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="card-link"
+  >
     <div class="card-image">
-      <img src="http://localhost:12345/images/javascript.jpg" alt="JavaScript Best Practices" loading="lazy" />
+      <img
+        src="http://localhost:12345/images/javascript.jpg"
+        alt="JavaScript Best Practices"
+        loading="lazy"
+      />
     </div>
     <div class="card-body">
       <div class="card-header">
         <div class="card-title">JavaScript Best Practices</div>
         <div class="card-provider">
-
           <span>Tech Blog</span>
         </div>
       </div>
-      <div class="card-description">Learn the essential JavaScript best practices for writing clean, maintainable code</div>
-
+      <div class="card-description">
+        Learn the essential JavaScript best practices for writing clean,
+        maintainable code
+      </div>
     </div>
   </a>
 </div>
 <p>This should display a card with:</p>
 <ul>
   <li>Title: "JavaScript Best Practices"</li>
-  <li>Description: "Learn the essential JavaScript best practices for writing clean, maintainable code"</li>
+  <li>
+    Description: "Learn the essential JavaScript best practices for writing
+    clean, maintainable code"
+  </li>
   <li>Additional metadata: author, published date, tags</li>
   <li>Type: article</li>
 </ul>
 <h3>Product Content</h3>
 <div class="card-container">
-  <a href="http://localhost:12345/product" target="_blank" rel="noopener noreferrer" class="card-link">
+  <a
+    href="http://localhost:12345/product"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="card-link"
+  >
     <div class="card-image">
-      <img src="http://localhost:12345/images/product.jpg" alt="Awesome Product - Only $99" loading="lazy" />
+      <img
+        src="http://localhost:12345/images/product.jpg"
+        alt="Awesome Product - Only $99"
+        loading="lazy"
+      />
     </div>
     <div class="card-body">
       <div class="card-header">
         <div class="card-title">Awesome Product - Only $99</div>
         <div class="card-provider">
-
           <span>localhost</span>
         </div>
       </div>
-      <div class="card-description">The best product you&#039;ll ever buy! High quality, affordable price.</div>
-
+      <div class="card-description">
+        The best product you&#039;ll ever buy! High quality, affordable price.
+      </div>
     </div>
   </a>
 </div>
 <p>This should display a card with:</p>
 <ul>
   <li>Title: "Awesome Product - Only $99"</li>
-  <li>Description: "The best product you'll ever buy! High quality, affordable price."</li>
+  <li>
+    Description: "The best product you'll ever buy! High quality, affordable
+    price."
+  </li>
   <li>Price information: $99 USD</li>
   <li>Availability: In Stock</li>
   <li>Type: product</li>
 </ul>
 <h3>Video Content</h3>
 <div class="card-container">
-  <a href="http://localhost:12345/video" target="_blank" rel="noopener noreferrer" class="card-link">
+  <a
+    href="http://localhost:12345/video"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="card-link"
+  >
     <div class="card-image">
-      <img src="http://localhost:12345/images/video-thumb.jpg" alt="Tutorial: Learn Node.js" loading="lazy" />
+      <img
+        src="http://localhost:12345/images/video-thumb.jpg"
+        alt="Tutorial: Learn Node.js"
+        loading="lazy"
+      />
     </div>
     <div class="card-body">
       <div class="card-header">
         <div class="card-title">Tutorial: Learn Node.js</div>
         <div class="card-provider">
-
           <span>localhost</span>
         </div>
       </div>
-      <div class="card-description">Complete Node.js tutorial for beginners - 2 hours of content</div>
-
+      <div class="card-description">
+        Complete Node.js tutorial for beginners - 2 hours of content
+      </div>
     </div>
   </a>
 </div>
 <p>This should display a card with:</p>
 <ul>
   <li>Title: "Tutorial: Learn Node.js"</li>
-  <li>Description: "Complete Node.js tutorial for beginners - 2 hours of content"</li>
+  <li>
+    Description: "Complete Node.js tutorial for beginners - 2 hours of content"
+  </li>
   <li>Video metadata: duration, release date</li>
   <li>Type: video</li>
 </ul>
 <h3>Fallback Content (No OGP)</h3>
 <div class="card-container">
-  <a href="http://localhost:12345/no-ogp" target="_blank" rel="noopener noreferrer" class="card-link">
-
+  <a
+    href="http://localhost:12345/no-ogp"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="card-link"
+  >
     <div class="card-body">
       <div class="card-header">
         <div class="card-title">Simple Page Without OGP</div>
         <div class="card-provider">
-
           <span>localhost</span>
         </div>
       </div>
-      <div class="card-description">A simple page without any Open Graph metadata</div>
-
+      <div class="card-description">
+        A simple page without any Open Graph metadata
+      </div>
     </div>
   </a>
 </div>
 <p>This should display a fallback card with:</p>
 <ul>
-  <li>Title extracted from <code>&#x3C;title></code> tag: "Simple Page Without OGP"</li>
+  <li>
+    Title extracted from <code>&#x3C;title></code> tag: "Simple Page Without
+    OGP"
+  </li>
   <li>Description from meta description</li>
   <li>No image</li>
   <li>Generic link display</li>
@@ -143,7 +202,12 @@
       Access failed - Error[HTTP error, status: 404]
     </div>
     <div class="card-content">
-      <a href="http://localhost:12345/non-existent" target="_blank" rel="noopener noreferrer" class="card-external-link">
+      <a
+        href="http://localhost:12345/non-existent"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="card-external-link"
+      >
         → Open localhost in new tab
       </a>
     </div>
@@ -153,16 +217,29 @@
 <h2>Expected Behavior</h2>
 <ol>
   <li>
-    <p><strong>Rich OGP Content</strong>: Pages with complete OGP metadata should display rich cards with titles, descriptions, images, and type-specific information.</p>
+    <p>
+      <strong>Rich OGP Content</strong>: Pages with complete OGP metadata should
+      display rich cards with titles, descriptions, images, and type-specific
+      information.
+    </p>
   </li>
   <li>
-    <p><strong>Graceful Degradation</strong>: Pages without OGP metadata should fall back to extracting basic information from standard HTML tags.</p>
+    <p>
+      <strong>Graceful Degradation</strong>: Pages without OGP metadata should
+      fall back to extracting basic information from standard HTML tags.
+    </p>
   </li>
   <li>
-    <p><strong>Error Handling</strong>: Invalid URLs or server errors should display user-friendly fallback content.</p>
+    <p>
+      <strong>Error Handling</strong>: Invalid URLs or server errors should
+      display user-friendly fallback content.
+    </p>
   </li>
   <li>
-    <p><strong>Consistent Styling</strong>: All cards should use consistent CSS classes and styling.</p>
+    <p>
+      <strong>Consistent Styling</strong>: All cards should use consistent CSS
+      classes and styling.
+    </p>
   </li>
 </ol>
 <h2>Technical Details</h2>
@@ -172,4 +249,7 @@
   <li>All responses include CORS headers for cross-origin testing</li>
   <li>Content is static and predictable for snapshot testing</li>
 </ul>
-<p>This test ensures the Card plugin correctly handles various OGP scenarios and edge cases in a controlled environment.</p>
+<p>
+  This test ensures the Card plugin correctly handles various OGP scenarios and
+  edge cases in a controlled environment.
+</p>

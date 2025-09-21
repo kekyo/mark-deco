@@ -11,13 +11,19 @@ import type { Plugin, PluginContext } from '../../types.js';
  * @param options - Configuration options for the oEmbed plugin
  * @returns Plugin instance for processing oEmbed blocks
  */
-export const createOEmbedPlugin = (providerList: OEmbedProvider[], options: OEmbedPluginOptions = {}): Plugin => {
+export const createOEmbedPlugin = (
+  providerList: OEmbedProvider[],
+  options: OEmbedPluginOptions = {}
+): Plugin => {
   const { maxRedirects = 5, timeoutEachRedirect = 10000 } = options;
 
   /**
    * Main plugin interface implementation
    */
-  const processBlock = async (content: string, context: PluginContext): Promise<string> => {
+  const processBlock = async (
+    content: string,
+    context: PluginContext
+  ): Promise<string> => {
     const url = content.trim();
 
     if (!isValidUrl(url)) {
@@ -25,7 +31,13 @@ export const createOEmbedPlugin = (providerList: OEmbedProvider[], options: OEmb
     }
 
     try {
-      const oembedData = await fetchOEmbedData(url, maxRedirects, timeoutEachRedirect, context, providerList);
+      const oembedData = await fetchOEmbedData(
+        url,
+        maxRedirects,
+        timeoutEachRedirect,
+        context,
+        providerList
+      );
       return generateHtml(oembedData, url, options);
     } catch (error) {
       context.logger.warn('oEmbed fetch failed for URL:', url, error);
@@ -45,6 +57,6 @@ export const createOEmbedPlugin = (providerList: OEmbedProvider[], options: OEmb
 
   return {
     name: 'oembed',
-    processBlock
+    processBlock,
   };
 };

@@ -1,4 +1,8 @@
-import { combineAbortSignals, createTimeoutSignal, isCORSError } from '../../utils.js';
+import {
+  combineAbortSignals,
+  createTimeoutSignal,
+  isCORSError,
+} from '../../utils.js';
 import type { Logger } from '../../types.js';
 // Removed unused import
 
@@ -20,18 +24,19 @@ export const resolveRedirects = async (
 
   while (redirectCount < maxRedirects) {
     try {
-      const headers: HeadersInit = {
-      };
+      const headers: HeadersInit = {};
       if (userAgent) {
         headers['User-Agent'] = userAgent;
       }
       const options: RequestInit = {
         method: 'HEAD',
-        redirect: 'manual',  // Will cause CORS error in browser environment
-        headers
+        redirect: 'manual', // Will cause CORS error in browser environment
+        headers,
       };
       const timeoutSignal = createTimeoutSignal(timeoutEachRedirect);
-      options.signal = signal ? combineAbortSignals(signal, timeoutSignal) : timeoutSignal;
+      options.signal = signal
+        ? combineAbortSignals(signal, timeoutSignal)
+        : timeoutSignal;
 
       const response = await fetch(currentUrl, options);
 
@@ -50,9 +55,16 @@ export const resolveRedirects = async (
       break;
     } catch (error) {
       if (isCORSError(error)) {
-        logger.debug('resolveRedirects: Browser CORS restrictions prevent redirect resolution for URL:', currentUrl);
+        logger.debug(
+          'resolveRedirects: Browser CORS restrictions prevent redirect resolution for URL:',
+          currentUrl
+        );
       } else {
-        logger.warn('resolveRedirects: Failed to resolve redirect for URL:', currentUrl, error);
+        logger.warn(
+          'resolveRedirects: Failed to resolve redirect for URL:',
+          currentUrl,
+          error
+        );
       }
       return currentUrl;
     }

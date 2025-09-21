@@ -14,7 +14,7 @@ const parseAttributes = (attrStr: string): Record<string, string> => {
   // Handle classes (.class)
   const classMatches = content.match(/\.([a-zA-Z0-9_-]+)/g);
   if (classMatches) {
-    const classes = classMatches.map(match => match.slice(1));
+    const classes = classMatches.map((match) => match.slice(1));
     attributes.class = classes.join(' ');
   }
 
@@ -43,7 +43,10 @@ const parseAttributes = (attrStr: string): Record<string, string> => {
  */
 const generateCodeBlockHTML = (node: any): string => {
   const lang = node.lang ? ` class="language-${node.lang}"` : '';
-  const code = node.value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const code = node.value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
   return `<pre><code${lang}>${code}</code></pre>`;
 };
 
@@ -65,7 +68,10 @@ const applyAttributes = (node: any, attributes: Record<string, string>) => {
       const existingClass = node.data.hProperties.class;
       if (existingClass) {
         // For code blocks, ensure language-* comes first, then custom classes
-        if (typeof existingClass === 'string' && existingClass.startsWith('language-')) {
+        if (
+          typeof existingClass === 'string' &&
+          existingClass.startsWith('language-')
+        ) {
           node.data.hProperties.class = `${existingClass} ${value}`;
         } else {
           node.data.hProperties.class = `${existingClass} ${value}`;
@@ -150,7 +156,8 @@ export const remarkAttr: Plugin<[], Root> = () => {
       if (node.type === 'listItem' && node.children?.length > 0) {
         const lastChild = node.children[node.children.length - 1];
         if (lastChild?.type === 'paragraph' && lastChild.children?.length > 0) {
-          const lastTextNode = lastChild.children[lastChild.children.length - 1];
+          const lastTextNode =
+            lastChild.children[lastChild.children.length - 1];
           if (lastTextNode?.type === 'text' && lastTextNode.value) {
             const match = lastTextNode.value.match(/^(.*?)\s*(\{[^}]+\})\s*$/);
             if (match) {
@@ -167,7 +174,10 @@ export const remarkAttr: Plugin<[], Root> = () => {
       // Handle lists with attributes on separate lines
       if (node.type === 'list' && parent && typeof index === 'number') {
         const nextSibling = parent.children[index + 1];
-        if (nextSibling?.type === 'paragraph' && nextSibling.children?.length === 1) {
+        if (
+          nextSibling?.type === 'paragraph' &&
+          nextSibling.children?.length === 1
+        ) {
           const textNode = nextSibling.children[0];
           if (textNode?.type === 'text' && textNode.value) {
             const match = textNode.value.match(/^\s*(\{[^}]+\})\s*$/);
@@ -186,7 +196,8 @@ export const remarkAttr: Plugin<[], Root> = () => {
       if (node.type === 'blockquote' && node.children?.length > 0) {
         const lastChild = node.children[node.children.length - 1];
         if (lastChild?.type === 'paragraph' && lastChild.children?.length > 0) {
-          const lastTextNode = lastChild.children[lastChild.children.length - 1];
+          const lastTextNode =
+            lastChild.children[lastChild.children.length - 1];
           if (lastTextNode?.type === 'text' && lastTextNode.value) {
             const match = lastTextNode.value.match(/^(.*?)\s*(\{[^}]+\})\s*$/);
             if (match) {
@@ -203,7 +214,10 @@ export const remarkAttr: Plugin<[], Root> = () => {
       // Handle blockquotes with attributes on separate lines
       if (node.type === 'blockquote' && parent && typeof index === 'number') {
         const nextSibling = parent.children[index + 1];
-        if (nextSibling?.type === 'paragraph' && nextSibling.children?.length === 1) {
+        if (
+          nextSibling?.type === 'paragraph' &&
+          nextSibling.children?.length === 1
+        ) {
           const textNode = nextSibling.children[0];
           if (textNode?.type === 'text' && textNode.value) {
             const match = textNode.value.match(/^\s*(\{[^}]+\})\s*$/);
@@ -243,10 +257,12 @@ export const remarkAttr: Plugin<[], Root> = () => {
           // Create a wrapper div to protect attributes from highlight.js
           const wrapperDiv = {
             type: 'html',
-            value: `<div class="${attributes.class || ''}" ${Object.entries(attributes)
+            value: `<div class="${attributes.class || ''}" ${Object.entries(
+              attributes
+            )
               .filter(([key]) => key !== 'class')
               .map(([key, value]) => `${key}="${value}"`)
-              .join(' ')}>${generateCodeBlockHTML(node)}</div>`
+              .join(' ')}>${generateCodeBlockHTML(node)}</div>`,
           };
 
           // Replace the code block with the wrapper div

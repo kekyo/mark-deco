@@ -2,13 +2,19 @@ import * as cheerio from 'cheerio';
 import { describe, it, expect } from 'vitest';
 import { amazonRules } from '../src/plugins/card/amazon-rules.js';
 import { ogpRules } from '../src/plugins/card/ogp-rules.js';
-import { findMatchingRule, applyScrapingRule } from '../src/plugins/card/rule-engine.js';
+import {
+  findMatchingRule,
+  applyScrapingRule,
+} from '../src/plugins/card/rule-engine.js';
 import type { ScrapingRule } from '../src/plugins/card/types.js';
 
 describe('Rule Engine', () => {
   describe('findMatchingRule', () => {
     it('should find Amazon JP rule for amazon.co.jp URLs', () => {
-      const rule = findMatchingRule(amazonRules, 'https://www.amazon.co.jp/dp/B0DG8Z9Y1R');
+      const rule = findMatchingRule(
+        amazonRules,
+        'https://www.amazon.co.jp/dp/B0DG8Z9Y1R'
+      );
       expect(rule).toBeDefined();
       expect(rule?.pattern).toBe('^https?://(?:www\\.)?amazon\\.co\\.jp/');
       expect(rule?.locale).toBe('ja-JP');
@@ -16,7 +22,10 @@ describe('Rule Engine', () => {
     });
 
     it('should find Amazon US rule for amazon.com URLs', () => {
-      const rule = findMatchingRule(amazonRules, 'https://www.amazon.com/dp/B08N5WRWNW');
+      const rule = findMatchingRule(
+        amazonRules,
+        'https://www.amazon.com/dp/B08N5WRWNW'
+      );
       expect(rule).toBeDefined();
       expect(rule?.pattern).toBe('^https?://(?:www\\.)?amazon\\.com/');
       expect(rule?.locale).toBe('en-US');
@@ -54,7 +63,11 @@ describe('Rule Engine', () => {
       const $ = cheerio.load(html);
       const rule = amazonRules[0]; // Amazon JP rule
       if (!rule) throw new Error('Amazon JP rule not found');
-      const result = applyScrapingRule(rule, $, 'https://www.amazon.co.jp/dp/B0DG8Z9Y1R');
+      const result = applyScrapingRule(
+        rule,
+        $,
+        'https://www.amazon.co.jp/dp/B0DG8Z9Y1R'
+      );
 
       expect(result.siteName).toBe('Amazon Japan');
       expect(result.title).toBe('UGREEN 30W USB-C 充電器');
@@ -62,7 +75,11 @@ describe('Rule Engine', () => {
       expect(result.reviewCount).toBe('71個の評価');
       expect(result.rating).toBe('5つ星のうち4.6');
       expect(result.brand).toBe('UGREEN');
-      expect(result.features).toEqual(['PSE技術基準適合', 'PD3.0対応', '30W急速充電']);
+      expect(result.features).toEqual([
+        'PSE技術基準適合',
+        'PD3.0対応',
+        '30W急速充電',
+      ]);
       expect(result.identifier).toBe('B0DG8Z9Y1R');
     });
 
@@ -90,7 +107,11 @@ describe('Rule Engine', () => {
       const $ = cheerio.load(html);
       const rule = amazonRules[1]; // Amazon US rule
       if (!rule) throw new Error('Amazon US rule not found');
-      const result = applyScrapingRule(rule, $, 'https://www.amazon.com/dp/B08N5WRWNW');
+      const result = applyScrapingRule(
+        rule,
+        $,
+        'https://www.amazon.com/dp/B08N5WRWNW'
+      );
 
       expect(result.siteName).toBe('Amazon US');
       expect(result.title).toBe('UGREEN 30W USB-C Charger PD Fast Charging');
@@ -98,7 +119,11 @@ describe('Rule Engine', () => {
       expect(result.reviewCount).toBe('152 ratings');
       expect(result.rating).toBe('4.5 out of 5 stars');
       expect(result.brand).toBe('UGREEN');
-      expect(result.features).toEqual(['PD 3.0 Fast Charging', 'Compact Design', 'Universal Compatibility']);
+      expect(result.features).toEqual([
+        'PD 3.0 Fast Charging',
+        'Compact Design',
+        'Universal Compatibility',
+      ]);
       expect(result.identifier).toBe('B08N5WRWNW');
     });
 
@@ -109,12 +134,14 @@ describe('Rule Engine', () => {
         siteName: 'Test Site',
         fields: {
           title: {
-            rules: [{
-              selector: '#title',
-              method: 'text'
-            }]
-          }
-        }
+            rules: [
+              {
+                selector: '#title',
+                method: 'text',
+              },
+            ],
+          },
+        },
       };
 
       const html = `
@@ -142,12 +169,14 @@ describe('Rule Engine', () => {
         siteName: 'Test Site',
         fields: {
           title: {
-            rules: [{
-              selector: '#title',
-              method: 'text'
-            }]
-          }
-        }
+            rules: [
+              {
+                selector: '#title',
+                method: 'text',
+              },
+            ],
+          },
+        },
       };
 
       const html = `
@@ -181,7 +210,11 @@ describe('Rule Engine', () => {
       const $ = cheerio.load(html);
       const rule = amazonRules[0]; // Amazon JP rule
       if (!rule) throw new Error('Amazon JP rule not found');
-      const result = applyScrapingRule(rule, $, 'https://www.amazon.co.jp/dp/B0DG8Z9Y1R');
+      const result = applyScrapingRule(
+        rule,
+        $,
+        'https://www.amazon.co.jp/dp/B0DG8Z9Y1R'
+      );
 
       expect(result.siteName).toBe('Amazon Japan');
       expect(result.title).toBe('Only Title Available');
@@ -198,15 +231,17 @@ describe('Rule Engine', () => {
         siteName: 'Test Site',
         fields: {
           processedField: {
-            rules: [{
-              selector: '.test',
-              method: 'text',
-              processor: (values) => {
-                return values.map(v => v.toUpperCase());
-              }
-            }]
-          }
-        }
+            rules: [
+              {
+                selector: '.test',
+                method: 'text',
+                processor: (values) => {
+                  return values.map((v) => v.toUpperCase());
+                },
+              },
+            ],
+          },
+        },
       };
 
       const html = `
@@ -229,12 +264,18 @@ describe('Rule Engine', () => {
         siteName: 'Test Site',
         fields: {
           title: {
-            rules: [{
-              selector: ['#primary-title', '#secondary-title', '.fallback-title'],
-              method: 'text'
-            }]
-          }
-        }
+            rules: [
+              {
+                selector: [
+                  '#primary-title',
+                  '#secondary-title',
+                  '.fallback-title',
+                ],
+                method: 'text',
+              },
+            ],
+          },
+        },
       };
 
       const html = `
@@ -257,13 +298,15 @@ describe('Rule Engine', () => {
         siteName: 'Test Site',
         fields: {
           tags: {
-            rules: [{
-              selector: '.tag',
-              method: 'text',
-              multiple: true
-            }]
-          }
-        }
+            rules: [
+              {
+                selector: '.tag',
+                method: 'text',
+                multiple: true,
+              },
+            ],
+          },
+        },
       };
 
       const html = `
@@ -290,16 +333,18 @@ describe('Rule Engine', () => {
         siteName: 'Test Site',
         fields: {
           price: {
-            rules: [{
-              selector: '.price',
-              method: 'text',
-              processor: {
-                type: 'currency',
-                params: { symbol: '€', locale: 'de-DE' }
-              }
-            }]
-          }
-        }
+            rules: [
+              {
+                selector: '.price',
+                method: 'text',
+                processor: {
+                  type: 'currency',
+                  params: { symbol: '€', locale: 'de-DE' },
+                },
+              },
+            ],
+          },
+        },
       };
 
       const html = `
@@ -322,21 +367,23 @@ describe('Rule Engine', () => {
         siteName: 'Test Site',
         fields: {
           cleanText: {
-            rules: [{
-              selector: '.text',
-              method: 'text',
-              processor: {
-                type: 'regex',
-                params: {
-                  replace: [
-                    { pattern: '^Prefix:\\s*', replacement: '' },
-                    { pattern: '\\s*Suffix$', replacement: '' }
-                  ]
-                }
-              }
-            }]
-          }
-        }
+            rules: [
+              {
+                selector: '.text',
+                method: 'text',
+                processor: {
+                  type: 'regex',
+                  params: {
+                    replace: [
+                      { pattern: '^Prefix:\\s*', replacement: '' },
+                      { pattern: '\\s*Suffix$', replacement: '' },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        },
       };
 
       const html = `
@@ -359,15 +406,17 @@ describe('Rule Engine', () => {
         siteName: 'Test Site',
         fields: {
           firstItem: {
-            rules: [{
-              selector: '.item',
-              method: 'text',
-              processor: {
-                type: 'first'
-              }
-            }]
-          }
-        }
+            rules: [
+              {
+                selector: '.item',
+                method: 'text',
+                processor: {
+                  type: 'first',
+                },
+              },
+            ],
+          },
+        },
       };
 
       const html = `
@@ -392,20 +441,22 @@ describe('Rule Engine', () => {
         siteName: 'Test Site',
         fields: {
           filteredItems: {
-            rules: [{
-              selector: '.item',
-              method: 'text',
-              multiple: true,
-              processor: {
-                type: 'filter',
-                params: {
-                  contains: 'keep',
-                  excludeContains: 'exclude'
-                }
-              }
-            }]
-          }
-        }
+            rules: [
+              {
+                selector: '.item',
+                method: 'text',
+                multiple: true,
+                processor: {
+                  type: 'filter',
+                  params: {
+                    contains: 'keep',
+                    excludeContains: 'exclude',
+                  },
+                },
+              },
+            ],
+          },
+        },
       };
 
       const html = `

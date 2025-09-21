@@ -2,8 +2,22 @@ import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { describe, it, expect, beforeEach, vi, beforeAll, afterAll } from 'vitest';
-import { generateCacheKey, createMemoryCacheStorage, createLocalCacheStorage, createFileSystemCacheStorage, type CacheStorage } from '../src/cache/index.js';
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  vi,
+  beforeAll,
+  afterAll,
+} from 'vitest';
+import {
+  generateCacheKey,
+  createMemoryCacheStorage,
+  createLocalCacheStorage,
+  createFileSystemCacheStorage,
+  type CacheStorage,
+} from '../src/cache/index.js';
 
 // Mock localStorage for Node.js environment
 const localStorageMock = (() => {
@@ -26,7 +40,7 @@ const localStorageMock = (() => {
     key: (index: number) => {
       const keys = Object.keys(store);
       return keys[index] || null;
-    }
+    },
   };
 })();
 
@@ -100,7 +114,7 @@ describe('MemoryCache', () => {
       await cache.set(key, value);
 
       // Wait a bit to ensure no automatic expiry
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(await cache.get(key)).toBe(value);
     });
@@ -116,7 +130,7 @@ describe('MemoryCache', () => {
       expect(await cache.get(key)).toBe(value);
 
       // Wait for TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Should be expired and return null
       expect(await cache.get(key)).toBeNull();
@@ -131,7 +145,7 @@ describe('MemoryCache', () => {
       expect(await cache.size()).toBe(2);
 
       // Wait for TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Expired entry should not count in size
       expect(await cache.size()).toBe(1);
@@ -148,7 +162,7 @@ describe('MemoryCache', () => {
       expect(await cache.size()).toBe(4);
 
       // Wait for short TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       expect(await cache.get('short')).toBeNull();
       expect(await cache.get('medium')).toBe('medium-value');
@@ -156,7 +170,7 @@ describe('MemoryCache', () => {
       expect(await cache.get('permanent')).toBe('permanent-value');
 
       // Wait for medium TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       expect(await cache.get('medium')).toBeNull();
       expect(await cache.get('long')).toBe('long-value');
@@ -198,7 +212,7 @@ describe('MemoryCache', () => {
       await cache.set(key, value, 1); // 1ms TTL
 
       // Wait a bit
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should definitely be expired
       expect(await cache.get(key)).toBeNull();
@@ -285,7 +299,7 @@ describe('MemoryCache', () => {
       await cache.set(key, 'value', ttl);
 
       // Start multiple concurrent reads near expiration time
-      await new Promise(resolve => setTimeout(resolve, 50)); // Wait half TTL
+      await new Promise((resolve) => setTimeout(resolve, 50)); // Wait half TTL
 
       const readPromises: Promise<string | null>[] = [];
       for (let i = 0; i < 10; i++) {
@@ -293,7 +307,7 @@ describe('MemoryCache', () => {
       }
 
       // Wait until after expiration
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Add more reads after expiration
       for (let i = 0; i < 10; i++) {
@@ -304,8 +318,8 @@ describe('MemoryCache', () => {
 
       // Results should be consistent (either all have value or all null)
       // Or a mix where earlier reads have value and later ones are null
-      const nonNullResults = results.filter(r => r !== null);
-      const nullResults = results.filter(r => r === null);
+      const nonNullResults = results.filter((r) => r !== null);
+      const nullResults = results.filter((r) => r === null);
 
       expect(nonNullResults.length + nullResults.length).toBe(results.length);
 
@@ -369,7 +383,7 @@ describe('MemoryCache', () => {
         cache.set('new-key2', 'new-value2'),
         cache.get('clear-key0'),
         cache.delete('clear-key1'),
-        cache.size()
+        cache.size(),
       ];
 
       const results = await Promise.all(operations);
@@ -458,12 +472,12 @@ describe('LocalCache', () => {
     Object.defineProperty(global, 'window', {
       value: { localStorage: localStorageMock },
       writable: true,
-      configurable: true
+      configurable: true,
     });
     Object.defineProperty(global, 'localStorage', {
       value: localStorageMock,
       writable: true,
-      configurable: true
+      configurable: true,
     });
   });
 
@@ -477,13 +491,15 @@ describe('LocalCache', () => {
     if (originalWindow !== undefined) {
       (global as typeof globalThis).window = originalWindow;
     } else {
-      (global as typeof globalThis).window = undefined as unknown as Window & typeof globalThis;
+      (global as typeof globalThis).window = undefined as unknown as Window &
+        typeof globalThis;
     }
 
     if (originalLocalStorage !== undefined) {
       (global as typeof globalThis).localStorage = originalLocalStorage;
     } else {
-      (global as typeof globalThis).localStorage = undefined as unknown as Storage;
+      (global as typeof globalThis).localStorage =
+        undefined as unknown as Storage;
     }
   });
 
@@ -565,7 +581,7 @@ describe('LocalCache', () => {
       await cache.set(key, value);
 
       // Wait a bit to ensure no automatic expiry
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(await cache.get(key)).toBe(value);
     });
@@ -581,7 +597,7 @@ describe('LocalCache', () => {
       expect(await cache.get(key)).toBe(value);
 
       // Wait for TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Should be expired and return null
       expect(await cache.get(key)).toBeNull();
@@ -598,7 +614,7 @@ describe('LocalCache', () => {
       expect(await cache.size()).toBe(2);
 
       // Wait for TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Expired entry should not count in size
       expect(await cache.size()).toBe(1);
@@ -637,7 +653,7 @@ describe('LocalCache', () => {
       await cache.set('valid', 'value3', 1000);
 
       // Wait for first two to expire
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       // Cleanup should be triggered by size() call
       await cache.size();
@@ -668,11 +684,21 @@ describe('LocalCache', () => {
 
       const errorCache = createLocalCacheStorage();
 
-      await expect(errorCache.get('test')).rejects.toThrow('localStorage is not available');
-      await expect(errorCache.set('test', 'value')).rejects.toThrow('localStorage is not available');
-      await expect(errorCache.delete('test')).rejects.toThrow('localStorage is not available');
-      await expect(errorCache.clear()).rejects.toThrow('localStorage is not available');
-      await expect(errorCache.size()).rejects.toThrow('localStorage is not available');
+      await expect(errorCache.get('test')).rejects.toThrow(
+        'localStorage is not available'
+      );
+      await expect(errorCache.set('test', 'value')).rejects.toThrow(
+        'localStorage is not available'
+      );
+      await expect(errorCache.delete('test')).rejects.toThrow(
+        'localStorage is not available'
+      );
+      await expect(errorCache.clear()).rejects.toThrow(
+        'localStorage is not available'
+      );
+      await expect(errorCache.size()).rejects.toThrow(
+        'localStorage is not available'
+      );
 
       // Restore localStorage
       (global as Record<string, unknown>).window = tempWindow;
@@ -719,7 +745,9 @@ describe('LocalCache', () => {
 
       // Verify all entries exist
       for (let i = 0; i < 10; i++) {
-        expect(await cache.get(`concurrent-key${i}`)).toBe(`concurrent-value${i}`);
+        expect(await cache.get(`concurrent-key${i}`)).toBe(
+          `concurrent-value${i}`
+        );
       }
 
       expect(await cache.size()).toBe(10);
@@ -759,7 +787,7 @@ describe('LocalCache', () => {
       await cache.set(key, 'local-value', ttl);
 
       // Start multiple concurrent reads near expiration time
-      await new Promise(resolve => setTimeout(resolve, 50)); // Wait half TTL
+      await new Promise((resolve) => setTimeout(resolve, 50)); // Wait half TTL
 
       const readPromises: Promise<string | null>[] = [];
       for (let i = 0; i < 10; i++) {
@@ -767,7 +795,7 @@ describe('LocalCache', () => {
       }
 
       // Wait until after expiration
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Add more reads after expiration
       for (let i = 0; i < 10; i++) {
@@ -777,8 +805,8 @@ describe('LocalCache', () => {
       const results = await Promise.all(readPromises);
 
       // Results should be consistent
-      const nonNullResults = results.filter(r => r !== null);
-      const nullResults = results.filter(r => r === null);
+      const nonNullResults = results.filter((r) => r !== null);
+      const nullResults = results.filter((r) => r === null);
 
       expect(nonNullResults.length + nullResults.length).toBe(results.length);
 
@@ -845,7 +873,8 @@ describe('LocalCache', () => {
 
       localStorageMock.setItem = vi.fn((key: string, value: string) => {
         // Simulate quota exceeded for first few attempts across different operations
-        if (quotaErrorCount < 2) { // Reduce from 3 to 2 to avoid multiple retry failures
+        if (quotaErrorCount < 2) {
+          // Reduce from 3 to 2 to avoid multiple retry failures
           quotaErrorCount++;
           const error = new Error('Storage quota exceeded');
           error.name = 'QuotaExceededError';
@@ -857,9 +886,10 @@ describe('LocalCache', () => {
 
       // Execute concurrent set operations
       const setPromises: Promise<void>[] = [];
-      for (let i = 0; i < 3; i++) { // Reduce from 5 to 3 to avoid too many quota errors
+      for (let i = 0; i < 3; i++) {
+        // Reduce from 5 to 3 to avoid too many quota errors
         setPromises.push(
-          cache.set(`quota-key${i}`, `quota-value${i}`).catch(error => {
+          cache.set(`quota-key${i}`, `quota-value${i}`).catch((error) => {
             // Allow some operations to fail due to quota exceeded
             if (!error.message.includes('Storage quota exceeded')) {
               throw error; // Re-throw unexpected errors
@@ -876,7 +906,7 @@ describe('LocalCache', () => {
         values.push(await cache.get(`quota-key${i}`));
       }
 
-      const successfulOperations = values.filter(v => v !== null).length;
+      const successfulOperations = values.filter((v) => v !== null).length;
 
       // Either some operations succeeded, or all failed gracefully due to quota
       expect(successfulOperations).toBeGreaterThanOrEqual(0);
@@ -994,7 +1024,7 @@ describe('FileSystemCache', () => {
       await cache.set(key, value);
 
       // Wait a bit to ensure no automatic expiry
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(await cache.get(key)).toBe(value);
     });
@@ -1010,7 +1040,7 @@ describe('FileSystemCache', () => {
       expect(await cache.get(key)).toBe(value);
 
       // Wait for TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Should be expired and return null
       expect(await cache.get(key)).toBeNull();
@@ -1029,7 +1059,7 @@ describe('FileSystemCache', () => {
       expect(await cache.size()).toBe(2);
 
       // Wait for TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Expired entry should not count in size
       expect(await cache.size()).toBe(1);
@@ -1046,7 +1076,7 @@ describe('FileSystemCache', () => {
       expect(await cache.size()).toBe(4);
 
       // Wait for short TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       expect(await cache.get('short')).toBeNull();
       expect(await cache.get('medium')).toBe('medium-value');
@@ -1054,7 +1084,7 @@ describe('FileSystemCache', () => {
       expect(await cache.get('permanent')).toBe('permanent-value');
 
       // Wait for medium TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       expect(await cache.get('medium')).toBeNull();
       expect(await cache.get('long')).toBe('long-value');
@@ -1100,7 +1130,12 @@ describe('FileSystemCache', () => {
     });
 
     it('should create cache directory if it does not exist', async () => {
-      const nonExistentDir = path.join(testCacheDir, 'nested', 'deep', 'directory');
+      const nonExistentDir = path.join(
+        testCacheDir,
+        'nested',
+        'deep',
+        'directory'
+      );
       const nestedCache = createFileSystemCacheStorage(nonExistentDir);
 
       await nestedCache.set('test', 'value');
@@ -1111,7 +1146,10 @@ describe('FileSystemCache', () => {
       expect(stats.isDirectory()).toBe(true);
 
       // Clean up
-      await fs.rm(path.join(testCacheDir, 'nested'), { recursive: true, force: true });
+      await fs.rm(path.join(testCacheDir, 'nested'), {
+        recursive: true,
+        force: true,
+      });
     });
 
     it('should handle special characters in cache keys', async () => {
@@ -1125,7 +1163,7 @@ describe('FileSystemCache', () => {
         'key"with"quotes',
         'key<with>angles',
         'key|with|pipes',
-        'ファイル名'
+        'ファイル名',
       ];
 
       for (const key of specialKeys) {
@@ -1146,7 +1184,7 @@ describe('FileSystemCache', () => {
       expect(files.length).toBe(3);
 
       // Wait for first two to expire
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       // Cleanup should be triggered by size() call
       const size = await cache.size();
@@ -1207,7 +1245,7 @@ describe('FileSystemCache', () => {
       await cache.set(key, value, 1); // 1ms TTL
 
       // Wait a bit
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should definitely be expired
       expect(await cache.get(key)).toBeNull();
@@ -1301,7 +1339,7 @@ describe('FileSystemCache', () => {
       await cache.set(key, 'fs-value', ttl);
 
       // Start multiple concurrent reads near expiration time
-      await new Promise(resolve => setTimeout(resolve, 50)); // Wait half TTL
+      await new Promise((resolve) => setTimeout(resolve, 50)); // Wait half TTL
 
       const readPromises: Promise<string | null>[] = [];
       for (let i = 0; i < 10; i++) {
@@ -1309,7 +1347,7 @@ describe('FileSystemCache', () => {
       }
 
       // Wait until after expiration
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Add more reads after expiration
       for (let i = 0; i < 10; i++) {
@@ -1319,8 +1357,8 @@ describe('FileSystemCache', () => {
       const results = await Promise.all(readPromises);
 
       // Results should be consistent
-      const nonNullResults = results.filter(r => r !== null);
-      const nullResults = results.filter(r => r === null);
+      const nonNullResults = results.filter((r) => r !== null);
+      const nullResults = results.filter((r) => r === null);
 
       expect(nonNullResults.length + nullResults.length).toBe(results.length);
 
@@ -1381,7 +1419,7 @@ describe('FileSystemCache', () => {
 
       // Verify file system consistency
       const files = await fs.readdir(testCacheDir);
-      const jsonFiles = files.filter(f => f.endsWith('.json'));
+      const jsonFiles = files.filter((f) => f.endsWith('.json'));
       expect(jsonFiles.length).toBe(finalSize);
 
       // Verify we can still perform operations
@@ -1438,7 +1476,9 @@ describe('generateCacheKey', () => {
     const key2 = generateCacheKey(url, accept, userAgent);
 
     expect(key1).toBe(key2);
-    expect(key1).toBe('fetch:https://example.com/api/data:application/json:test-agent/1.0');
+    expect(key1).toBe(
+      'fetch:https://example.com/api/data:application/json:test-agent/1.0'
+    );
   });
 
   it('should generate different keys for different parameters', () => {
@@ -1468,7 +1508,9 @@ describe('generateCacheKey', () => {
     const userAgent = 'test-agent/1.0';
 
     const key = generateCacheKey(url, accept, userAgent);
-    expect(key).toBe('fetch:https://example.com/api/data?param=value&other=123:application/json:test-agent/1.0');
+    expect(key).toBe(
+      'fetch:https://example.com/api/data?param=value&other=123:application/json:test-agent/1.0'
+    );
   });
 
   it('should handle undefined userAgent', () => {
@@ -1476,7 +1518,9 @@ describe('generateCacheKey', () => {
     const accept = 'application/json';
 
     const key = generateCacheKey(url, accept);
-    expect(key).toBe('fetch:https://example.com/api/data:application/json:default');
+    expect(key).toBe(
+      'fetch:https://example.com/api/data:application/json:default'
+    );
   });
 
   it('should handle empty userAgent', () => {
@@ -1485,7 +1529,9 @@ describe('generateCacheKey', () => {
     const userAgent = '';
 
     const key = generateCacheKey(url, accept, userAgent);
-    expect(key).toBe('fetch:https://example.com/api/data:application/json:default');
+    expect(key).toBe(
+      'fetch:https://example.com/api/data:application/json:default'
+    );
   });
 
   it('should generate different keys for different userAgents', () => {
@@ -1498,8 +1544,12 @@ describe('generateCacheKey', () => {
     const key2 = generateCacheKey(url, accept, userAgent2);
 
     expect(key1).not.toBe(key2);
-    expect(key1).toBe('fetch:https://example.com/api/data:application/json:browser/1.0');
-    expect(key2).toBe('fetch:https://example.com/api/data:application/json:mobile-app/2.0');
+    expect(key1).toBe(
+      'fetch:https://example.com/api/data:application/json:browser/1.0'
+    );
+    expect(key2).toBe(
+      'fetch:https://example.com/api/data:application/json:mobile-app/2.0'
+    );
   });
 });
 
@@ -1531,12 +1581,12 @@ describe('Factory functions', () => {
     Object.defineProperty(global, 'window', {
       value: { localStorage: localStorageMock },
       writable: true,
-      configurable: true
+      configurable: true,
     });
     Object.defineProperty(global, 'localStorage', {
       value: localStorageMock,
       writable: true,
-      configurable: true
+      configurable: true,
     });
 
     const cache = createLocalCacheStorage();

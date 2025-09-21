@@ -1,11 +1,17 @@
-import { createResponsiveImageWithContainer, createResponsiveImageTag } from '../../utils/responsive-image.js';
+import {
+  createResponsiveImageWithContainer,
+  createResponsiveImageTag,
+} from '../../utils/responsive-image.js';
 import { escapeHtml, truncateText, cleanText, extractDomain } from './utils.js';
 import type { ExtractedMetadata, CardPluginOptions } from './types.js';
 
 /**
  * Generate fallback HTML for when OGP data cannot be fetched
  */
-export const generateFallbackHtml = (url: string, errorInfo?: string): string => {
+export const generateFallbackHtml = (
+  url: string,
+  errorInfo?: string
+): string => {
   const domain = extractDomain(url);
 
   // Determine error message based on error type
@@ -13,7 +19,11 @@ export const generateFallbackHtml = (url: string, errorInfo?: string): string =>
   let hint = '';
 
   if (errorInfo) {
-    if (errorInfo.includes('CORS') || errorInfo.includes('NetworkError') || errorInfo.includes('TypeError')) {
+    if (
+      errorInfo.includes('CORS') ||
+      errorInfo.includes('NetworkError') ||
+      errorInfo.includes('TypeError')
+    ) {
       errorMessage = 'CORS restriction';
       hint = 'This site blocks cross-origin requests in browsers';
     } else if (errorInfo.includes('Timeout')) {
@@ -46,7 +56,11 @@ export const generateFallbackHtml = (url: string, errorInfo?: string): string =>
 /**
  * Generate HTML card from extracted metadata
  */
-export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, options: CardPluginOptions = {}): string => {
+export const generateCardHtml = (
+  data: ExtractedMetadata,
+  originalUrl: string,
+  options: CardPluginOptions = {}
+): string => {
   // Default display fields with default order when displayFields is undefined
   const defaultDisplayFields: Record<string, number> = {
     title: 1,
@@ -79,7 +93,7 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
 
   // Determine which URL to use based on useMetadataUrlLink option
   const url = options.useMetadataUrlLink
-    ? (getString('url') || originalUrl)
+    ? getString('url') || originalUrl
     : originalUrl;
   const siteName = getString('siteName') || extractDomain(url);
 
@@ -108,7 +122,7 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
         'card-image',
         undefined,
         'loading="lazy"'
-      )
+      ),
     });
   }
 
@@ -131,7 +145,7 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
       order: displayFields.title,
       section: 'header',
       isHeader: true,
-      html: `<div class="card-title">${escapeHtml(truncatedTitle)}</div>`
+      html: `<div class="card-title">${escapeHtml(truncatedTitle)}</div>`,
     });
   }
 
@@ -143,7 +157,7 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
       html: `<div class="card-provider">
           ${displayFields.favicon !== undefined ? faviconHtml : ''}
           <span>${escapeHtml(siteName)}</span>
-        </div>`
+        </div>`,
     });
   }
 
@@ -152,14 +166,25 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
     allItems.push({
       order: displayFields.description,
       section: 'body',
-      html: `<div class="card-description">${escapeHtml(truncatedDescription)}</div>`
+      html: `<div class="card-description">${escapeHtml(truncatedDescription)}</div>`,
     });
   }
 
   // Generate enhanced fields from metadata
   for (const [fieldName, value] of Object.entries(data)) {
     // Skip basic fields that are handled separately
-    if (['title', 'description', 'image', 'url', 'siteName', 'type', 'locale', 'favicon'].includes(fieldName)) {
+    if (
+      [
+        'title',
+        'description',
+        'image',
+        'url',
+        'siteName',
+        'type',
+        'locale',
+        'favicon',
+      ].includes(fieldName)
+    ) {
       continue;
     }
 
@@ -169,7 +194,10 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
 
       if (Array.isArray(value)) {
         // Handle array values (e.g., features)
-        const items = value.slice(0, 3).map(item => `<li>${escapeHtml(String(item))}</li>`).join('');
+        const items = value
+          .slice(0, 3)
+          .map((item) => `<li>${escapeHtml(String(item))}</li>`)
+          .join('');
         fieldHtml = `<div class="card-field card-${fieldName}">
           <div class="field-label">${escapeHtml(fieldName)}:</div>
           <ul class="field-list">${items}</ul>
@@ -185,7 +213,7 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
       allItems.push({
         order,
         section: 'enhanced',
-        html: fieldHtml
+        html: fieldHtml,
       });
     }
   }
@@ -194,7 +222,18 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
   const undefinedFields: string[] = [];
   for (const fieldName of Object.keys(data)) {
     // Skip basic fields and already processed fields
-    if (['title', 'description', 'image', 'url', 'siteName', 'type', 'locale', 'favicon'].includes(fieldName)) {
+    if (
+      [
+        'title',
+        'description',
+        'image',
+        'url',
+        'siteName',
+        'type',
+        'locale',
+        'favicon',
+      ].includes(fieldName)
+    ) {
       continue;
     }
 
@@ -210,7 +249,10 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
     let fieldHtml = '';
 
     if (Array.isArray(value)) {
-      const items = value.slice(0, 3).map(item => `<li>${escapeHtml(String(item))}</li>`).join('');
+      const items = value
+        .slice(0, 3)
+        .map((item) => `<li>${escapeHtml(String(item))}</li>`)
+        .join('');
       fieldHtml = `<div class="card-field card-${fieldName}">
         <div class="field-label">${escapeHtml(fieldName)}:</div>
         <ul class="field-list">${items}</ul>
@@ -225,7 +267,7 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
     allItems.push({
       order: undefinedOrder++,
       section: 'enhanced',
-      html: fieldHtml
+      html: fieldHtml,
     });
   }
 
@@ -236,31 +278,38 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
   let headerHtml = '';
   if (sortedHeaderItems.length > 0) {
     headerHtml = `<div class="card-header">
-        ${sortedHeaderItems.map(item => item.html).join('')}
+        ${sortedHeaderItems.map((item) => item.html).join('')}
       </div>`;
   }
 
   // Sort non-header items by order
-  const sortedBodyItems = allItems.filter(item => !item.isHeader).sort((a, b) => a.order - b.order);
+  const sortedBodyItems = allItems
+    .filter((item) => !item.isHeader)
+    .sort((a, b) => a.order - b.order);
 
   // Group items by section for proper HTML structure
-  const imageItems = sortedBodyItems.filter(item => item.section === 'image');
-  const bodyItems = sortedBodyItems.filter(item => item.section === 'body' || item.section === 'enhanced');
+  const imageItems = sortedBodyItems.filter((item) => item.section === 'image');
+  const bodyItems = sortedBodyItems.filter(
+    (item) => item.section === 'body' || item.section === 'enhanced'
+  );
 
   // Generate image section HTML
-  const imageHtml = imageItems.map(item => item.html).join('');
+  const imageHtml = imageItems.map((item) => item.html).join('');
 
   // Generate body content HTML
   let bodyContentHtml = '';
   if (bodyItems.length > 0) {
-    bodyContentHtml = bodyItems.map(item => item.html).join('');
+    bodyContentHtml = bodyItems.map((item) => item.html).join('');
   }
 
   // Combine header and body content
-  const bodyHtml = headerHtml || bodyContentHtml ? `<div class="card-body">
+  const bodyHtml =
+    headerHtml || bodyContentHtml
+      ? `<div class="card-body">
       ${headerHtml}
       ${bodyContentHtml}
-    </div>` : '';
+    </div>`
+      : '';
 
   // Add class modifier for Amazon products
   const isAmazon = getString('siteName')?.toLowerCase().includes('amazon');
@@ -269,12 +318,13 @@ export const generateCardHtml = (data: ExtractedMetadata, originalUrl: string, o
     : 'card-container';
 
   // Generate the card HTML conditionally
-  const cardContent = displayFields.url !== undefined
-    ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="card-link">
+  const cardContent =
+    displayFields.url !== undefined
+      ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="card-link">
     ${imageHtml}
     ${bodyHtml}
   </a>`
-    : `${imageHtml}
+      : `${imageHtml}
     ${bodyHtml}`;
 
   return `<div class="${containerClass}">

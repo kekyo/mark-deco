@@ -8,4 +8,4 @@
   "width": 640,
   "height": 360,
   "html": "<iframe width=\"640\" height=\"360\" src=\"http://localhost:{{PORT}}/embed/video-1\" frameborder=\"0\" allowfullscreen></iframe>"
-} 
+}

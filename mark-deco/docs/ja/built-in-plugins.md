@@ -2,18 +2,21 @@
 
 MarkDecoは、プラグインシステムを持っています。MarkdownからHTMLに変換する過程で、これらのプラグインの効果を追加することが出来ます。以下に内蔵されているプラグインを示します:
 
-|プラグイン名|詳細|
-|:----|:----|
-|`oembed`|指定されたURLからoEmbed APIにアクセスして、得られるメタデータでHTMLをレンダリングします|
-|`card`|指定されたURLのページをスクレイピングして、得られるメタデータでHTMLをレンダリングします|
-|`mermaid`|`mermaid.js`のグラフ構文で記述されたコードで、グラフ描画を可能にします|
+| プラグイン名 | 詳細                                                                                    |
+| :----------- | :-------------------------------------------------------------------------------------- |
+| `oembed`     | 指定されたURLからoEmbed APIにアクセスして、得られるメタデータでHTMLをレンダリングします |
+| `card`       | 指定されたURLのページをスクレイピングして、得られるメタデータでHTMLをレンダリングします |
+| `mermaid`    | `mermaid.js`のグラフ構文で記述されたコードで、グラフ描画を可能にします                  |
 
 プラグインを使用するには、以下のように指定します:
 
 ```typescript
 import {
-  createMarkdownProcessor, createCachedFetcher,
-  createOEmbedPlugin, defaultProviderList } from 'mark-deco';
+  createMarkdownProcessor,
+  createCachedFetcher,
+  createOEmbedPlugin,
+  defaultProviderList,
+} from 'mark-deco';
 
 // フェッチャーを作成
 const fetcher = createCachedFetcher('MyApp/1.0');
@@ -22,8 +25,8 @@ const fetcher = createCachedFetcher('MyApp/1.0');
 const oembedPlugin = createOEmbedPlugin(defaultProviderList);
 
 const processor = createMarkdownProcessor({
-  plugins: [ oembedPlugin ],   // 使用するプラグイン群を指定する
-  fetcher                      // フェッチャーを指定
+  plugins: [oembedPlugin], // 使用するプラグイン群を指定する
+  fetcher, // フェッチャーを指定
 });
 
 const markdown = `# メディア埋め込みのテスト
@@ -35,7 +38,7 @@ https://youtu.be/1La4QzGeaaQ
 \`\`\``;
 
 // YouTube動画の埋め込みを行う
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // 埋め込みHTMLが生成される
 console.log(result.html);
@@ -52,8 +55,11 @@ oEmbedプラグインを使用すると、YouTube動画、Flickr写真、SNS投�
 
 ```typescript
 import {
-  createMarkdownProcessor, createCachedFetcher,
-  createOEmbedPlugin, defaultProviderList } from 'mark-deco';
+  createMarkdownProcessor,
+  createCachedFetcher,
+  createOEmbedPlugin,
+  defaultProviderList,
+} from 'mark-deco';
 
 // フェッチャーを作成
 const fetcher = createCachedFetcher('MyApp/1.0');
@@ -61,8 +67,8 @@ const fetcher = createCachedFetcher('MyApp/1.0');
 // デフォルトプロバイダーリストを使用して、oEmbedプラグインを生成
 const oembedPlugin = createOEmbedPlugin(defaultProviderList);
 const processor = createMarkdownProcessor({
-  plugins: [ oembedPlugin ],
-  fetcher
+  plugins: [oembedPlugin],
+  fetcher,
 });
 
 const markdown = `# メディア埋め込みのテスト
@@ -85,7 +91,7 @@ https://flickr.com/photos/bees/2362225867/
 https://bit.ly/example-site-page
 \`\`\``;
 
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 ```
 
 生成されるHTMLの例を示します（YouTube動画の場合）:
@@ -98,13 +104,20 @@ const result = await processor.process(markdown, "id");
     <div class="oembed-provider">from YouTube</div>
   </div>
   <div class="oembed-content">
-    <iframe src="https://www.youtube.com/embed/[VIDEO_ID]" 
-            frameborder="0" allowfullscreen>
-            <!-- プロバイダー固有の実装 ... -->
+    <iframe
+      src="https://www.youtube.com/embed/[VIDEO_ID]"
+      frameborder="0"
+      allowfullscreen
+    >
+      <!-- プロバイダー固有の実装 ... -->
     </iframe>
   </div>
   <div class="oembed-footer">
-    <a href="https://youtu.be/[VIDEO_ID]" target="_blank" rel="noopener noreferrer">
+    <a
+      href="https://youtu.be/[VIDEO_ID]"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       Watch on YouTube
     </a>
   </div>
@@ -115,18 +128,18 @@ const result = await processor.process(markdown, "id");
 
 oEmbedプラグインは `https://oembed.com/providers.json` で公開されている「デフォルトプロバイダーリスト」を内蔵しています。または、あなたが用意したリストも指定可能です。主要なプロバイダーには以下が含まれます:
 
-|プロバイダー|対応ドメイン|内容|
-|:----|:----|:----|
-|YouTube|`youtube.com`, `youtu.be`|動画埋め込み|
-|Vimeo|`vimeo.com`|動画埋め込み|
-|Twitter/X|`twitter.com`, `x.com`|ツイート埋め込み|
-|Instagram|`instagram.com`|投稿埋め込み|
-|Flickr|`flickr.com`|写真埋め込み|
-|TikTok|`tiktok.com`|動画埋め込み|
-|Spotify|`spotify.com`|音楽・プレイリスト埋め込み|
-|SoundCloud|`soundcloud.com`|音声埋め込み|
-|Reddit|`reddit.com`|投稿埋め込み|
-|その他|多数のサイト|様々なコンテンツ埋め込み|
+| プロバイダー | 対応ドメイン              | 内容                       |
+| :----------- | :------------------------ | :------------------------- |
+| YouTube      | `youtube.com`, `youtu.be` | 動画埋め込み               |
+| Vimeo        | `vimeo.com`               | 動画埋め込み               |
+| Twitter/X    | `twitter.com`, `x.com`    | ツイート埋め込み           |
+| Instagram    | `instagram.com`           | 投稿埋め込み               |
+| Flickr       | `flickr.com`              | 写真埋め込み               |
+| TikTok       | `tiktok.com`              | 動画埋め込み               |
+| Spotify      | `spotify.com`             | 音楽・プレイリスト埋め込み |
+| SoundCloud   | `soundcloud.com`          | 音声埋め込み               |
+| Reddit       | `reddit.com`              | 投稿埋め込み               |
+| その他       | 多数のサイト              | 様々なコンテンツ埋め込み   |
 
 デフォルトプロバイダーリストのサイズは大きいです。従って、バンドルサイズを削減したい場合は、ご自身でリストを用意したほうが良いでしょう。`defaultProviderList`を使わなければ、バンドラーは暗黙にそのデータを削減すると考えられます。
 
@@ -136,34 +149,32 @@ oEmbedプラグインでは、`displayFields`オプションを使用して、�
 
 ```typescript
 // カスタム表示順序: 埋め込みコンテンツを最初、次にタイトル、最後に外部リンク
-const customOrderOEmbedPlugin = createOEmbedPlugin(
-  defaultProviderList, {
-    displayFields: {
-      'embeddedContent': 1,   // 1番目に表示
-      'title': 2,             // 2番目に表示
-      'externalLink': 3,      // 3番目に表示
-    }  // その他の項目は出力しない
-  });
+const customOrderOEmbedPlugin = createOEmbedPlugin(defaultProviderList, {
+  displayFields: {
+    embeddedContent: 1, // 1番目に表示
+    title: 2, // 2番目に表示
+    externalLink: 3, // 3番目に表示
+  }, // その他の項目は出力しない
+});
 
 // displayFieldsがundefinedの場合はデフォルト順序
-const defaultOEmbedPlugin = createOEmbedPlugin(
-  defaultProviderList, { });
+const defaultOEmbedPlugin = createOEmbedPlugin(defaultProviderList, {});
 ```
 
-* 各フィールドの数値は、表示項目の順序を表しています。連番である必要はなく、数値が小さいほど先に出力されます。
-* `displayFields`を指定しない場合は、全てのメタデータ項目がレンダリングされます。
+- 各フィールドの数値は、表示項目の順序を表しています。連番である必要はなく、数値が小さいほど先に出力されます。
+- `displayFields`を指定しない場合は、全てのメタデータ項目がレンダリングされます。
 
 利用可能な表示制御オプション:
 
-|フィールド|説明|CSSクラス|デフォルト順序|
-|:----|:----|:----|:----|
-|`title`|コンテンツタイトル|`.oembed-title`|`1`|
-|`author`|作者情報|`.oembed-author`|`2`|
-|`provider`|プロバイダー情報|`.oembed-provider`|`3`|
-|`description`|説明文|`.oembed-description`|`4`|
-|`thumbnail`|サムネイル画像|`.oembed-thumbnail`|`5`|
-|`embeddedContent`|埋め込みコンテンツ (動画など)|`.oembed-content`|`6`|
-|`externalLink`|外部リンク|`a[href]`|`7`|
+| フィールド        | 説明                          | CSSクラス             | デフォルト順序 |
+| :---------------- | :---------------------------- | :-------------------- | :------------- |
+| `title`           | コンテンツタイトル            | `.oembed-title`       | `1`            |
+| `author`          | 作者情報                      | `.oembed-author`      | `2`            |
+| `provider`        | プロバイダー情報              | `.oembed-provider`    | `3`            |
+| `description`     | 説明文                        | `.oembed-description` | `4`            |
+| `thumbnail`       | サムネイル画像                | `.oembed-thumbnail`   | `5`            |
+| `embeddedContent` | 埋め込みコンテンツ (動画など) | `.oembed-content`     | `6`            |
+| `externalLink`    | 外部リンク                    | `a[href]`             | `7`            |
 
 #### リンクURL制御
 
@@ -171,24 +182,22 @@ oEmbedプラグインでは、`useMetadataUrlLink`オプションを通じて、
 
 ```typescript
 // Markdownに記述されたURLを使用
-const providedLinkOEmbedPlugin = createOEmbedPlugin(
-  defaultProviderList, {
-    useMetadataUrlLink: false   // Markdownに記述されたURLを使用
-  });
+const providedLinkOEmbedPlugin = createOEmbedPlugin(defaultProviderList, {
+  useMetadataUrlLink: false, // Markdownに記述されたURLを使用
+});
 
 // メタデータの正規URLを使用
-const metadataLinkOEmbedPlugin = createOEmbedPlugin(
-  defaultProviderList, {
-    useMetadataUrlLink: true    // oEmbedメタデータの`web_page`URLを使用
-  });
+const metadataLinkOEmbedPlugin = createOEmbedPlugin(defaultProviderList, {
+  useMetadataUrlLink: true, // oEmbedメタデータの`web_page`URLを使用
+});
 ```
 
 リンクURL選択優先順位:
 
-|`useMetadataUrlLink`|URLソース優先順位|用途|
-|:----|:----|:----|
-|`false`|記述URL|元URL(短縮リンクなど)を保持 (デフォルト)|
-|`true`|oEmbed `web_page` URL --> 記述URL|プロバイダーの正規URLを使用|
+| `useMetadataUrlLink` | URLソース優先順位                 | 用途                                     |
+| :------------------- | :-------------------------------- | :--------------------------------------- |
+| `false`              | 記述URL                           | 元URL(短縮リンクなど)を保持 (デフォルト) |
+| `true`               | oEmbed `web_page` URL --> 記述URL | プロバイダーの正規URLを使用              |
 
 #### リダイレクト解決機能
 
@@ -197,11 +206,11 @@ oEmbedプロバイダーリストには、正規化されたURLでしかマッ�
 
 ```markdown
 \`\`\`oembed
-https://youtu.be/1La4QzGeaaQ    # --> https://youtube.com/watch?v=1La4QzGeaaQ に解決
+https://youtu.be/1La4QzGeaaQ # --> https://youtube.com/watch?v=1La4QzGeaaQ に解決
 \`\`\`
 
 \`\`\`oembed
-https://bit.ly/shortened-link   # --> 正規化されたURLに解決
+https://bit.ly/shortened-link # --> 正規化されたURLに解決
 \`\`\`
 ```
 
@@ -220,7 +229,11 @@ https://bit.ly/shortened-link   # --> 正規化されたURLに解決
     <div class="oembed-provider">from example.com</div>
   </div>
   <div class="oembed-content">
-    <a href="https://example.com/content" target="_blank" rel="noopener noreferrer">
+    <a
+      href="https://example.com/content"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       View content on example.com
     </a>
   </div>
@@ -231,22 +244,22 @@ https://bit.ly/shortened-link   # --> 正規化されたURLに解決
 
 oEmbedプラグインが生成するHTMLには、スタイリング用のCSSクラスが付与されます:
 
-|CSSクラス|適用要素|説明|
-|:----|:----|:----|
-|`.oembed-container`| コンテナ全体 | oEmbed埋め込み全体のコンテナ |
-|`.oembed-video`| コンテナ | 動画コンテンツ用の追加クラス |
-|`.oembed-photo`| コンテナ | 写真コンテンツ用の追加クラス |
-|`.oembed-link`| コンテナ | リンクコンテンツ用の追加クラス |
-|`.oembed-rich`| コンテナ | リッチコンテンツ用の追加クラス |
-|`.oembed-header`| ヘッダー部分 | タイトル・作者・プロバイダー情報のコンテナ |
-|`.oembed-title`| タイトル要素 | コンテンツのタイトル |
-|`.oembed-author`| 作者要素 | 作者・チャンネル名など |
-|`.oembed-provider`| プロバイダー要素 | サービス提供者名 |
-|`.oembed-description`| 説明要素 | コンテンツの説明文 |
-|`.oembed-thumbnail`| サムネイル要素 | サムネイル画像 |
-|`.oembed-content`| 埋め込み要素 | iframe や実際のコンテンツ |
-|`.oembed-footer`| フッター部分 | 外部リンクなど |
-|`.oembed-fallback`| フォールバック要素 | 未対応サイト用フォールバック表示 |
+| CSSクラス             | 適用要素           | 説明                                       |
+| :-------------------- | :----------------- | :----------------------------------------- |
+| `.oembed-container`   | コンテナ全体       | oEmbed埋め込み全体のコンテナ               |
+| `.oembed-video`       | コンテナ           | 動画コンテンツ用の追加クラス               |
+| `.oembed-photo`       | コンテナ           | 写真コンテンツ用の追加クラス               |
+| `.oembed-link`        | コンテナ           | リンクコンテンツ用の追加クラス             |
+| `.oembed-rich`        | コンテナ           | リッチコンテンツ用の追加クラス             |
+| `.oembed-header`      | ヘッダー部分       | タイトル・作者・プロバイダー情報のコンテナ |
+| `.oembed-title`       | タイトル要素       | コンテンツのタイトル                       |
+| `.oembed-author`      | 作者要素           | 作者・チャンネル名など                     |
+| `.oembed-provider`    | プロバイダー要素   | サービス提供者名                           |
+| `.oembed-description` | 説明要素           | コンテンツの説明文                         |
+| `.oembed-thumbnail`   | サムネイル要素     | サムネイル画像                             |
+| `.oembed-content`     | 埋め込み要素       | iframe や実際のコンテンツ                  |
+| `.oembed-footer`      | フッター部分       | 外部リンクなど                             |
+| `.oembed-fallback`    | フォールバック要素 | 未対応サイト用フォールバック表示           |
 
 ### カードプラグイン
 
@@ -264,8 +277,8 @@ const fetcher = createCachedFetcher('MyApp/1.0');
 const cardPlugin = createCardPlugin();
 
 const processor = createMarkdownProcessor({
-  plugins: [ cardPlugin ],
-  fetcher
+  plugins: [cardPlugin],
+  fetcher,
 });
 
 const markdown = `# 製品レビュー
@@ -280,7 +293,7 @@ https://github.com/kekyo/async-primitives
 https://www.ebay.com/itm/167556314958
 \`\`\``;
 
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // リッチカードHTMLが生成される
 console.log(result.html);
@@ -320,29 +333,35 @@ import { createCardPlugin } from 'mark-deco';
 const cardPlugin = createCardPlugin({
   scrapingRules: [
     {
-      pattern: '^https?://example\\.com/',  // URLパターン
+      pattern: '^https?://example\\.com/', // URLパターン
       siteName: 'Example Site',
-      fields: {   // フィールド設定群
-        title: {         // `title`フィールド設定
-          rules: [{ selector: 'h1.main-title', method: 'text' }]
+      fields: {
+        // フィールド設定群
+        title: {
+          // `title`フィールド設定
+          rules: [{ selector: 'h1.main-title', method: 'text' }],
         },
-        description: {   // `description`フィールド設定
-          rules: [{ selector: '.description', method: 'text' }]
+        description: {
+          // `description`フィールド設定
+          rules: [{ selector: '.description', method: 'text' }],
         },
-        image: {         // `image`フィールド設定
-          rules: [{ selector: '.hero-image img', method: 'attr', attr: 'src' }]
-        }
-      }
-    }
-  ]
+        image: {
+          // `image`フィールド設定
+          rules: [{ selector: '.hero-image img', method: 'attr', attr: 'src' }],
+        },
+      },
+    },
+  ],
 });
 ```
 
 `FieldConfig`（フィールド設定）:
+
 - `required`: このフィールドが必須かどうか（boolean）
 - `rules`: 抽出ルールの配列。上から順番に試行され、最初に成功したルールの結果が使用されます
 
 `FieldRule`（抽出ルール）:
+
 - `selector`: CSSセレクタ（文字列または配列）
 - `method`: 抽出方法（`text`、`attr`、`html`）
 - `attr`: `attr`メソッド使用時の属性名
@@ -357,11 +376,11 @@ const cardPlugin = createCardPlugin({
 
 抽出ルールの`method`フィールドでは、HTML要素からどのようにデータを取得するかを指定します。以下の3つの方法が利用可能です：
 
-|抽出方法|説明|使用例|
-|:----|:----|:----|
-|`text`|要素のテキスト内容を取得（HTMLタグは除去）|`<span>Hello World</span>` --> `"Hello World"`|
-|`attr`|要素の属性値を取得|`<img src="image.jpg">` --> `"image.jpg"` (attr: `src`)|
-|`html`|要素の内部HTMLを取得（HTMLタグ含む）|`<div><b>Bold</b> text</div>` --> `"<b>Bold</b> text"`|
+| 抽出方法 | 説明                                       | 使用例                                                  |
+| :------- | :----------------------------------------- | :------------------------------------------------------ |
+| `text`   | 要素のテキスト内容を取得（HTMLタグは除去） | `<span>Hello World</span>` --> `"Hello World"`          |
+| `attr`   | 要素の属性値を取得                         | `<img src="image.jpg">` --> `"image.jpg"` (attr: `src`) |
+| `html`   | 要素の内部HTMLを取得（HTMLタグ含む）       | `<div><b>Bold</b> text</div>` --> `"<b>Bold</b> text"`  |
 
 各方法の具体的な使用例：
 
@@ -392,10 +411,10 @@ const cardPlugin = createCardPlugin({
 
 抽出したデータに対して後処理を行うために、`processor`フィールドを使用できます。以下の2つの形式で指定できます:
 
-|形式|詳細|
-|:----|:----|
-|設定オブジェクト|いくつかの固定的な手法から選択します。組み込みの処理方式なので、ルール全体をJSONで流し込むような使い方で使用できます。|
-|関数|関数で独自の処理を記述できます。どのような後処理でも対応できます。|
+| 形式             | 詳細                                                                                                                   |
+| :--------------- | :--------------------------------------------------------------------------------------------------------------------- |
+| 設定オブジェクト | いくつかの固定的な手法から選択します。組み込みの処理方式なので、ルール全体をJSONで流し込むような使い方で使用できます。 |
+| 関数             | 関数で独自の処理を記述できます。どのような後処理でも対応できます。                                                     |
 
 ##### 設定オブジェクト形式
 
@@ -415,13 +434,13 @@ const cardPlugin = createCardPlugin({
 
 利用可能な設定タイプ:
 
-|タイプ|説明|パラメータ例|結果例|
-|:----|:----|:----|:----|
-|`regex`|正規表現による文字列変換|`replace: [{ pattern: '^Prefix:\\s*', replacement: '' }]`|前置詞除去|
-|`filter`|条件による値のフィルタリング|`contains: 'keep', excludeContains: ['exclude']`|特定文字列を含む/含まない値の抽出|
-|`slice`|配列の部分取得|`start: 0, end: 3`|最初の3つの要素のみ取得|
-|`first`|最初の値のみ取得|（パラメータなし）|`['a', 'b', 'c']` --> `'a'`|
-|`currency`|通貨フォーマット|`symbol: '$', locale: 'en-US'`|`'19.99'` --> `'$19.99'`|
+| タイプ     | 説明                         | パラメータ例                                              | 結果例                            |
+| :--------- | :--------------------------- | :-------------------------------------------------------- | :-------------------------------- |
+| `regex`    | 正規表現による文字列変換     | `replace: [{ pattern: '^Prefix:\\s*', replacement: '' }]` | 前置詞除去                        |
+| `filter`   | 条件による値のフィルタリング | `contains: 'keep', excludeContains: ['exclude']`          | 特定文字列を含む/含まない値の抽出 |
+| `slice`    | 配列の部分取得               | `start: 0, end: 3`                                        | 最初の3つの要素のみ取得           |
+| `first`    | 最初の値のみ取得             | （パラメータなし）                                        | `['a', 'b', 'c']` --> `'a'`       |
+| `currency` | 通貨フォーマット             | `symbol: '$', locale: 'en-US'`                            | `'19.99'` --> `'$19.99'`          |
 
 複合的な処理例:
 
@@ -461,12 +480,12 @@ const cardPlugin = createCardPlugin({
 
 関数形式の`processor`に渡される`context`引数には、以下の情報が含まれています:
 
-|プロパティ|型|説明|使用例|
-|:----|:----|:----|:----|
-|`$`|`Cheerio`|ページ全体のCheerioインスタンス|`context.$.html()` でページ全体のHTMLを取得|
-|`$head`|`Cheerio`|HTML headセクションのCheerioインスタンス|`context.$head('meta[name="description"]')` でメタデータ取得|
-|`url`|`string`|処理中のページURL|`context.url` でドメイン抽出やASIN抽出に使用|
-|`locale`|`string`|ページの言語・地域情報|`context.locale` で言語固有の処理を実行|
+| プロパティ | 型        | 説明                                     | 使用例                                                       |
+| :--------- | :-------- | :--------------------------------------- | :----------------------------------------------------------- |
+| `$`        | `Cheerio` | ページ全体のCheerioインスタンス          | `context.$.html()` でページ全体のHTMLを取得                  |
+| `$head`    | `Cheerio` | HTML headセクションのCheerioインスタンス | `context.$head('meta[name="description"]')` でメタデータ取得 |
+| `url`      | `string`  | 処理中のページURL                        | `context.url` でドメイン抽出やASIN抽出に使用                 |
+| `locale`   | `string`  | ページの言語・地域情報                   | `context.locale` で言語固有の処理を実行                      |
 
 `context`を活用した実用的な例:
 
@@ -475,7 +494,7 @@ const cardPlugin = createCardPlugin({
 processor: (values, context) => {
   const match = context.url.match(/\/dp\/([A-Z0-9]{10,})/);
   return match ? match[1] : undefined;
-}
+};
 
 // ドメイン名を抽出する例
 processor: (values, context) => {
@@ -485,15 +504,15 @@ processor: (values, context) => {
   } catch {
     return 'Unknown Site';
   }
-}
+};
 
 // 言語に応じた処理を行う例
 processor: (values, context) => {
   const isJapanese = context.locale?.startsWith('ja');
-  return isJapanese 
+  return isJapanese
     ? values[0]?.replace(/ブランド:\s*/, '')
     : values[0]?.replace(/Brand:\s*/, '');
-}
+};
 ```
 
 #### 表示項目の順序制御
@@ -503,11 +522,11 @@ processor: (values, context) => {
 ```typescript
 const cardPlugin = createCardPlugin({
   displayFields: {
-    'image': 1,       // フィールド名 `image` を最初に表示
-    'title': 2,       // フィールド名 `title` を2番目に表示
-    'description': 3, // フィールド名 `description` を3番目に表示
+    image: 1, // フィールド名 `image` を最初に表示
+    title: 2, // フィールド名 `title` を2番目に表示
+    description: 3, // フィールド名 `description` を3番目に表示
     // (その他のメタデータ項目は、取得しても表示しない)
-  }
+  },
 });
 ```
 
@@ -520,21 +539,21 @@ const cardPlugin = createCardPlugin({
 ```typescript
 // Markdownに記述されたURLを使用
 const providedLinkCardPlugin = createCardPlugin({
-  useMetadataUrlLink: false   // Markdownに記述されたURLを使用
+  useMetadataUrlLink: false, // Markdownに記述されたURLを使用
 });
 
 // メタデータURL (取得したページの正規URL) を使用
 const metadataLinkCardPlugin = createCardPlugin({
-  useMetadataUrlLink: true    // OGPメタデータの正規URLを使用
+  useMetadataUrlLink: true, // OGPメタデータの正規URLを使用
 });
 ```
 
 リンクURL選択優先順位:
 
-|`useMetadataUrlLink`|URLソース優先順位|用途|
-|:----|:----|:----|
-|`false`|記述URL|トラッキングパラメータ付き元URLの保持 (デフォルト)|
-|`true`|拡張正規URL --> OGP URL --> ソースURL --> 記述URL|正規化されたURLを期待|
+| `useMetadataUrlLink` | URLソース優先順位                                 | 用途                                               |
+| :------------------- | :------------------------------------------------ | :------------------------------------------------- |
+| `false`              | 記述URL                                           | トラッキングパラメータ付き元URLの保持 (デフォルト) |
+| `true`               | 拡張正規URL --> OGP URL --> ソースURL --> 記述URL | 正規化されたURLを期待                              |
 
 #### フォールバック処理
 
@@ -548,10 +567,16 @@ const metadataLinkCardPlugin = createCardPlugin({
       <div class="card-provider">example.com</div>
     </div>
     <div class="card-description">
-      CORS制限 - このサイトはブラウザでのクロスオリジンリクエストをブロックしています
+      CORS制限 -
+      このサイトはブラウザでのクロスオリジンリクエストをブロックしています
     </div>
     <div class="card-content">
-      <a href="[URL]" target="_blank" rel="noopener noreferrer" class="card-external-link">
+      <a
+        href="[URL]"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="card-external-link"
+      >
         → example.comを新しいタブで開く
       </a>
     </div>
@@ -563,22 +588,22 @@ const metadataLinkCardPlugin = createCardPlugin({
 
 カードプラグインが生成するHTMLには、スタイリング用のCSSクラスが付与されます:
 
-|CSSクラス|適用要素|説明|
-|:----|:----|:----|
-|`.card-container`| コンテナ全体 | カード全体のコンテナ |
-|`.card-amazon`| コンテナ | Amazon商品用の追加クラス |
-|`.card-fallback`| コンテナ | フォールバック表示用の追加クラス |
-|`.card-link`| リンク要素 | カード全体のクリック可能なリンク |
-|`.card-image`| 画像コンテナ | 画像表示エリア |
-|`.card-body`| ボディ部分 | カードの本文エリア |
-|`.card-header`| ヘッダー部分 | タイトル・プロバイダー情報のコンテナ |
-|`.card-title`| タイトル要素 | カードのタイトル |
-|`.card-provider`| プロバイダー要素 | サイト名・ファビコンエリア |
-|`.card-favicon`| ファビコン要素 | サイトのファビコン画像 |
-|`.card-description`| 説明要素 | カードの説明文 |
-|`.card-content`| コンテンツ要素 | フォールバック時の追加コンテンツ |
-|`.card-external-link`| 外部リンク要素 | フォールバック時の外部リンク |
-|`.card-{fieldName}`| 特定フィールド | 各フィールド名に対応したクラス（例：`.card-price`、`.card-rating`） |
+| CSSクラス             | 適用要素         | 説明                                                                |
+| :-------------------- | :--------------- | :------------------------------------------------------------------ |
+| `.card-container`     | コンテナ全体     | カード全体のコンテナ                                                |
+| `.card-amazon`        | コンテナ         | Amazon商品用の追加クラス                                            |
+| `.card-fallback`      | コンテナ         | フォールバック表示用の追加クラス                                    |
+| `.card-link`          | リンク要素       | カード全体のクリック可能なリンク                                    |
+| `.card-image`         | 画像コンテナ     | 画像表示エリア                                                      |
+| `.card-body`          | ボディ部分       | カードの本文エリア                                                  |
+| `.card-header`        | ヘッダー部分     | タイトル・プロバイダー情報のコンテナ                                |
+| `.card-title`         | タイトル要素     | カードのタイトル                                                    |
+| `.card-provider`      | プロバイダー要素 | サイト名・ファビコンエリア                                          |
+| `.card-favicon`       | ファビコン要素   | サイトのファビコン画像                                              |
+| `.card-description`   | 説明要素         | カードの説明文                                                      |
+| `.card-content`       | コンテンツ要素   | フォールバック時の追加コンテンツ                                    |
+| `.card-external-link` | 外部リンク要素   | フォールバック時の外部リンク                                        |
+| `.card-{fieldName}`   | 特定フィールド   | 各フィールド名に対応したクラス（例：`.card-price`、`.card-rating`） |
 
 フィールド固有クラスの命名規則:
 
@@ -589,7 +614,11 @@ const metadataLinkCardPlugin = createCardPlugin({
 Mermaidプラグインを使用すると、[mermaid.js](https://mermaid.js.org/)記法を使用してダイアグラムやフローチャートを作成できます:
 
 ```typescript
-import { createMarkdownProcessor, createMermaidPlugin, createCachedFetcher } from 'mark-deco';
+import {
+  createMarkdownProcessor,
+  createMermaidPlugin,
+  createCachedFetcher,
+} from 'mark-deco';
 
 // フェッチャーを作成
 const fetcher = createCachedFetcher('MyApp/1.0');
@@ -599,7 +628,7 @@ const mermaidPlugin = createMermaidPlugin();
 
 const processor = createMarkdownProcessor({
   plugins: [mermaidPlugin],
-  fetcher
+  fetcher,
 });
 
 const markdown = `# ダイアグラム例
@@ -613,7 +642,7 @@ graph TD
   D --> E
 \`\`\``;
 
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // <div class="mermaid">...</div>が含まれる
 console.log(result.html);
@@ -623,13 +652,13 @@ console.log(result.html);
 
 ```html
 <div class="mermaid-wrapper">
-  <style> { ... } </style>
-  <div class="mermaid" id="id-1">graph TD
-  A[開始] --&gt; B{判定}
-  B --&gt;|はい| C[アクション1]
-  B --&gt;|いいえ| D[アクション2]
-  C --&gt; E[終了]
-  D --&gt; E</div>
+  <style>
+    { ... }
+  </style>
+  <div class="mermaid" id="id-1">
+    graph TD A[開始] --&gt; B{判定} B --&gt;|はい| C[アクション1] B
+    --&gt;|いいえ| D[アクション2] C --&gt; E[終了] D --&gt; E
+  </div>
 </div>
 ```
 
@@ -637,32 +666,32 @@ console.log(result.html);
 
 生成されるHTMLには以下の特徴があります:
 
-* 図形コードは適切にHTMLエスケープされ、XSS攻撃を防止します。
-* `mermaid-wrapper`クラスでラップし、SVGのサイズ制約を上書きするスタイルを含みます。
-* デフォルトでユニークIDが付与され、複数の図形がある場合でも適切に識別できます。
+- 図形コードは適切にHTMLエスケープされ、XSS攻撃を防止します。
+- `mermaid-wrapper`クラスでラップし、SVGのサイズ制約を上書きするスタイルを含みます。
+- デフォルトでユニークIDが付与され、複数の図形がある場合でも適切に識別できます。
 
 Mermaidスクリプト本体の導入方法は、Mermaidのドキュメントを参照してください。以下に簡単な例を示します:
 
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Mermaidレンダリング</title>
-  <!-- Mermaid.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-</head>
-<body>
-  <div id="content">
-    <!-- ここにプロセッサの変換結果HTMLを挿入する -->
-  </div>
-  <script>
-    // Mermaidを初期化
-    mermaid.initialize({ 
-      startOnLoad: true,
-      theme: 'default'
-    });
-  </script>
-</body>
+  <head>
+    <title>Mermaidレンダリング</title>
+    <!-- Mermaid.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  </head>
+  <body>
+    <div id="content">
+      <!-- ここにプロセッサの変換結果HTMLを挿入する -->
+    </div>
+    <script>
+      // Mermaidを初期化
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+      });
+    </script>
+  </body>
 </html>
 ```
 
@@ -679,11 +708,11 @@ const processAndUpdate = async () => {
   // ...
 
   // MarkDecoプロセッサを実行
-  const result = await processor.process(markdown, "id");
-  
+  const result = await processor.process(markdown, 'id');
+
   // DOMを更新
   document.getElementById('output').innerHTML = result.html;
-  
+
   // Mermaid図形が存在する場合
   if (result.html.includes('class="mermaid"')) {
     // DOM更新の完了を待つ (100msec)
@@ -691,7 +720,8 @@ const processAndUpdate = async () => {
       // Mermaidを初期化して、SVGを生成させる
       window.mermaid.init(
         undefined,
-        document.querySelectorAll('.mermaid:not([data-processed="true"])'));
+        document.querySelectorAll('.mermaid:not([data-processed="true"])')
+      );
     }, 100);
   }
 };

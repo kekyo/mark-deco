@@ -1,4 +1,4 @@
-import { Logger } from "./types";
+import { Logger } from './types';
 
 const NO_OP_LOGGER_FUNCTION = () => {};
 const NO_OP_LOGGER: Logger = {

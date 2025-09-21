@@ -1,4 +1,9 @@
-import { createMarkdownProcessor, createOEmbedPlugin, createDirectFetcher, defaultProviderList } from '../dist/index.js';
+import {
+  createMarkdownProcessor,
+  createOEmbedPlugin,
+  createDirectFetcher,
+  defaultProviderList,
+} from '../dist/index.js';
 
 // Create direct fetcher that bypasses cache
 const directFetcher = createDirectFetcher(
@@ -7,14 +12,16 @@ const directFetcher = createDirectFetcher(
 );
 
 console.log('[DirectFetcher] User-Agent:', directFetcher.userAgent);
-console.log('[DirectFetcher] No caching - every request goes directly to network');
+console.log(
+  '[DirectFetcher] No caching - every request goes directly to network'
+);
 
 // Create oEmbed plugin
 const plugin = createOEmbedPlugin(defaultProviderList);
 
 const processor = createMarkdownProcessor({
   plugins: [plugin],
-  fetcher: directFetcher
+  fetcher: directFetcher,
 });
 
 // Test Markdown
@@ -36,7 +43,7 @@ console.log('=== OEmbed Plugin Test Using Direct Fetcher (No Cache) ===');
 // First execution
 console.log('\n--- First execution ---');
 try {
-  const result1 = await processor.process(markdown, "direct-test-1");
+  const result1 = await processor.process(markdown, 'direct-test-1');
   console.log('✓ First execution completed');
   console.log('Generated HTML length:', result1.html.length);
 } catch (error) {
@@ -46,7 +53,7 @@ try {
 // Second execution (would use cache with cachedFetcher, but not with directFetcher)
 console.log('\n--- Second execution (no cache hit) ---');
 try {
-  const result2 = await processor.process(markdown, "direct-test-2");
+  const result2 = await processor.process(markdown, 'direct-test-2');
   console.log('✓ Second execution completed');
   console.log('Generated HTML length:', result2.html.length);
   console.log('Note: This request also hit the network (no cache)');
@@ -57,7 +64,7 @@ try {
 // Third execution
 console.log('\n--- Third execution (no cache hit) ---');
 try {
-  const result3 = await processor.process(markdown, "direct-test-3");
+  const result3 = await processor.process(markdown, 'direct-test-3');
   console.log('✓ Third execution completed');
   console.log('Generated HTML length:', result3.html.length);
   console.log('Note: Every request with directFetcher hits the network');
@@ -66,4 +73,4 @@ try {
 }
 
 console.log('\n=== Direct Fetcher Test Completed ===');
-console.log('All requests were made directly to the network without caching.'); 
+console.log('All requests were made directly to the network without caching.');

@@ -4,15 +4,9 @@
     "noEmit": true,
     "skipLibCheck": true,
     "rootDir": ".",
-    "types": [
-      "vitest/globals",
-      "node"
-    ]
+    "types": ["vitest/globals", "node"]
   },
-  "include": [
-    "tests/**/*",
-    "src/**/*"
-  ],
+  "include": ["tests/**/*", "src/**/*"],
   "exclude": [
     "node_modules",
     "dist",

@@ -10,10 +10,18 @@ describe('Card Plugin Logging', () => {
   beforeEach(() => {
     logCalls = [];
     mockLogger = {
-      info: vi.fn((message: string, ...args) => logCalls.push({ level: 'info', message, data: args })),
-      debug: vi.fn((message: string, ...args) => logCalls.push({ level: 'debug', message, data: args })),
-      warn: vi.fn((message: string, ...args) => logCalls.push({ level: 'warn', message, data: args })),
-      error: vi.fn((message: string, ...args) => logCalls.push({ level: 'error', message, data: args }))
+      info: vi.fn((message: string, ...args) =>
+        logCalls.push({ level: 'info', message, data: args })
+      ),
+      debug: vi.fn((message: string, ...args) =>
+        logCalls.push({ level: 'debug', message, data: args })
+      ),
+      warn: vi.fn((message: string, ...args) =>
+        logCalls.push({ level: 'warn', message, data: args })
+      ),
+      error: vi.fn((message: string, ...args) =>
+        logCalls.push({ level: 'error', message, data: args })
+      ),
     };
   });
 
@@ -37,16 +45,22 @@ describe('Card Plugin Logging', () => {
     const result = extractEnhancedData($, testUrl, [], mockLogger);
 
     // Should log the start of rule matching process
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message === 'extractEnhancedData: Starting rule matching process'
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message === 'extractEnhancedData: Starting rule matching process'
+      )
+    ).toBe(true);
 
     // Should log rule testing attempts
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message === 'findMatchingRule: Testing rules against URL'
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message === 'findMatchingRule: Testing rules against URL'
+      )
+    ).toBe(true);
 
     // Should find OGP rules and extract metadata
     expect(result).toBeTruthy();
@@ -74,28 +88,42 @@ describe('Card Plugin Logging', () => {
     const result = extractEnhancedData($, testUrl, [], mockLogger);
 
     // Should log rule application starting
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message === 'applyScrapingRule: Starting metadata extraction'
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message === 'applyScrapingRule: Starting metadata extraction'
+      )
+    ).toBe(true);
 
     // Should log field processing for each OGP field
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message.includes('applyScrapingRule: Processing field')
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message.includes('applyScrapingRule: Processing field')
+      )
+    ).toBe(true);
 
     // Should log successful field extractions
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message.includes('applyScrapingRule: Successfully extracted field')
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message.includes(
+            'applyScrapingRule: Successfully extracted field'
+          )
+      )
+    ).toBe(true);
 
     // Should log completion with extracted fields count
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message === 'applyScrapingRule: Metadata extraction completed'
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message === 'applyScrapingRule: Metadata extraction completed'
+      )
+    ).toBe(true);
 
     expect(result).toBeTruthy();
     expect(Object.keys(result!).length).toBeGreaterThan(0);
@@ -115,22 +143,20 @@ describe('Card Plugin Logging', () => {
       </html>
     `;
 
-    const customRules = [{
-      pattern: '^https://github\\.com/',
-      siteName: 'GitHub',
-      fields: {
-        title: {
-          rules: [
-            { selector: '.repo-title', method: 'text' as const }
-          ]
+    const customRules = [
+      {
+        pattern: '^https://github\\.com/',
+        siteName: 'GitHub',
+        fields: {
+          title: {
+            rules: [{ selector: '.repo-title', method: 'text' as const }],
+          },
+          description: {
+            rules: [{ selector: '.repo-description', method: 'text' as const }],
+          },
         },
-        description: {
-          rules: [
-            { selector: '.repo-description', method: 'text' as const }
-          ]
-        }
-      }
-    }];
+      },
+    ];
 
     const $ = cheerio.load(htmlContent);
     const testUrl = 'https://github.com/user/repo';
@@ -138,26 +164,41 @@ describe('Card Plugin Logging', () => {
     const result = extractEnhancedData($, testUrl, customRules, mockLogger);
 
     // Should log custom rules count
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message === 'extractEnhancedData: Starting rule matching process' &&
-      Array.isArray(call.data) && call.data.some((data: unknown) =>
-        typeof data === 'object' && data !== null && 'customRulesCount' in data && (data as { customRulesCount: number }).customRulesCount === 1
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message ===
+            'extractEnhancedData: Starting rule matching process' &&
+          Array.isArray(call.data) &&
+          call.data.some(
+            (data: unknown) =>
+              typeof data === 'object' &&
+              data !== null &&
+              'customRulesCount' in data &&
+              (data as { customRulesCount: number }).customRulesCount === 1
+          )
       )
-    )).toBe(true);
+    ).toBe(true);
 
     // Should log that a matching rule was found
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message === 'extractEnhancedData: Found matching rule'
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message === 'extractEnhancedData: Found matching rule'
+      )
+    ).toBe(true);
 
     // Should log field extraction attempts
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message.includes('extractFieldWithRules: Trying') &&
-      call.message.includes('rules for field "title"')
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message.includes('extractFieldWithRules: Trying') &&
+          call.message.includes('rules for field "title"')
+      )
+    ).toBe(true);
 
     expect(result).toBeTruthy();
     expect(result?.siteName).toBe('GitHub');
@@ -172,10 +213,13 @@ describe('Card Plugin Logging', () => {
     const result = extractEnhancedData($, testUrl, [], mockLogger);
 
     // Should log that rules are being tested
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message === 'findMatchingRule: Testing rules against URL'
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message === 'findMatchingRule: Testing rules against URL'
+      )
+    ).toBe(true);
 
     // Should eventually find OGP rules (as fallback)
     expect(result).toBeTruthy(); // OGP rules should still match and extract title
@@ -194,25 +238,27 @@ describe('Card Plugin Logging', () => {
       </html>
     `;
 
-    const customRules = [{
-      pattern: '^https://shop\\.example\\.com/',
-      siteName: 'Example Shop',
-      fields: {
-        prices: {
-          rules: [
-            {
-              selector: '.price',
-              method: 'text' as const,
-              multiple: true,
-              processor: {
-                type: 'currency' as const,
-                params: { symbol: '$', locale: 'en-US' }
-              }
-            }
-          ]
-        }
-      }
-    }];
+    const customRules = [
+      {
+        pattern: '^https://shop\\.example\\.com/',
+        siteName: 'Example Shop',
+        fields: {
+          prices: {
+            rules: [
+              {
+                selector: '.price',
+                method: 'text' as const,
+                multiple: true,
+                processor: {
+                  type: 'currency' as const,
+                  params: { symbol: '$', locale: 'en-US' },
+                },
+              },
+            ],
+          },
+        },
+      },
+    ];
 
     const $ = cheerio.load(htmlContent);
     const testUrl = 'https://shop.example.com/product/123';
@@ -220,23 +266,33 @@ describe('Card Plugin Logging', () => {
     const result = extractEnhancedData($, testUrl, customRules, mockLogger);
 
     // Should log field extraction attempts
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message === 'extractField: Attempting field extraction'
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message === 'extractField: Attempting field extraction'
+      )
+    ).toBe(true);
 
     // Should log processor application
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message === 'extractField: Applying processor to extracted values'
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message ===
+            'extractField: Applying processor to extracted values'
+      )
+    ).toBe(true);
 
     // Should log element count for selectors
-    expect(logCalls.some(call =>
-      call.level === 'debug' &&
-      call.message.includes('Found') &&
-      call.message.includes('elements for selector')
-    )).toBe(true);
+    expect(
+      logCalls.some(
+        (call) =>
+          call.level === 'debug' &&
+          call.message.includes('Found') &&
+          call.message.includes('elements for selector')
+      )
+    ).toBe(true);
 
     expect(result).toBeTruthy();
   });

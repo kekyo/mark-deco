@@ -1,7 +1,9 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
+import prettierMax from 'prettier-max';
 
 export default defineConfig({
+  plugins: [prettierMax()],
   root: '.',
   build: {
     outDir: './dist',
@@ -10,29 +12,24 @@ export default defineConfig({
       entry: resolve(__dirname, 'index.ts'),
       name: 'MarkDecoNode',
       fileName: 'index',
-      formats: ['es']
+      formats: ['es'],
     },
     rollupOptions: {
-      external: [
-        'commander',
-        'mark-deco',
-        'fs/promises',
-        'path'
-      ],
+      external: ['commander', 'mark-deco', 'fs/promises', 'path'],
       output: {
         globals: {
           commander: 'commander',
-          'mark-deco': 'markDeco'
-        }
-      }
+          'mark-deco': 'markDeco',
+        },
+      },
     },
-    target: 'node18'
+    target: 'node18',
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, '.'),
       // Directly reference library source files during development
-      'mark-deco': resolve(__dirname, '../mark-deco/src/index.ts')
-    }
-  }
+      'mark-deco': resolve(__dirname, '../mark-deco/src/index.ts'),
+    },
+  },
 });

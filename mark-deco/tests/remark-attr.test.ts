@@ -12,7 +12,7 @@ describe('remark-attr integration', () => {
 
     processor = createMarkdownProcessor({
       plugins: [],
-      fetcher: defaultTestFetcher
+      fetcher: defaultTestFetcher,
     });
   });
 
@@ -59,7 +59,8 @@ describe('remark-attr integration', () => {
     });
 
     it('should apply attributes to links', async () => {
-      const markdown = '[Link text](https://example.com){.external target="_blank"}';
+      const markdown =
+        '[Link text](https://example.com){.external target="_blank"}';
       const result = await processor.process(markdown, 'test');
 
       expect(result.html).toContain('class="external"');
@@ -70,7 +71,8 @@ describe('remark-attr integration', () => {
 
   describe('code block attribute application', () => {
     it('should apply attributes to code blocks', async () => {
-      const markdown = '```javascript {.highlight-code}\nconsole.log("Hello");\n```';
+      const markdown =
+        '```javascript {.highlight-code}\nconsole.log("Hello");\n```';
       const result = await processor.process(markdown, 'test');
 
       expect(result.html).toContain('class="highlight-code"');
@@ -79,7 +81,8 @@ describe('remark-attr integration', () => {
     });
 
     it('should apply id and class to code blocks', async () => {
-      const markdown = '```python {#code-example .my-code}\nprint("Hello")\n```';
+      const markdown =
+        '```python {#code-example .my-code}\nprint("Hello")\n```';
       const result = await processor.process(markdown, 'test');
 
       expect(result.html).toContain('id="code-example"');
@@ -88,7 +91,8 @@ describe('remark-attr integration', () => {
     });
 
     it('should apply data attributes to code blocks', async () => {
-      const markdown = '```yaml {data-config="true" data-env="prod"}\nkey: value\n```';
+      const markdown =
+        '```yaml {data-config="true" data-env="prod"}\nkey: value\n```';
       const result = await processor.process(markdown, 'test');
 
       expect(result.html).toContain('data-config="true"');
@@ -107,7 +111,8 @@ describe('remark-attr integration', () => {
     });
 
     it('should apply multiple attributes to inline code', async () => {
-      const markdown = 'Check this `command`{.warning #cmd data-lang="bash"} out.';
+      const markdown =
+        'Check this `command`{.warning #cmd data-lang="bash"} out.';
       const result = await processor.process(markdown, 'test');
 
       expect(result.html).toContain('class="warning"');
@@ -127,7 +132,8 @@ describe('remark-attr integration', () => {
     });
 
     it('should apply attributes to blockquotes on separate lines', async () => {
-      const markdown = '> This is a quote\n> Multi-line quote\n\n{.fancy-quote #testimonial}';
+      const markdown =
+        '> This is a quote\n> Multi-line quote\n\n{.fancy-quote #testimonial}';
       const result = await processor.process(markdown, 'test');
 
       expect(result.html).toContain('class="fancy-quote"');
@@ -162,15 +168,16 @@ describe('remark-attr integration', () => {
         name: 'test-plugin',
         processBlock: async (content: string): Promise<string> => {
           return `<div class="test-plugin-output">${content}</div>`;
-        }
+        },
       };
 
       const pluginProcessor = createMarkdownProcessor({
         plugins: [mockPlugin],
-        fetcher: defaultTestFetcher
+        fetcher: defaultTestFetcher,
       });
 
-      const markdown = '```test-plugin {.custom-styling #plugin-block}\ntest content\n```';
+      const markdown =
+        '```test-plugin {.custom-styling #plugin-block}\ntest content\n```';
       const result = await pluginProcessor.process(markdown, 'test');
 
       // Note: When plugins process code blocks, they replace the original code block
@@ -198,7 +205,8 @@ describe('remark-attr integration', () => {
     });
 
     it('should handle attributes on standard code blocks that become plugin blocks', async () => {
-      const markdown = '```javascript {.highlight-js data-theme="dark"}\nconsole.log("test");\n```';
+      const markdown =
+        '```javascript {.highlight-js data-theme="dark"}\nconsole.log("test");\n```';
       const result = await processor.process(markdown, 'test');
 
       // Standard code blocks should have attributes applied

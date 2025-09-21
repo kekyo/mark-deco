@@ -31,16 +31,21 @@ export function getBrowserInjectionScript(testServerPort: number): string {
  * Normalize HTML for comparison by removing extra whitespace and formatting differences
  */
 export function normalizeHtml(html: string): string {
-  return html
-    .replace(/\s+/g, ' ')  // Replace multiple whitespace with single space
-    .replace(/>\s+</g, '><')  // Remove whitespace between tags
-    .replace(/^\s+|\s+$/g, '')  // Trim leading/trailing whitespace
-    // Normalize error messages that vary between browsers
-    // Handle WebKit's detailed error messages vs simpler ones in other browsers
-    // WebKit pattern: TypeError[message]', 'property' is undefined)]
-    // Target pattern: TypeError[message]
-    .replace(/typeerror\[finalcachestorage\.get is not a function[^\]]*\][^)]*\)/gi, 'typeerror[finalcachestorage.get is not a function]')
-    // Handle various forms of "Failed by" vs "failed by" capitalization
-    .replace(/\((failed|Failed) by/gi, '(failed by')
-    .toLowerCase();  // Case insensitive comparison
+  return (
+    html
+      .replace(/\s+/g, ' ') // Replace multiple whitespace with single space
+      .replace(/>\s+</g, '><') // Remove whitespace between tags
+      .replace(/^\s+|\s+$/g, '') // Trim leading/trailing whitespace
+      // Normalize error messages that vary between browsers
+      // Handle WebKit's detailed error messages vs simpler ones in other browsers
+      // WebKit pattern: TypeError[message]', 'property' is undefined)]
+      // Target pattern: TypeError[message]
+      .replace(
+        /typeerror\[finalcachestorage\.get is not a function[^\]]*\][^)]*\)/gi,
+        'typeerror[finalcachestorage.get is not a function]'
+      )
+      // Handle various forms of "Failed by" vs "failed by" capitalization
+      .replace(/\((failed|Failed) by/gi, '(failed by')
+      .toLowerCase()
+  ); // Case insensitive comparison
 }

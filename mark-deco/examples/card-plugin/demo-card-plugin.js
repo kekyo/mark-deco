@@ -5,39 +5,39 @@ async function demo() {
 
   // Create markdown processor with card plugin
   const cardPlugin = createCardPlugin({
-    timeout: 10000
+    timeout: 10000,
   });
-  
+
   const processor = createMarkdownProcessor({
-  userAgent: 'card-plugin-basic/1.0.0',
-    plugins: [cardPlugin]
+    userAgent: 'card-plugin-basic/1.0.0',
+    plugins: [cardPlugin],
   });
 
   // Test cases
   const testCases = [
     {
       name: 'Example.com (OGP metadata)',
-      markdown: '```card\nhttps://example.com\n```'
+      markdown: '```card\nhttps://example.com\n```',
     },
     {
       name: 'GitHub Repository (Rich OGP)',
-      markdown: '```card\nhttps://github.com/microsoft/vscode\n```'
+      markdown: '```card\nhttps://github.com/microsoft/vscode\n```',
     },
     {
       name: 'Invalid URL (Error handling)',
-      markdown: '```card\ninvalid-url\n```'
-    }
+      markdown: '```card\ninvalid-url\n```',
+    },
   ];
 
   for (const testCase of testCases) {
     console.log(`\nTest: ${testCase.name}`);
     console.log('-'.repeat(40));
-    
+
     try {
-      const result = await processor.process(testCase.markdown, "id");
+      const result = await processor.process(testCase.markdown, 'id');
       console.log('Success! Generated HTML:');
       console.log(result.html.substring(0, 200) + '...');
-      
+
       // Check for expected patterns
       if (result.html.includes('card-container')) {
         console.log('✓ Card container found');
@@ -57,4 +57,4 @@ async function demo() {
   console.log('Demo completed successfully!');
 }
 
-demo().catch(console.error); 
+demo().catch(console.error);

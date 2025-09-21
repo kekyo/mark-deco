@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as net from 'net';
 import * as path from 'path';
-import * as url from 'url';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -131,9 +130,17 @@ export function createTestServer(config: TestServerConfig): TestServer {
       return;
     }
 
-    const parsedUrl = url.parse(req.url || '', true);
-    const pathname = parsedUrl.pathname;
-    const query = parsedUrl.query;
+    const baseUrl = `http://localhost:${actualPort}`;
+    let requestUrl: URL;
+    try {
+      requestUrl = new URL(req.url ?? '/', baseUrl);
+    } catch {
+      res.writeHead(400);
+      res.end('Invalid URL');
+      return;
+    }
+
+    const pathname = requestUrl.pathname;
 
     if (!pathname) {
       res.writeHead(404);
@@ -143,7 +150,7 @@ export function createTestServer(config: TestServerConfig): TestServer {
 
     // Handle oEmbed API endpoints for testing
     if (pathname === '/oembed') {
-      const urlParam = query.url as string;
+      const urlParam = requestUrl.searchParams.get('url');
 
       if (!urlParam) {
         res.writeHead(400);

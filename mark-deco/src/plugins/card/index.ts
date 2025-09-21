@@ -14,11 +14,13 @@ export { amazonRules } from './amazon-rules.js';
  * @returns Plugin instance for processing card blocks
  */
 export const createCardPlugin = (options: CardPluginOptions = {}): Plugin => {
-
   /**
    * Main plugin interface implementation
    */
-  const processBlock = async (content: string, context: PluginContext): Promise<string> => {
+  const processBlock = async (
+    content: string,
+    context: PluginContext
+  ): Promise<string> => {
     const url = content.trim();
 
     if (!isValidUrl(url)) {
@@ -46,6 +48,6 @@ export const createCardPlugin = (options: CardPluginOptions = {}): Plugin => {
 
   return {
     name: 'card',
-    processBlock
+    processBlock,
   };
 };

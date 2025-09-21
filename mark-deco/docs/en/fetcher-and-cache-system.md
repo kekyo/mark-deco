@@ -27,9 +27,9 @@ import { createCachedFetcher, createMemoryCacheStorage } from 'mark-deco';
 
 const memoryStorage = createMemoryCacheStorage();
 const fetcher = createCachedFetcher(
-  'MyApp/1.0',        // User agent
-  60000,              // Timeout (milliseconds)
-  memoryStorage       // Cache storage
+  'MyApp/1.0', // User agent
+  60000, // Timeout (milliseconds)
+  memoryStorage // Cache storage
 );
 ```
 
@@ -57,22 +57,18 @@ const fetcher = createCachedFetcher('MyApp/1.0', 60000, fileStorage);
 You can control detailed cache behavior:
 
 ```typescript
-const fetcher = createCachedFetcher(
-  'MyApp/1.0',
-  60000,
-  fileStorage, {
-    cache: true,                    // Enable/disable cache
-    cacheTTL: 30 * 60 * 1000,       // Cache time-to-live (30 minutes)
-    cacheFailures: true,            // Cache failed requests too
-    failureCacheTTL: 5 * 60 * 1000  // Failure cache time-to-live (5 minutes)
-  }
-);
+const fetcher = createCachedFetcher('MyApp/1.0', 60000, fileStorage, {
+  cache: true, // Enable/disable cache
+  cacheTTL: 30 * 60 * 1000, // Cache time-to-live (30 minutes)
+  cacheFailures: true, // Cache failed requests too
+  failureCacheTTL: 5 * 60 * 1000, // Failure cache time-to-live (5 minutes)
+});
 ```
 
 Cache behavior on fetch failures:
 
-* Success cache: Successful responses are retained until the specified TTL and aren't deleted even on failures.
-* Failure cache: When `cacheFailures` is `true`, failures are also cached with a separate TTL (`failureCacheTTL`).
-* Old data protection: Existing success cache isn't affected even if new requests fail.
+- Success cache: Successful responses are retained until the specified TTL and aren't deleted even on failures.
+- Failure cache: When `cacheFailures` is `true`, failures are also cached with a separate TTL (`failureCacheTTL`).
+- Old data protection: Existing success cache isn't affected even if new requests fail.
 
 Caching reduces duplicate requests to the same URL and improves performance.

@@ -1,4 +1,11 @@
-import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  vi,
+  type MockedFunction,
+} from 'vitest';
 import { createDirectFetcher } from '../src/fetcher.js';
 
 // Mock fetch globally
@@ -29,23 +36,28 @@ describe('createDirectFetcher', () => {
     const accept = 'application/json';
     const responseData = '{"test": "data"}';
 
-    mockFetch.mockResolvedValueOnce(new Response(responseData, {
-      status: 200,
-      headers: { 'Content-Type': accept }
-    }));
+    mockFetch.mockResolvedValueOnce(
+      new Response(responseData, {
+        status: 200,
+        headers: { 'Content-Type': accept },
+      })
+    );
 
     const fetcherInterface = createDirectFetcher(userAgent, timeout);
     const response = await fetcherInterface.rawFetcher(url, accept, undefined);
 
     expect(mockFetch).toHaveBeenCalledOnce();
-    expect(mockFetch).toHaveBeenCalledWith(url, expect.objectContaining({
-      method: 'GET',
-      headers: expect.objectContaining({
-        'Accept': accept,
-        'User-Agent': userAgent
-      }),
-      signal: expect.any(AbortSignal)
-    }));
+    expect(mockFetch).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Accept: accept,
+          'User-Agent': userAgent,
+        }),
+        signal: expect.any(AbortSignal),
+      })
+    );
     expect(response).toBeInstanceOf(Response);
     expect(await response.text()).toBe(responseData);
   });
@@ -59,18 +71,24 @@ describe('createDirectFetcher', () => {
 
     // Mock different responses for each call to verify no caching
     mockFetch
-      .mockResolvedValueOnce(new Response(responseData, {
-        status: 200,
-        headers: { 'Content-Type': accept }
-      }))
-      .mockResolvedValueOnce(new Response(responseData, {
-        status: 200,
-        headers: { 'Content-Type': accept }
-      }))
-      .mockResolvedValueOnce(new Response(responseData, {
-        status: 200,
-        headers: { 'Content-Type': accept }
-      }));
+      .mockResolvedValueOnce(
+        new Response(responseData, {
+          status: 200,
+          headers: { 'Content-Type': accept },
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response(responseData, {
+          status: 200,
+          headers: { 'Content-Type': accept },
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response(responseData, {
+          status: 200,
+          headers: { 'Content-Type': accept },
+        })
+      );
 
     const fetcherInterface = createDirectFetcher(userAgent, timeout);
 
@@ -96,23 +114,28 @@ describe('createDirectFetcher', () => {
     const url = 'https://api.example.com/data';
     const accept = 'application/json';
 
-    mockFetch.mockResolvedValueOnce(new Response('{"test": "data"}', {
-      status: 200,
-      headers: { 'Content-Type': accept }
-    }));
+    mockFetch.mockResolvedValueOnce(
+      new Response('{"test": "data"}', {
+        status: 200,
+        headers: { 'Content-Type': accept },
+      })
+    );
 
     const fetcherInterface = createDirectFetcher(userAgent, timeout);
     const response = await fetcherInterface.rawFetcher(url, accept, undefined);
 
     expect(mockFetch).toHaveBeenCalledOnce();
-    expect(mockFetch).toHaveBeenCalledWith(url, expect.objectContaining({
-      method: 'GET',
-      headers: expect.objectContaining({
-        'Accept': accept,
-        'User-Agent': userAgent
-      }),
-      signal: expect.any(AbortSignal)
-    }));
+    expect(mockFetch).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Accept: accept,
+          'User-Agent': userAgent,
+        }),
+        signal: expect.any(AbortSignal),
+      })
+    );
     expect(response).toBeInstanceOf(Response);
     expect(fetcherInterface.userAgent).toBe(userAgent);
   });
@@ -150,13 +173,17 @@ describe('createDirectFetcher', () => {
     // Abort the signal immediately
     abortController.abort();
 
-    await expect(fetcherInterface.rawFetcher(url, accept, abortController.signal))
-      .rejects.toThrow('The operation was aborted');
+    await expect(
+      fetcherInterface.rawFetcher(url, accept, abortController.signal)
+    ).rejects.toThrow('The operation was aborted');
 
     expect(mockFetch).toHaveBeenCalledOnce();
-    expect(mockFetch).toHaveBeenCalledWith(url, expect.objectContaining({
-      signal: expect.any(AbortSignal)
-    }));
+    expect(mockFetch).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        signal: expect.any(AbortSignal),
+      })
+    );
   });
 
   it('should handle HTTP errors correctly', async () => {
@@ -169,7 +196,9 @@ describe('createDirectFetcher', () => {
 
     const fetcherInterface = createDirectFetcher(userAgent, timeout);
 
-    await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('HTTP error, status: 404');
+    await expect(
+      fetcherInterface.rawFetcher(url, accept, undefined)
+    ).rejects.toThrow('HTTP error, status: 404');
     expect(mockFetch).toHaveBeenCalledOnce();
   });
 
@@ -183,7 +212,9 @@ describe('createDirectFetcher', () => {
 
     const fetcherInterface = createDirectFetcher(userAgent, timeout);
 
-    await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow('Network error');
+    await expect(
+      fetcherInterface.rawFetcher(url, accept, undefined)
+    ).rejects.toThrow('Network error');
     expect(mockFetch).toHaveBeenCalledOnce();
   });
 
@@ -213,7 +244,9 @@ describe('createDirectFetcher', () => {
 
     const fetcherInterface = createDirectFetcher(userAgent, timeout);
 
-    await expect(fetcherInterface.rawFetcher(url, accept, undefined)).rejects.toThrow();
+    await expect(
+      fetcherInterface.rawFetcher(url, accept, undefined)
+    ).rejects.toThrow();
     expect(mockFetch).toHaveBeenCalledOnce();
   });
 
@@ -234,24 +267,32 @@ describe('createDirectFetcher', () => {
     const url = 'https://api.example.com/log-test';
     const accept = 'application/json';
 
-    mockFetch.mockResolvedValueOnce(new Response('{"logged": true}', {
-      status: 200,
-      headers: { 'Content-Type': accept }
-    }));
+    mockFetch.mockResolvedValueOnce(
+      new Response('{"logged": true}', {
+        status: 200,
+        headers: { 'Content-Type': accept },
+      })
+    );
 
     const mockLogger = {
       debug: vi.fn(),
       info: vi.fn(),
       warn: vi.fn(),
-      error: vi.fn()
+      error: vi.fn(),
     };
 
     const fetcherInterface = createDirectFetcher(userAgent, timeout);
     await fetcherInterface.rawFetcher(url, accept, undefined, mockLogger);
 
-    expect(mockLogger.debug).toHaveBeenCalledWith(`Direct fetch for URL: ${url}`);
-    expect(mockLogger.debug).toHaveBeenCalledWith(`Fetching data from URL: ${url}`);
-    expect(mockLogger.debug).toHaveBeenCalledWith(`Successfully fetched data from URL: ${url}`);
+    expect(mockLogger.debug).toHaveBeenCalledWith(
+      `Direct fetch for URL: ${url}`
+    );
+    expect(mockLogger.debug).toHaveBeenCalledWith(
+      `Fetching data from URL: ${url}`
+    );
+    expect(mockLogger.debug).toHaveBeenCalledWith(
+      `Successfully fetched data from URL: ${url}`
+    );
   });
 
   it('should use default timeout when not specified', () => {

@@ -24,7 +24,8 @@ export const formatErrorInfo = (error: unknown): string | undefined => {
 
     // For non-Error objects, try to get constructor name
     if (typeof error === 'object' && error !== null) {
-      const typeName = (error as { constructor?: { name?: string } }).constructor?.name;
+      const typeName = (error as { constructor?: { name?: string } })
+        .constructor?.name;
       if (typeName && typeName !== 'Object') {
         const message = (error as { message?: string }).message;
         if (message) {

@@ -22,7 +22,7 @@ export const rehypeResponsiveImages = () => {
         }
 
         // Get existing style attribute if any
-        const existingStyle = node.properties.style as string || '';
+        const existingStyle = (node.properties.style as string) || '';
 
         // Combine existing styles with responsive styles
         const combinedStyles = existingStyle

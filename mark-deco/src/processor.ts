@@ -19,7 +19,7 @@ import type {
   ProcessOptions,
   ProcessResult,
   FrontmatterData,
-  HeadingNode
+  HeadingNode,
 } from './types.js';
 import type { HTMLBeautifyOptions } from 'js-beautify';
 
@@ -40,7 +40,7 @@ export const defaultHtmlOptions: HTMLBeautifyOptions = {
   indent_empty_lines: false,
   unformatted: ['code', 'pre', 'textarea'],
   content_unformatted: ['pre', 'code', 'textarea'],
-  extra_liners: []
+  extra_liners: [],
 } as const;
 
 /**
@@ -69,7 +69,9 @@ const generateHierarchicalId = (prefix: string, numbers: number[]): string => {
 /**
  * Build hierarchical heading numbers
  */
-const buildHierarchicalNumbers = (headings: Array<{ level: number; text: string }>): Array<{ level: number; text: string; numbers: number[] }> => {
+const buildHierarchicalNumbers = (
+  headings: Array<{ level: number; text: string }>
+): Array<{ level: number; text: string; numbers: number[] }> => {
   const result: Array<{ level: number; text: string; numbers: number[] }> = [];
   const stack: number[] = []; // Track numbers at each level
 
@@ -96,7 +98,7 @@ const buildHierarchicalNumbers = (headings: Array<{ level: number; text: string 
     result.push({
       level: heading.level,
       text: heading.text,
-      numbers
+      numbers,
     });
   }
 
@@ -106,7 +108,11 @@ const buildHierarchicalNumbers = (headings: Array<{ level: number; text: string 
 /**
  * Generate ID from heading text with fallback strategy (internal use)
  */
-const generateHeadingIdInternal = (prefix: string, text: string, fallbackId: () => string): string => {
+const generateHeadingIdInternal = (
+  prefix: string,
+  text: string,
+  fallbackId: () => string
+): string => {
   const result = generateHeadingId(text);
   if (result !== undefined) {
     return `${prefix}-${result}`;
@@ -118,7 +124,9 @@ const generateHeadingIdInternal = (prefix: string, text: string, fallbackId: () 
 /**
  * Build heading tree from flat list of headings
  */
-const buildHeadingTree = (headings: Array<{ level: number; text: string; id: string }>): HeadingNode[] => {
+const buildHeadingTree = (
+  headings: Array<{ level: number; text: string; id: string }>
+): HeadingNode[] => {
   const tree: HeadingNode[] = [];
   const stack: HeadingNode[] = [];
 
@@ -127,7 +135,7 @@ const buildHeadingTree = (headings: Array<{ level: number; text: string; id: str
       level: heading.level,
       text: heading.text,
       id: heading.id,
-      children: []
+      children: [],
     };
 
     // Find the correct parent level
@@ -162,19 +170,19 @@ const buildHeadingTree = (headings: Array<{ level: number; text: string; id: str
  * @param options - Configuration options for the markdown processor
  * @returns A configured markdown processor instance
  */
-export const createMarkdownProcessor = (options: MarkdownProcessorOptions): MarkdownProcessor => {
-  const {
-    plugins = [],
-    logger = getNoOpLogger(),
-    fetcher
-  } = options;
+export const createMarkdownProcessor = (
+  options: MarkdownProcessorOptions
+): MarkdownProcessor => {
+  const { plugins = [], logger = getNoOpLogger(), fetcher } = options;
 
   const pluginsMap: Map<string, Plugin> = new Map();
 
   // Initialize plugins
   for (const plugin of plugins) {
     if (pluginsMap.has(plugin.name)) {
-      throw new Error(`Plugin with name '${plugin.name}' is already registered`);
+      throw new Error(
+        `Plugin with name '${plugin.name}' is already registered`
+      );
     }
     pluginsMap.set(plugin.name, plugin);
   }
@@ -200,7 +208,11 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
   /**
    * Create a remark plugin for processing custom code blocks
    */
-  const createCustomBlockPlugin = (frontmatter: FrontmatterData, signal: AbortSignal | undefined, getUniqueId: () => string) => {
+  const createCustomBlockPlugin = (
+    frontmatter: FrontmatterData,
+    signal: AbortSignal | undefined,
+    getUniqueId: () => string
+  ) => {
     const context: PluginContext = {
       logger,
       signal,
@@ -213,31 +225,35 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
       return async (tree: any) => {
         const promises: Promise<void>[] = [];
 
-        visit(tree, 'code', (node: any, index: number | undefined, parent: any) => {
-          if (!node.lang || !pluginsMap.has(node.lang)) {
-            return;
-          }
-
-          const promise = (async () => {
-            const processedHtml = await processBlock(
-              node.lang,
-              node.value,
-              context
-            );
-
-            // Replace the code node with an HTML node
-            const htmlNode = {
-              type: 'html',
-              value: processedHtml
-            };
-
-            if (parent && typeof index === 'number') {
-              parent.children[index] = htmlNode;
+        visit(
+          tree,
+          'code',
+          (node: any, index: number | undefined, parent: any) => {
+            if (!node.lang || !pluginsMap.has(node.lang)) {
+              return;
             }
-          })();
 
-          promises.push(promise);
-        });
+            const promise = (async () => {
+              const processedHtml = await processBlock(
+                node.lang,
+                node.value,
+                context
+              );
+
+              // Replace the code node with an HTML node
+              const htmlNode = {
+                type: 'html',
+                value: processedHtml,
+              };
+
+              if (parent && typeof index === 'number') {
+                parent.children[index] = htmlNode;
+              }
+            })();
+
+            promises.push(promise);
+          }
+        );
 
         // Wait for all plugin processing to complete
         await Promise.all(promises);
@@ -268,17 +284,22 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
         });
 
         // Generate hierarchical numbers if requested
-        let hierarchicalNumbers: Array<{ level: number; text: string; numbers: number[] }> = [];
+        let hierarchicalNumbers: Array<{
+          level: number;
+          text: string;
+          numbers: number[];
+        }> = [];
         if (useHierarchicalId) {
-          const basicHeadings = headingNodes.map(node => ({
+          const basicHeadings = headingNodes.map((node) => ({
             level: node.depth,
-            text: extractHeadingText(node)
+            text: extractHeadingText(node),
           }));
           hierarchicalNumbers = buildHierarchicalNumbers(basicHeadings);
         }
 
         // Second pass: set IDs and collect heading data
-        const parentContentIds: Array<{ level: number; contentId: string }> = [];
+        const parentContentIds: Array<{ level: number; contentId: string }> =
+          [];
 
         headingNodes.forEach((node, index) => {
           const headingText = extractHeadingText(node);
@@ -291,7 +312,11 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
             headingId = existingId;
           } else if (useHierarchicalId && useContentBasedId) {
             // Both hierarchical and content-based: create hierarchical content IDs
-            const contentBasedId = generateHeadingIdInternal(uniqueIdPrefix, headingText, () => generateId(headingText)).replace(`${uniqueIdPrefix}-`, '');
+            const contentBasedId = generateHeadingIdInternal(
+              uniqueIdPrefix,
+              headingText,
+              () => generateId(headingText)
+            ).replace(`${uniqueIdPrefix}-`, '');
 
             // Remove parent IDs that are deeper than current level
             while (parentContentIds.length > 0) {
@@ -304,22 +329,26 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
             }
 
             // Build hierarchical content ID
-            const parentParts = parentContentIds.map(p => p.contentId);
-            const hierarchicalContentId = parentParts.length > 0
-              ? `${uniqueIdPrefix}-${parentParts.join('-')}-${contentBasedId}`
-              : `${uniqueIdPrefix}-${contentBasedId}`;
+            const parentParts = parentContentIds.map((p) => p.contentId);
+            const hierarchicalContentId =
+              parentParts.length > 0
+                ? `${uniqueIdPrefix}-${parentParts.join('-')}-${contentBasedId}`
+                : `${uniqueIdPrefix}-${contentBasedId}`;
 
             headingId = hierarchicalContentId;
 
             // Store this heading's content ID for children
             parentContentIds.push({
               level: node.depth,
-              contentId: contentBasedId
+              contentId: contentBasedId,
             });
           } else if (useHierarchicalId && index < hierarchicalNumbers.length) {
             const hierarchicalData = hierarchicalNumbers[index];
             if (hierarchicalData) {
-              headingId = generateHierarchicalId(uniqueIdPrefix, hierarchicalData.numbers);
+              headingId = generateHierarchicalId(
+                uniqueIdPrefix,
+                hierarchicalData.numbers
+              );
             } else {
               headingId = generateId(headingText);
             }
@@ -341,7 +370,7 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
           headings.push({
             level: node.depth,
             text: headingText,
-            id: headingId
+            id: headingId,
           });
         });
 
@@ -355,19 +384,23 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
   /**
    * Process markdown content with frontmatter
    */
-  const process = async (markdown: string, uniqueIdPrefix: string, {
-    signal,
-    useContentStringHeaderId = false,
-    useHierarchicalHeadingId = true,
-    advancedOptions
-  }: ProcessOptions = {}): Promise<ProcessResult> => {
+  const process = async (
+    markdown: string,
+    uniqueIdPrefix: string,
+    {
+      signal,
+      useContentStringHeaderId = false,
+      useHierarchicalHeadingId = true,
+      advancedOptions,
+    }: ProcessOptions = {}
+  ): Promise<ProcessResult> => {
     // Extract extended options with defaults
     const {
       allowDangerousHtml = true,
       htmlOptions = defaultHtmlOptions,
       gfmOptions = {},
       remarkPlugins = [],
-      rehypePlugins = []
+      rehypePlugins = [],
     } = advancedOptions || {};
     try {
       // Parse frontmatter
@@ -385,8 +418,7 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
       };
 
       // Create unified processor with plugins
-      let processor0 = unified()
-        .use(remarkParse);
+      let processor0 = unified().use(remarkParse);
 
       // Add custom remark plugins first
       if (remarkPlugins) {
@@ -404,12 +436,18 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
       let processor = processor0
         .use(remarkGfm, gfmOptions) // Add remark-gfm with options, provide empty object if undefined
         .use(remarkAttr) // Add remark-attr for CSS attribute support (before heading tree and custom plugins)
-        .use(createHeadingTreePlugin(
-          headingTree,
-          useContentStringHeaderId ? (text => generateHeadingIdInternal(uniqueIdPrefix, text, getUniqueId)) : getUniqueId,
-          useHierarchicalHeadingId,
-          useContentStringHeaderId,
-          uniqueIdPrefix))
+        .use(
+          createHeadingTreePlugin(
+            headingTree,
+            useContentStringHeaderId
+              ? (text) =>
+                  generateHeadingIdInternal(uniqueIdPrefix, text, getUniqueId)
+              : getUniqueId,
+            useHierarchicalHeadingId,
+            useContentStringHeaderId,
+            uniqueIdPrefix
+          )
+        )
         .use(createCustomBlockPlugin(frontmatter, signal, getUniqueId))
         .use(remarkRehype, { allowDangerousHtml })
         .use(rehypeResponsiveImages) // Add responsive images plugin
@@ -438,15 +476,19 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
       return {
         html: formattedHtml,
         frontmatter,
-        headingTree
+        headingTree,
       };
     } catch (error) {
-      logger.error(`Failed to process markdown: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      throw new Error(`Failed to process markdown: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      logger.error(
+        `Failed to process markdown: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+      throw new Error(
+        `Failed to process markdown: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
   return {
-    process
+    process,
   };
 };

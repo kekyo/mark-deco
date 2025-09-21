@@ -12,4 +12,4 @@ http://localhost:12345/news
 
 ```oembed
 http://localhost:12345/content/social
-``` 
+```

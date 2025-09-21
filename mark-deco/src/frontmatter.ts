@@ -24,7 +24,7 @@ export function parseFrontmatter(content: string): ParsedFrontmatter {
     // No frontmatter found, return empty data and original content
     return {
       data: {},
-      content
+      content,
     };
   }
 
@@ -36,17 +36,19 @@ export function parseFrontmatter(content: string): ParsedFrontmatter {
     const parsedData = loadYaml(yamlContent);
 
     // Ensure we return an object (handle null/undefined cases)
-    const data: FrontmatterData = parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)
-      ? parsedData as FrontmatterData
-      : {};
+    const data: FrontmatterData =
+      parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)
+        ? (parsedData as FrontmatterData)
+        : {};
 
     return {
       data,
-      content: markdownContent
+      content: markdownContent,
     };
   } catch (error) {
     // Re-throw with more descriptive error message
-    const errorMessage = error instanceof Error ? error.message : 'Unknown YAML parsing error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown YAML parsing error';
     throw new Error(`Failed to parse frontmatter YAML: ${errorMessage}`);
   }
 }

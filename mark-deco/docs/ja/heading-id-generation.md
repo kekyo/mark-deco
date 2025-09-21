@@ -21,7 +21,7 @@ const markdown = `# はじめに
 
 これは結論部分です。`;
 
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // 見出し情報の出力（後述）
 console.log(result.headingTree);
@@ -46,28 +46,27 @@ console.log(result.headingTree);
 
 この機能により、見出しのIDが以下の形式で生成されます:
 
-| 見出しレベル | ID形式 | 例 |
-|------------|--------|-----|
-| H1 | `id-N` | `id-1`, `id-2`, `id-3` |
-| H2 | `id-N-M` | `id-1-1`, `id-1-2`, `id-2-1` |
-| H3 | `id-N-M-L` | `id-1-1-1`, `id-1-1-2`, `id-1-2-1` |
+| 見出しレベル | ID形式     | 例                                 |
+| ------------ | ---------- | ---------------------------------- |
+| H1           | `id-N`     | `id-1`, `id-2`, `id-3`             |
+| H2           | `id-N-M`   | `id-1-1`, `id-1-2`, `id-2-1`       |
+| H3           | `id-N-M-L` | `id-1-1-1`, `id-1-1-2`, `id-1-2-1` |
 
 これにより、見出し構造が明確になり、ナビゲーションや目次生成において有用です。
 
 `useHierarchicalHeadingId`を`false`にした場合、IDの番号は階層的ではなく、連番として付与されます:
 
 ```typescript
-const result = await processor.process(
-  markdown, "id", {
-    // 階層的見出しIDを無効にする
-    useHierarchicalHeadingId: false
-  });
+const result = await processor.process(markdown, 'id', {
+  // 階層的見出しIDを無効にする
+  useHierarchicalHeadingId: false,
+});
 ```
 
 連番方式での見出しID生成例:
 
-| 見出しレベル | ID形式 | 例 |
-|------------|--------|-----|
+| 見出しレベル | ID形式 | 例                                     |
+| ------------ | ------ | -------------------------------------- |
 | 全ての見出し | `id-N` | `id-1`, `id-2`, `id-3`, `id-4`, `id-5` |
 
 注：連番方式では見出しレベルに関係なく、ドキュメント内の全ての見出しに順番に番号が付与されます。
@@ -79,20 +78,21 @@ IDに使用されるプレフィックスをカスタマイズできます。こ
 ```typescript
 // IDプレフィックスを第二引数で指定
 // 生成されるID: "id-1", "id-2", "id-3", など
-const result = await processor.process(markdown, "id");
+const result = await processor.process(markdown, 'id');
 
 // 生成されるID: "section-1", "section-2", "section-3", など
-const result = await processor.process(markdown, "section");
+const result = await processor.process(markdown, 'section');
 
 // コンテンツベースID (<h?>タグのみ。後述)
-const result = await processor.process(markdown, "id", {
-  useContentStringHeaderId: true
+const result = await processor.process(markdown, 'id', {
+  useContentStringHeaderId: true,
 });
 
 // 複数のHTMLを生成する場合に、IDを完全に一意にする例:
 // "id1-1", "id1-2", "id2-1", "id2-2", "id3-1" ...
 const results = await Promise.all(
-  markdowns.map((markdown, index) => processor.process(markdown, `id${index}`)));
+  markdowns.map((markdown, index) => processor.process(markdown, `id${index}`))
+);
 ```
 
 ### コンテンツベースID
@@ -107,8 +107,8 @@ const markdown = `# Hello world
 
 ### Subsection`;
 
-const result = await processor.process(markdown, "id", {
-  useContentStringHeaderId: true
+const result = await processor.process(markdown, 'id', {
+  useContentStringHeaderId: true,
 });
 ```
 
@@ -126,56 +126,56 @@ const result = await processor.process(markdown, "id", {
 
 ヨーロッパ言語のアクセントをASCII相当文字に正規化します:
 
-* 入力: "Café Naïve"
-* 出力: "cafe-naive"
+- 入力: "Café Naïve"
+- 出力: "cafe-naive"
 
-* 入力: "Résumé"
-* 出力: "resume"
+- 入力: "Résumé"
+- 出力: "resume"
 
 #### ステップ2: 制御文字の処理
 
 エスケープシーケンスと制御文字をハイフンに変換します:
 
-* 入力: "Section\n\nTitle"
-* 出力: "section-title"
+- 入力: "Section\n\nTitle"
+- 出力: "section-title"
 
-* 入力: "Hello\tWorld"
-* 出力: "hello-world"
+- 入力: "Hello\tWorld"
+- 出力: "hello-world"
 
 #### ステップ3: ASCII文字抽出
 
 非ASCII文字（日本語、中国語、絵文字など）を除去します:
 
-* 入力: "Hello 世界 World"
-* 出力: "hello-world"
+- 入力: "Hello 世界 World"
+- 出力: "hello-world"
 
-* 入力: "🎉 lucky time!"
-* 出力: "lucky-time"
+- 入力: "🎉 lucky time!"
+- 出力: "lucky-time"
 
 #### ステップ4: 無効IDのフォールバック
 
 結果のIDが短すぎる（3文字未満）または空の場合、プロセッサーは一意IDにフォールバックします:
 
-* 入力: "こんにちは"（日本語のみ）
-* 出力: "id-1"（フォールバック）
+- 入力: "こんにちは"（日本語のみ）
+- 出力: "id-1"（フォールバック）
 
-* 入力: "🎉"（絵文字のみ）
-* 出力: "id-2"（フォールバック）
+- 入力: "🎉"（絵文字のみ）
+- 出力: "id-2"（フォールバック）
 
-* 入力: "A"（短すぎる）
-* 出力: "id-3"（フォールバック）
+- 入力: "A"（短すぎる）
+- 出力: "id-3"（フォールバック）
 
 ### ID生成例
 
-|入力見出し|生成ID|処理内容|
-|:----|:----|:----|
-|`"Hello World"`|`"hello-world"`|標準処理|
-|`"Café Naïve"`|`"cafe-naive"`|Unicode正規化|
-|`"Section\n\nTwo"`|`"section-two"`|制御文字処理|
-|`"Hello 世界"`|`"hello"`|非ASCII除去|
-|`"こんにちは"`|`"id-1"`|フォールバック（非ASCIIのみ）|
-|`"🎉 パーティー"`|`"id-2"`|フォールバック（絵文字+日本語）|
-|`"A"`|`"id-3"`|フォールバック（短すぎる）|
+| 入力見出し         | 生成ID          | 処理内容                        |
+| :----------------- | :-------------- | :------------------------------ |
+| `"Hello World"`    | `"hello-world"` | 標準処理                        |
+| `"Café Naïve"`     | `"cafe-naive"`  | Unicode正規化                   |
+| `"Section\n\nTwo"` | `"section-two"` | 制御文字処理                    |
+| `"Hello 世界"`     | `"hello"`       | 非ASCII除去                     |
+| `"こんにちは"`     | `"id-1"`        | フォールバック（非ASCIIのみ）   |
+| `"🎉 パーティー"`  | `"id-2"`        | フォールバック（絵文字+日本語） |
+| `"A"`              | `"id-3"`        | フォールバック（短すぎる）      |
 
 注意: 多くのサイトでこのようなコンテンツベースIDが採用されていますが、MarkDecoではデフォルトではありません。
 理由は、英語ではない文字でIDを構築しても非常に認識・管理しづらい上に、現在では検索システムがそれを特別高く評価しないからです。

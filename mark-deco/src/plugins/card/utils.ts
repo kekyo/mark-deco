@@ -25,7 +25,7 @@ export const escapeHtml = (text: string): string => {
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    "'": '&#039;'
+    "'": '&#039;',
   };
   return text.replace(/[&<>"']/g, (m) => map[m] || m);
 };
@@ -91,7 +91,7 @@ export const cleanText = (text: string): string => {
  */
 const buildRuleSet = (customRules: ScrapingRule[] = []): ScrapingRule[] => [
   ...customRules,
-  ...ogpRules  // OGP rules as fallback
+  ...ogpRules, // OGP rules as fallback
 ];
 
 /**
@@ -109,7 +109,7 @@ export const extractEnhancedData = (
     url: sourceUrl,
     totalRules: rules.length,
     customRulesCount: customRules?.length || 0,
-    ogpRulesCount: ogpRules.length
+    ogpRulesCount: ogpRules.length,
   });
 
   const matchingRule = findMatchingRule(rules, sourceUrl, logger);
@@ -118,19 +118,22 @@ export const extractEnhancedData = (
     logger?.debug('extractEnhancedData: Found matching rule', {
       pattern: matchingRule.pattern,
       siteName: matchingRule.siteName,
-      fieldsToExtract: Object.keys(matchingRule.fields)
+      fieldsToExtract: Object.keys(matchingRule.fields),
     });
 
     const result = applyScrapingRule(matchingRule, $, sourceUrl, logger);
 
     logger?.debug('extractEnhancedData: Rule application completed', {
       extractedFields: Object.keys(result),
-      successfulFieldsCount: Object.keys(result).length
+      successfulFieldsCount: Object.keys(result).length,
     });
 
     return result;
   }
 
-  logger?.debug('extractEnhancedData: No matching rule found for URL:', sourceUrl);
+  logger?.debug(
+    'extractEnhancedData: No matching rule found for URL:',
+    sourceUrl
+  );
   return null;
 };

@@ -6,16 +6,18 @@ import type { Plugin, PluginContext } from '../../types.js';
  * @param options - Configuration options for the mermaid plugin
  * @returns Plugin instance for processing mermaid blocks
  */
-export const createMermaidPlugin = (options: MermaidPluginOptions = {}): Plugin => {
-  const {
-    className = 'mermaid',
-    includeId = true
-  } = options;
+export const createMermaidPlugin = (
+  options: MermaidPluginOptions = {}
+): Plugin => {
+  const { className = 'mermaid', includeId = true } = options;
 
   /**
    * Process mermaid code block content
    */
-  const processBlock = async (content: string, context: PluginContext): Promise<string> => {
+  const processBlock = async (
+    content: string,
+    context: PluginContext
+  ): Promise<string> => {
     // Trim whitespace from content
     const trimmedContent = content.trim();
 
@@ -65,7 +67,7 @@ export const createMermaidPlugin = (options: MermaidPluginOptions = {}): Plugin 
     context.logger.debug('Mermaid plugin processed content:', {
       contentLength: trimmedContent.length,
       className,
-      includeId
+      includeId,
     });
 
     return html;
@@ -73,6 +75,6 @@ export const createMermaidPlugin = (options: MermaidPluginOptions = {}): Plugin 
 
   return {
     name: 'mermaid',
-    processBlock
+    processBlock,
   };
 };

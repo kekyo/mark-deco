@@ -1,4 +1,4 @@
-import { createAsyncLock } from 'async-primitives';
+import { createMutex } from 'async-primitives';
 import type { CacheStorage, CacheEntry } from './index.js';
 
 /**
@@ -25,13 +25,17 @@ const generateFileHash = async (input: string): Promise<string> => {
  * @returns FileSystemCache instance that uses file system
  * @throws Error if file system operations fail or if not running in Node.js environment
  */
-export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => {
+export const createFileSystemCacheStorage = (
+  cacheDir: string
+): CacheStorage => {
   // Check if we're in a browser environment
   if (typeof window !== 'undefined') {
-    throw new Error('File system cache is only available in Node.js environment, not in browsers');
+    throw new Error(
+      'File system cache is only available in Node.js environment, not in browsers'
+    );
   }
 
-  const asyncLock = createAsyncLock();
+  const mutex = createMutex();
 
   /**
    * Generate safe file name from cache key using hash
@@ -83,14 +87,16 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
 
     // Check TTL expiration - only lock if we need to delete expired file
     if (entry.ttl !== undefined) {
-      const isExpired = entry.ttl === 0 || Date.now() > entry.timestamp + entry.ttl;
+      const isExpired =
+        entry.ttl === 0 || Date.now() > entry.timestamp + entry.ttl;
       if (isExpired) {
         // Lock only for the deletion operation
-        const lockHandle = await asyncLock.lock();
+        const lockHandle = await mutex.lock();
         try {
           // Double-check expiration under lock to avoid race conditions
           const currentTime = Date.now();
-          const stillExpired = entry.ttl === 0 || currentTime > entry.timestamp + entry.ttl;
+          const stillExpired =
+            entry.ttl === 0 || currentTime > entry.timestamp + entry.ttl;
           if (stillExpired) {
             await fs.unlink(filePath);
           }
@@ -107,12 +113,16 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
     return entry.data;
   };
 
-  const set = async (key: string, value: string, ttl?: number): Promise<void> => {
+  const set = async (
+    key: string,
+    value: string,
+    ttl?: number
+  ): Promise<void> => {
     // Pre-compute everything possible outside of lock
     const fileName = await generateFileName(key);
     const entry: CacheEntry = {
       data: value,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     if (ttl !== undefined) {
@@ -121,7 +131,7 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
 
     const serialized = JSON.stringify(entry, null, 2);
 
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       await ensureCacheDir();
 
@@ -147,7 +157,7 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
     // Pre-compute file name outside of lock
     const fileName = await generateFileName(key);
 
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       await ensureCacheDir();
       const { promises: fs } = require('fs');
@@ -167,7 +177,7 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
   };
 
   const clear = async (): Promise<void> => {
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       await ensureCacheDir();
       const { promises: fs } = require('fs');
@@ -207,7 +217,7 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
     }
 
     // Clean up expired entries with lock
-    const lockHandle = await asyncLock.lock();
+    const lockHandle = await mutex.lock();
     try {
       const now = Date.now();
       let validCount = 0;
@@ -220,7 +230,8 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
 
           // Check if entry is expired
           if (entry.ttl !== undefined) {
-            const isExpired = entry.ttl === 0 || now > entry.timestamp + entry.ttl;
+            const isExpired =
+              entry.ttl === 0 || now > entry.timestamp + entry.ttl;
             if (isExpired) {
               await fs.unlink(filePath);
               continue; // Don't count this file
@@ -250,6 +261,6 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
     set,
     delete: deleteEntry,
     clear,
-    size
+    size,
   };
 };
