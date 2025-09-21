@@ -120,10 +120,10 @@ export function extractMermaidInfo(html: string): {
 /**
  * Count total headings in heading tree
  */
-export function countTotalHeadings(headingTree: any[]): number { // eslint-disable-line @typescript-eslint/no-explicit-any
+export function countTotalHeadings(headingTree: any[]): number {
   let count = 0;
 
-  function countHeadings(items: any[]): void { // eslint-disable-line @typescript-eslint/no-explicit-any
+  function countHeadings(items: any[]): void {
     for (const item of items) {
       count++;
       if (item.children && item.children.length > 0) {

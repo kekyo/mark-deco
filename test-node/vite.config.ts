@@ -1,18 +1,7 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-// @ts-expect-error - vite-plugin-eslint has type definition issues
-import eslint from 'vite-plugin-eslint';
 
 export default defineConfig({
-  plugins: [
-    eslint({
-      include: ['**/*.ts', '**/*.tsx'],
-      exclude: ['node_modules', 'dist'],
-      failOnWarning: true,
-      failOnError: true,
-      overrideConfigFile: resolve(__dirname, '../eslint.config.js')
-    })
-  ],
   root: '.',
   build: {
     outDir: './dist',

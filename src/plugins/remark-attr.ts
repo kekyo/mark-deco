@@ -41,7 +41,7 @@ const parseAttributes = (attrStr: string): Record<string, string> => {
 /**
  * Generate HTML for a code block
  */
-const generateCodeBlockHTML = (node: any): string => { // eslint-disable-line @typescript-eslint/no-explicit-any
+const generateCodeBlockHTML = (node: any): string => {
   const lang = node.lang ? ` class="language-${node.lang}"` : '';
   const code = node.value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   return `<pre><code${lang}>${code}</code></pre>`;
@@ -50,7 +50,7 @@ const generateCodeBlockHTML = (node: any): string => { // eslint-disable-line @t
 /**
  * Apply attributes to a node
  */
-const applyAttributes = (node: any, attributes: Record<string, string>) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+const applyAttributes = (node: any, attributes: Record<string, string>) => {
   if (!node.data) {
     node.data = {};
   }
@@ -85,7 +85,7 @@ const applyAttributes = (node: any, attributes: Record<string, string>) => { // 
  */
 export const remarkAttr: Plugin<[], Root> = () => {
   return (tree: Root) => {
-    visit(tree, (node: any, index: number | undefined, parent: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    visit(tree, (node: any, index: number | undefined, parent: any) => {
       // Handle headings with attributes in text
       if (node.type === 'heading' && node.children?.length > 0) {
         const lastChild = node.children[node.children.length - 1];

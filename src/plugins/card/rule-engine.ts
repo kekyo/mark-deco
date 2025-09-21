@@ -24,15 +24,12 @@ const extractLocaleFromHTML = ($: ReturnType<typeof import('cheerio').load>): st
 /**
  * Built-in processor rules
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const executeProcessorRule = (rule: ProcessorRule, values: string[], _context: ProcessorContext): string | string[] | undefined => {
   const params = rule.params || {};
 
   switch (rule.type) {
     case 'regex': {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const replace = params.replace as any;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const match = params.match as any;
       if (replace) {
         return values.map(value => {

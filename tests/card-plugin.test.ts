@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as cheerio from 'cheerio';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {

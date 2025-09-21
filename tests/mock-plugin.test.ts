@@ -113,7 +113,6 @@ describe('MockPlugin', () => {
   it('should handle basic mock plugin functionality', async () => {
     const mockPlugin: Plugin = {
       name: 'mock-test',
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       processBlock: async (content: string, context: PluginContext) => {
         return `<div class="mock-plugin">${content}</div>`;
       }

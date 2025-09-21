@@ -11,7 +11,7 @@ import type { Element } from 'hast';
  * to make them responsive while preserving aspect ratio
  */
 export const rehypeResponsiveImages = () => {
-  return (tree: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  return (tree: any) => {
     visit(tree, 'element', (node: Element) => {
       if (node.tagName === 'img') {
         const responsiveStyles = generateResponsiveImageStyles();

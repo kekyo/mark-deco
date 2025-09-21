@@ -1001,9 +1001,7 @@ test content
 
       // Mock remark plugin that wraps paragraphs with custom class
       const customPlugin = () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (tree: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
           tree.children.forEach((node: any) => {
             if (node.type === 'paragraph') {
               node.data = node.data || {};

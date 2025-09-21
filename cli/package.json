@@ -27,7 +27,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "rv --npm . && npm run lint && npm run typecheck && vite build",
+    "build": "rv --npm . && npm run typecheck && vite build",
     "build:bundle": "ncc build src/cli.ts -o dist-bundle",
     "build:native": "npm run build:bundle && npm run pkg",
     "build:native:all": "npm run build:bundle && npm run pkg:all",
@@ -39,7 +39,6 @@
     "dev": "vite build --watch",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "lint": "eslint . --ext .ts --report-unused-disable-directives",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build && npm run test"
   },
@@ -53,11 +52,8 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.33.1",
-    "@typescript-eslint/parser": "^8.33.1",
     "@vercel/ncc": "^0.38.3",
     "esbuild": "^0.21.5",
-    "eslint": "^9.28.0",
     "pkg": "^5.8.1",
     "rollup": "^4.42.0",
     "tslib": "^2.8.1",

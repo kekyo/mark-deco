@@ -9,7 +9,6 @@ import type { CacheStorage, CacheEntry } from './index.js';
  */
 const generateFileHash = async (input: string): Promise<string> => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const crypto = require('crypto');
     const hash = crypto.createHash('sha256');
     hash.update(input, 'utf8');
@@ -48,7 +47,6 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
    */
   const ensureCacheDir = async (): Promise<void> => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { promises: fs } = require('fs');
       await fs.mkdir(cacheDir, { recursive: true });
     } catch (error: unknown) {
@@ -70,9 +68,7 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
       throw new Error(`Failed to ensure cache directory: ${error}`);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { promises: fs } = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const path = require('path');
     const filePath = path.join(cacheDir, fileName);
 
@@ -129,9 +125,7 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
     try {
       await ensureCacheDir();
 
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { promises: fs } = require('fs');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const path = require('path');
       const filePath = path.join(cacheDir, fileName);
 
@@ -156,9 +150,7 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
     const lockHandle = await asyncLock.lock();
     try {
       await ensureCacheDir();
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { promises: fs } = require('fs');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const path = require('path');
       const filePath = path.join(cacheDir, fileName);
 
@@ -178,9 +170,7 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
     const lockHandle = await asyncLock.lock();
     try {
       await ensureCacheDir();
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { promises: fs } = require('fs');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const path = require('path');
       const files = await fs.readdir(cacheDir);
 
@@ -205,9 +195,7 @@ export const createFileSystemCacheStorage = (cacheDir: string): CacheStorage => 
   const size = async (): Promise<number> => {
     await ensureCacheDir();
 
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { promises: fs } = require('fs');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const path = require('path');
 
     // Get file list without lock first

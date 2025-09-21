@@ -46,7 +46,7 @@ export const defaultHtmlOptions: HTMLBeautifyOptions = {
 /**
  * Extract text content from heading node
  */
-const extractHeadingText = (node: any): string => { // eslint-disable-line @typescript-eslint/no-explicit-any
+const extractHeadingText = (node: any): string => {
   if (node.type === 'text') {
     return node.value || '';
   }
@@ -210,10 +210,10 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
     };
 
     return () => {
-      return async (tree: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+      return async (tree: any) => {
         const promises: Promise<void>[] = [];
 
-        visit(tree, 'code', (node: any, index: number | undefined, parent: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+        visit(tree, 'code', (node: any, index: number | undefined, parent: any) => {
           if (!node.lang || !pluginsMap.has(node.lang)) {
             return;
           }
@@ -256,12 +256,12 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
     uniqueIdPrefix: string = ''
   ) => {
     return () => {
-      return (tree: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+      return (tree: any) => {
         const headings: Array<{ level: number; text: string; id: string }> = [];
 
         // First pass: collect all headings
-        const headingNodes: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
-        visit(tree, 'heading', (node: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+        const headingNodes: any[] = [];
+        visit(tree, 'heading', (node: any) => {
           if (node.depth >= 1 && node.depth <= 6) {
             headingNodes.push(node);
           }
@@ -396,7 +396,7 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
             processor0 = processor0.use(plugin[0], plugin[1]);
           } else {
             // Plugin without options
-            processor0 = processor0.use(plugin as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+            processor0 = processor0.use(plugin as any);
           }
         }
       }
@@ -423,7 +423,7 @@ export const createMarkdownProcessor = (options: MarkdownProcessorOptions): Mark
             processor = processor.use(plugin[0], plugin[1]);
           } else {
             // Plugin without options
-            processor = processor.use(plugin as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+            processor = processor.use(plugin as any);
           }
         }
       }

@@ -45,7 +45,6 @@ export interface ProcessorRule {
   /** Type of processing to apply */
   type: 'regex' | 'filter' | 'slice' | 'first' | 'currency';
   /** Parameters for the processor */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: any;
 }
 

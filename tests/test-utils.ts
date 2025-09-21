@@ -10,7 +10,6 @@ import type { Plugin, PluginContext } from '../src/types.js';
  * Create a mock plugin for testing purposes
  */
 export const createMockPlugin = (name: string): Plugin => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const processBlock = async (content: string, _context: PluginContext): Promise<string> => {
     return `<div class="mock-plugin" data-plugin="${name}">Mock plugin processed: ${content}</div>`;
   };

@@ -14,7 +14,7 @@ interface ProcessorOptions {
 }
 
 // Helper function to count total headings in the tree
-function countHeadings(headingTree: any[]): number { // eslint-disable-line @typescript-eslint/no-explicit-any
+function countHeadings(headingTree: any[]): number {
   let count = 0;
   for (const heading of headingTree) {
     count++; // Count this heading
