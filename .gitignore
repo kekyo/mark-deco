@@ -14,11 +14,6 @@ demo-pages/dist
 *.local
 bin/
 
-# CLI bundle directories
-cli/dist-bundle/
-cli/dist-ncc/
-cli/dist-esbuild/
-cli/dist-rollup/
 test-shared/*.js
 
 # Editor directories and files

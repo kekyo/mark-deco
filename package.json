@@ -14,7 +14,6 @@
   "scripts": {
     "build": "npm run build --workspace=mark-deco-test-shared && npm run build --workspace=mark-deco && npm run build --workspace=mark-deco-node-tests && npm run build --workspace=mark-deco-demo-pages && npm run build --workspace=mark-deco-e2e-tests && npm run build --workspace=mark-deco-cli",
     "build:library": "npm run build --workspace=mark-deco",
-    "build:native": "npm run build && npm run build:native --workspace=mark-deco-cli",
     "dev": "npm run build --workspace=mark-deco && npm run dev --workspace=mark-deco-demo-pages",
     "test": "npm run build --workspace=mark-deco-test-shared && npm run test:library && npm run test:cli && npm run test:node && npm run test:e2e",
     "test:library": "npm run build --workspace=mark-deco && npm run test --workspace=mark-deco",
