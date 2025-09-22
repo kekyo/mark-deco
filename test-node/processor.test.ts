@@ -51,8 +51,8 @@ More content here.`;
     });
 
     expect(result.headingTree).toHaveLength(2);
-    expect(result.headingTree[0].text).toBe('Main Title');
-    expect(result.headingTree[1].text).toBe('Another Title');
+    expect(result.headingTree[0]?.text).toBe('Main Title');
+    expect(result.headingTree[1]?.text).toBe('Another Title');
 
     expect(result.html).toContain('<h1 id="id-main-title">Main Title</h1>');
     expect(result.html).toContain(
@@ -77,7 +77,7 @@ Just some content.`;
 
     expect(result.frontmatter).toEqual({});
     expect(result.headingTree).toHaveLength(1);
-    expect(result.headingTree[0].text).toBe('Simple Title');
+    expect(result.headingTree[0]?.text).toBe('Simple Title');
     expect(result.html).toContain('<h1 id="id-simple-title">Simple Title</h1>');
   });
 
@@ -140,9 +140,9 @@ Content 3`;
     });
 
     expect(result.headingTree).toHaveLength(3);
-    expect(result.headingTree[0].text).toBe('First Title');
-    expect(result.headingTree[1].text).toBe('Second Title');
-    expect(result.headingTree[2].text).toBe('Third Title');
+    expect(result.headingTree[0]?.text).toBe('First Title');
+    expect(result.headingTree[1]?.text).toBe('Second Title');
+    expect(result.headingTree[2]?.text).toBe('Third Title');
 
     expect(result.html).toContain('<h1 id="id-first-title">First Title</h1>');
     expect(result.html).toContain('<h1 id="id-second-title">Second Title</h1>');
@@ -188,6 +188,6 @@ This is test content.`;
     });
 
     expect(result.headingTree).toHaveLength(1);
-    expect(result.headingTree[0].text).toBe('Test Content');
+    expect(result.headingTree[0]?.text).toBe('Test Content');
   });
 });

@@ -1,4 +1,4 @@
-# mark-deco-cli
+# MarkDeco CLI
 
 Command-line interface for [mark-deco](https://github.com/kekyo/mark-deco) Markdown to HTML conversion processor.
 

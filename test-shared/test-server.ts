@@ -162,12 +162,13 @@ export function createTestServer(config: TestServerConfig): TestServer {
       // Extract path after localhost:port/content/
       const urlObj = new URL(urlParam);
       const pathMatch = urlObj.pathname.match(/^\/content\/(.+)$/);
+      const matchedPath = pathMatch?.[1];
 
       let responseFile: string | null = null;
 
-      if (pathMatch) {
+      if (matchedPath) {
         // Convert path segments to filename: /content/video/short-url -> oembed/video-short-url.json
-        const contentPath = pathMatch[1].replace(/\//g, '-');
+        const contentPath = matchedPath.replace(/\//g, '-');
         responseFile = `oembed/${contentPath}.json`;
       } else {
         // Return a generic 404 for unsupported URLs

@@ -133,11 +133,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           // Simple YAML parsing for idPrefix only
           const yamlContent = frontmatterMatch[1];
+          if (!yamlContent) {
+            throw new Error('Frontmatter capture missing');
+          }
           const idPrefixMatch = yamlContent.match(
             /^idPrefix:\s*["']?([^"'\n\r]+)["']?$/m
           );
-          if (idPrefixMatch) {
-            idPrefix = idPrefixMatch[1].trim();
+          const matchedIdPrefix = idPrefixMatch?.[1];
+          if (matchedIdPrefix) {
+            idPrefix = matchedIdPrefix.trim();
           }
         } catch (error) {
           console.warn(

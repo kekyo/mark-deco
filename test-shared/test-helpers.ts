@@ -92,7 +92,11 @@ export function extractMermaidInfo(html: string): {
     // Check if this has the exact "mermaid" class but not "mermaid-wrapper"
     const classMatch = match.match(/class="([^"]*)"/);
     if (classMatch) {
-      const classes = classMatch[1].split(/\s+/);
+      const classNames = classMatch[1];
+      if (!classNames) {
+        return false;
+      }
+      const classes = classNames.split(/\s+/);
       return classes.includes('mermaid') && !classes.includes('mermaid-wrapper');
     }
     return false;
@@ -103,7 +107,10 @@ export function extractMermaidInfo(html: string): {
   actualMermaidMatches.forEach(match => {
     const idMatch = match.match(/id="([^"]+)"/);
     if (idMatch) {
-      ids.push(idMatch[1]);
+      const id = idMatch[1];
+      if (id) {
+        ids.push(id);
+      }
     }
   });
 

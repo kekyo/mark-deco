@@ -1,6 +1,6 @@
 # MarkDeco
 
-Flexible Markdown to HTML conversion library written in TypeScript.
+Flexible Markdown to HTML conversion library.
 
 [![npm version](https://img.shields.io/npm/v/mark-deco.svg)](https://www.npmjs.com/package/mark-deco)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

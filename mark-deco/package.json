@@ -1,7 +1,7 @@
 {
   "name": "mark-deco",
   "version": "0.0.1",
-  "description": "Flexible Markdown to HTML conversion library written in TypeScript.",
+  "description": "Flexible Markdown to HTML conversion library",
   "keywords": [
     "markdown",
     "processor",
@@ -17,7 +17,7 @@
     "url": "https://github.com/kekyo/mark-deco.git"
   },
   "homepage": "https://github.com/kekyo/mark-deco#readme",
-  "readme": "README-package.md",
+  "readme": "README-pack.md",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -35,8 +35,9 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "test": "vitest --run",
-    "update:providers": "curl -s https://oembed.com/providers.json | node -pe 'JSON.stringify(JSON.parse(require(\"fs\").readFileSync(0, \"utf8\")), null, 2)' > src/plugins/oembed/providers.json"
+    "test": "vitest run",
+    "update:providers": "curl -s https://oembed.com/providers.json | node -pe 'JSON.stringify(JSON.parse(require(\"fs\").readFileSync(0, \"utf8\")), null, 2)' > src/plugins/oembed/providers.json",
+    "pack": "npm run build && screw-up pack --pack-destination ../artifacts/"
   },
   "dependencies": {
     "async-primitives": ">=0.2.0",
@@ -59,7 +60,7 @@
     "@types/node": ">=20.0.0",
     "@vitest/coverage-v8": ">=1.0.0",
     "prettier-max": ">=1.9.0",
-    "screw-up": ">=1.8.0",
+    "screw-up": ">=1.9.0",
     "typescript": ">=5.0.0",
     "vite": ">=6.3.5",
     "vite-plugin-dts": ">=4.5.4",

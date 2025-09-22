@@ -1,7 +1,14 @@
 {
   "name": "mark-deco-node-tests",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Node.js application for mark-deco library",
+  "keywords": [
+    "markdown",
+    "processor",
+    "node",
+    "console"
+  ],
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -12,16 +19,8 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "start": "node dist/index.js",
-    "test": "vitest --run"
+    "test": "vitest run"
   },
-  "keywords": [
-    "markdown",
-    "processor",
-    "node",
-    "console"
-  ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "commander": ">=12.1.0",
     "mark-deco": "*"
