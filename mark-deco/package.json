@@ -1,7 +1,7 @@
 {
   "name": "mark-deco",
   "version": "0.0.1",
-  "description": "A high-performance Markdown to HTML conversion library written in TypeScript.",
+  "description": "Flexible Markdown to HTML conversion library written in TypeScript.",
   "keywords": [
     "markdown",
     "processor",

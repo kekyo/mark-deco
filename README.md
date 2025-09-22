@@ -1,9 +1,9 @@
 # MarkDeco
 
-A high-performance Markdown to HTML conversion library written in TypeScript.
+Flexible Markdown to HTML conversion library.
 
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/kekyo/mark-deco/actions/workflows/ci.yml/badge.svg)](https://github.com/kekyo/mark-deco/actions/workflows/ci.yml)
 
 |Package|npm|
 |:----|:----|
@@ -14,7 +14,7 @@ A high-performance Markdown to HTML conversion library written in TypeScript.
 
 ## What is this?
 
-A high-performance Markdown to HTML conversion library written in TypeScript.
+Flexible Markdown to HTML conversion library written in TypeScript.
 It interprets GitHub Flavored Markdown (GFM) and outputs HTML.
 Supports frontmatter parsing, heading analysis, source code formatting, oEmbed/card/Mermaid graph rendering, and custom code block processing through plugin extensions.
 

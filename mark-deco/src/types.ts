@@ -1,3 +1,8 @@
+// mark-deco - Flexible Markdown to HTML conversion library
+// Copyright (c) Kouji Matsui. (@kekyo@mi.kekyo.net)
+// Under MIT.
+// https://github.com/kekyo/mark-deco
+
 import type { HTMLBeautifyOptions } from 'js-beautify';
 import type { Options as RemarkGfmOptions } from 'remark-gfm';
 import type { PluggableList } from 'unified';

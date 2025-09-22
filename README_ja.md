@@ -1,9 +1,9 @@
 # MarkDeco
 
-TypeScriptで書かれた、高機能なMarkdown-->HTML変換ライブラリ
+高機能なMarkdown-->HTML変換ライブラリ
 
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/kekyo/mark-deco/actions/workflows/ci.yml/badge.svg)](https://github.com/kekyo/mark-deco/actions/workflows/ci.yml)
 
 |Package|npm|
 |:----|:----|

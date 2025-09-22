@@ -1,3 +1,8 @@
+// mark-deco - Flexible Markdown to HTML conversion library
+// Copyright (c) Kouji Matsui. (@kekyo@mi.kekyo.net)
+// Under MIT.
+// https://github.com/kekyo/mark-deco
+
 import { fetchJson, isCORSError } from '../../utils.js';
 import { getOEmbedUrl, buildProvidersCache } from './providers.js';
 import { resolveRedirects } from './redirect-resolver.js';
