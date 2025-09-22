@@ -4,7 +4,6 @@
 // https://github.com/kekyo/mark-deco
 
 import { resolve } from 'path';
-import swc from '@rollup/plugin-swc';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import screwUp from 'screw-up';
@@ -14,40 +13,6 @@ export default defineConfig({
   plugins: [
     screwUp(),
     prettierMax(),
-    swc({
-      swc: {
-        jsc: {
-          parser: {
-            syntax: 'typescript',
-            tsx: false,
-            decorators: false,
-            dynamicImport: true,
-          },
-          target: 'es2022',
-          loose: false,
-          externalHelpers: false,
-          keepClassNames: true,
-          preserveAllComments: false,
-          transform: {
-            constModules: {
-              globals: {},
-            },
-          },
-        },
-        module: {
-          type: 'es6',
-          strict: false,
-          strictMode: true,
-          lazy: false,
-          noInterop: false,
-        },
-        minify: false,
-        isModule: true,
-        sourceMaps: true,
-      },
-      include: /\.(ts|tsx)$/,
-      exclude: /node_modules/,
-    }),
     dts({
       insertTypesEntry: true,
       copyDtsFiles: true,
@@ -59,7 +24,7 @@ export default defineConfig({
         index: resolve(__dirname, 'src/index.ts'),
         internal: resolve(__dirname, 'src/internal.ts'),
       },
-      name: 'MarkdownEnhancedProcessor',
+      name: 'mark-deco',
       formats: ['es', 'cjs'],
       fileName: (format, entryName) =>
         `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
