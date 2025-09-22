@@ -39,3 +39,30 @@ Frontmatterデータは以下のような用途で活用できます:
 - カスタムレンダリングロジックの制御
 
 注意: MarkDecoプロセッサ自身は、Frontmatterの情報を使用しません。後述のプラグインは、プラグインの実装によっては情報を使用する可能性があります。
+
+### 処理中にFrontmatterを更新する
+
+レンダリング前にメタデータを調整したい場合は、`ProcessOptions` の `frontmatterTransform` を利用します。コールバックには解析済みの frontmatter と、frontmatter を取り除いた Markdown 本文が渡されます。変更が不要なときは `undefined` を返し、更新したい場合は新しいオブジェクトを返します。
+
+```typescript
+const result = await processor.process(markdown, 'id', {
+  frontmatterTransform: ({ originalFrontmatter }) => {
+    if (!originalFrontmatter || originalFrontmatter.status !== 'draft') {
+      return undefined;
+    }
+
+    return {
+      ...originalFrontmatter,
+      status: 'published',
+      updatedAt: new Date().toISOString(),
+    };
+  },
+});
+
+if (result.changed) {
+  const updatedMarkdown = result.composeMarkdown();
+  // メタデータが変化したときだけ、更新後のMarkdown文字列を保存します
+}
+```
+
+`ProcessResult.changed` は `frontmatterTransform` がメタデータを変更したかを示します。変更があった場合は `composeMarkdown()` が反映済みの frontmatter を含む Markdown を返し、変更がない場合は入力された Markdown をそのまま返すため、不要な書き込みを避けられます。

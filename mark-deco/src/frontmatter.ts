@@ -3,7 +3,7 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import { load as loadYaml } from 'js-yaml';
+import { dump as dumpYaml, load as loadYaml } from 'js-yaml';
 import type { FrontmatterData } from './types.js';
 
 export interface ParsedFrontmatter {
@@ -56,4 +56,34 @@ export function parseFrontmatter(content: string): ParsedFrontmatter {
       error instanceof Error ? error.message : 'Unknown YAML parsing error';
     throw new Error(`Failed to parse frontmatter YAML: ${errorMessage}`);
   }
+}
+
+/**
+ * Convert frontmatter data back into YAML string (excluding delimiters)
+ */
+export function stringifyFrontmatter(frontmatter: FrontmatterData): string {
+  if (!frontmatter || Object.keys(frontmatter).length === 0) {
+    return '';
+  }
+
+  const yaml = dumpYaml(frontmatter, { lineWidth: 0 });
+  if (typeof yaml !== 'string' || yaml.length === 0) {
+    return '';
+  }
+
+  return yaml.endsWith('\n') ? yaml : `${yaml}\n`;
+}
+
+/**
+ * Compose markdown from frontmatter data and content
+ */
+export function composeMarkdownFromParts(
+  frontmatter: FrontmatterData,
+  content: string
+): string {
+  const body = content ?? '';
+  const yaml = stringifyFrontmatter(frontmatter);
+
+  const frontmatterSection = `${'---'}\n${yaml}${'---'}\n`;
+  return `${frontmatterSection}${body}`;
 }

@@ -21,6 +21,23 @@ export interface FrontmatterData {
 }
 
 /**
+ * Context supplied to a frontmatter transform callback
+ */
+export interface FrontmatterTransformContext {
+  /** Frontmatter extracted from the original markdown */
+  readonly originalFrontmatter: FrontmatterData;
+  /** Markdown content body without the frontmatter block */
+  readonly markdownContent: string;
+}
+
+/**
+ * Function signature for frontmatter transformation
+ */
+export type FrontmatterTransform = (
+  ctx: FrontmatterTransformContext
+) => FrontmatterData | undefined;
+
+/**
  * Heading node (representing a hierarchical structure)
  */
 export interface HeadingNode {
@@ -124,6 +141,8 @@ export interface ProcessOptions {
   useHierarchicalHeadingId?: boolean;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
+  /** Optional transform that can modify frontmatter before rendering */
+  frontmatterTransform?: FrontmatterTransform;
 }
 
 /**
@@ -134,8 +153,12 @@ export interface ProcessResult {
   readonly html: string;
   /** Extracted frontmatter data */
   readonly frontmatter: FrontmatterData;
+  /** Indicates whether frontmatter was modified by the transform */
+  readonly changed: boolean;
   /** Heading node tree (representing a hierarchical structure) */
   readonly headingTree: HeadingNode[];
+  /** Compose markdown string using the current frontmatter and content */
+  readonly composeMarkdown: () => string;
 }
 
 /**

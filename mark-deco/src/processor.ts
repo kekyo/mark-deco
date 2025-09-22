@@ -10,7 +10,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
-import { parseFrontmatter } from './frontmatter.js';
+import { composeMarkdownFromParts, parseFrontmatter } from './frontmatter.js';
 import { getNoOpLogger } from './logger.js';
 import { escapeHtml } from './plugins/oembed/utils.js';
 import { remarkAttr } from './plugins/remark-attr.js';
@@ -25,6 +25,7 @@ import type {
   ProcessResult,
   FrontmatterData,
   HeadingNode,
+  FrontmatterTransformContext,
 } from './types.js';
 import type { HTMLBeautifyOptions } from 'js-beautify';
 
@@ -47,6 +48,53 @@ export const defaultHtmlOptions: HTMLBeautifyOptions = {
   content_unformatted: ['pre', 'code', 'textarea'],
   extra_liners: [],
 } as const;
+
+const cloneFrontmatterData = (source: FrontmatterData): FrontmatterData => {
+  const cloneValue = (value: unknown): unknown => {
+    if (value instanceof Date) {
+      return new Date(value.getTime());
+    }
+    if (Array.isArray(value)) {
+      return value.map(cloneValue);
+    }
+    if (value && typeof value === 'object') {
+      const result: Record<string, unknown> = {};
+      for (const [key, inner] of Object.entries(
+        value as Record<string, unknown>
+      )) {
+        result[key] = cloneValue(inner);
+      }
+      return result;
+    }
+    return value;
+  };
+
+  return cloneValue(source ?? {}) as FrontmatterData;
+};
+
+const normalizeFrontmatterValue = (value: unknown): unknown => {
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (Array.isArray(value)) {
+    return value.map(normalizeFrontmatterValue);
+  }
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .filter(([, inner]) => inner !== undefined)
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+    const normalized: Record<string, unknown> = {};
+    for (const [key, inner] of entries) {
+      normalized[key] = normalizeFrontmatterValue(inner);
+    }
+    return normalized;
+  }
+  return value;
+};
+
+const snapshotFrontmatter = (data: FrontmatterData): string => {
+  return JSON.stringify(normalizeFrontmatterValue(data ?? {}));
+};
 
 /**
  * Extract text content from heading node
@@ -397,6 +445,7 @@ export const createMarkdownProcessor = (
       useContentStringHeaderId = false,
       useHierarchicalHeadingId = true,
       advancedOptions,
+      frontmatterTransform,
     }: ProcessOptions = {}
   ): Promise<ProcessResult> => {
     // Extract extended options with defaults
@@ -408,8 +457,26 @@ export const createMarkdownProcessor = (
       rehypePlugins = [],
     } = advancedOptions || {};
     try {
+      const originalMarkdown = markdown;
+
       // Parse frontmatter
-      const { data: frontmatter, content } = parseFrontmatter(markdown);
+      const { data: parsedFrontmatter, content } = parseFrontmatter(markdown);
+      let frontmatter = parsedFrontmatter;
+
+      const originalSnapshot = snapshotFrontmatter(parsedFrontmatter);
+      let changed = false;
+
+      if (frontmatterTransform) {
+        const context: FrontmatterTransformContext = {
+          originalFrontmatter: cloneFrontmatterData(parsedFrontmatter),
+          markdownContent: content,
+        };
+        const transformed = frontmatterTransform(context);
+        if (transformed !== undefined) {
+          frontmatter = transformed;
+          changed = snapshotFrontmatter(transformed) !== originalSnapshot;
+        }
+      }
 
       // Array to collect heading tree
       const headingTree: HeadingNode[] = [];
@@ -478,10 +545,19 @@ export const createMarkdownProcessor = (
       // Format HTML with js-beautify, using provided options or defaults from advancedOptions
       const formattedHtml = beautifyHtml(rehypedHtml, htmlOptions);
 
+      const composeMarkdown = (): string => {
+        if (!changed) {
+          return originalMarkdown;
+        }
+        return composeMarkdownFromParts(frontmatter, content);
+      };
+
       return {
         html: formattedHtml,
         frontmatter,
+        changed,
         headingTree,
+        composeMarkdown,
       };
     } catch (error) {
       logger.error(

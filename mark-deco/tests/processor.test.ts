@@ -1680,4 +1680,65 @@ This is a test paragraph.`;
     expect(result.html).toContain('<h1 id="id-test-heading">Test Heading</h1>');
     expect(result.html).toContain('<p>This is a test paragraph.</p>');
   });
+
+  describe('frontmatterTransform', () => {
+    it('should keep original markdown when transformer returns undefined', async () => {
+      const markdown = '# Heading\n';
+
+      const result = await processor.process(markdown, 'id', {
+        frontmatterTransform: () => undefined,
+      });
+
+      expect(result.changed).toBe(false);
+      expect(result.composeMarkdown()).toBe(markdown);
+    });
+
+    it('should report unchanged when transformer returns equivalent data', async () => {
+      const markdown = `---
+title: Post
+---
+
+# Heading
+`;
+
+      const result = await processor.process(markdown, 'id', {
+        frontmatterTransform: ({ originalFrontmatter }) => ({
+          ...originalFrontmatter,
+        }),
+      });
+
+      expect(result.changed).toBe(false);
+      expect(result.composeMarkdown()).toBe(markdown);
+    });
+
+    it('should compose updated markdown when transformer modifies frontmatter', async () => {
+      const markdown = `---
+title: Post
+---
+
+# Heading
+`;
+
+      const result = await processor.process(markdown, 'id', {
+        frontmatterTransform: ({ originalFrontmatter }) => ({
+          ...originalFrontmatter,
+          category: 'release',
+        }),
+      });
+
+      expect(result.changed).toBe(true);
+      expect(result.frontmatter).toEqual({
+        title: 'Post',
+        category: 'release',
+      });
+      const expectedMarkdown = `---
+title: Post
+category: release
+---
+
+# Heading
+`;
+      expect(result.composeMarkdown()).toBe(expectedMarkdown);
+    });
+  });
 });
