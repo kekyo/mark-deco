@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "title": "Rich Content",
+  "author_name": "Content Creator",
+  "provider_name": "Rich Platform",
+  "provider_url": "http://localhost:12345",
+  "html": "<div style=\"background: #f0f0f0; padding: 20px; border-radius: 8px;\"><h3>Rich Embedded Content</h3><p>This is rich content with custom HTML</p></div>",
+  "width": 600,
+  "height": 400
+}

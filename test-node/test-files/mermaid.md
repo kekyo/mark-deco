@@ -60,4 +60,4 @@ classDiagram
     Animal <|-- Duck
 ```
 
-This should create proper HTML elements that mermaid.js can render as SVG diagrams. 
+This should create proper HTML elements that mermaid.js can render as SVG diagrams.

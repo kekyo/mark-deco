@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Test Photo 1" />
+    <meta property="og:description" content="A test photo for oEmbed testing" />
+    <meta property="og:image" content="http://localhost:{{PORT}}/photo-1.jpg" />
+    <meta
+      property="og:url"
+      content="http://localhost:{{PORT}}/content/photo-1"
+    />
+
+    <!-- oEmbed discovery link -->
+    <link
+      rel="alternate"
+      type="application/json+oembed"
+      href="http://localhost:{{PORT}}/oembed?url=http://localhost:{{PORT}}/content/photo-1&format=json"
+      title="Test Photo 1"
+    />
+  </head>
+  <body>
+    <h1>Test Photo 1</h1>
+    <p>This is a test photo page for oEmbed discovery testing.</p>
+    <img
+      src="http://localhost:{{PORT}}/photo-1.jpg"
+      alt="Test Photo 1"
+      width="800"
+      height="600"
+    />
+  </body>
+</html>

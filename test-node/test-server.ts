@@ -2,7 +2,6 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as net from 'net';
 import * as path from 'path';
-import * as url from 'url';
 
 export interface TestServer {
   start: () => Promise<void>;
@@ -29,7 +28,8 @@ const isPortAvailable = (port: number): Promise<boolean> => {
  */
 const findAvailablePort = async (startPort: number): Promise<number> => {
   let port = startPort;
-  while (port < startPort + 100) { // Try up to 100 ports
+  while (port < startPort + 100) {
+    // Try up to 100 ports
     if (await isPortAvailable(port)) {
       return port;
     }
@@ -73,7 +73,10 @@ export function createTestServer(preferredPort: number = 12345): TestServer {
     }
   };
 
-  const requestHandler = (req: http.IncomingMessage, res: http.ServerResponse) => {
+  const requestHandler = (
+    req: http.IncomingMessage,
+    res: http.ServerResponse
+  ) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -85,9 +88,17 @@ export function createTestServer(preferredPort: number = 12345): TestServer {
       return;
     }
 
-    const parsedUrl = url.parse(req.url || '', true);
-    const pathname = parsedUrl.pathname;
-    const query = parsedUrl.query;
+    const baseUrl = `http://localhost:${actualPort}`;
+    let requestUrl: URL;
+    try {
+      requestUrl = new URL(req.url ?? '/', baseUrl);
+    } catch {
+      res.writeHead(400);
+      res.end('Invalid URL');
+      return;
+    }
+
+    const pathname = requestUrl.pathname;
 
     if (!pathname) {
       res.writeHead(404);
@@ -97,7 +108,7 @@ export function createTestServer(preferredPort: number = 12345): TestServer {
 
     // Handle oEmbed API endpoints for testing
     if (pathname === '/oembed') {
-      const urlParam = query.url as string;
+      const urlParam = requestUrl.searchParams.get('url');
 
       if (!urlParam) {
         res.writeHead(400);
@@ -110,9 +121,15 @@ export function createTestServer(preferredPort: number = 12345): TestServer {
       // Determine which mock response to use based on URL
       if (urlParam.includes('flickr.com/photos/bees/2362225867')) {
         responseFile = 'oembed/flickr-photo.json';
-      } else if (urlParam.includes('youtu.be/1La4QzGeaaQ') || urlParam.includes('youtube.com/watch?v=1La4QzGeaaQ')) {
+      } else if (
+        urlParam.includes('youtu.be/1La4QzGeaaQ') ||
+        urlParam.includes('youtube.com/watch?v=1La4QzGeaaQ')
+      ) {
         responseFile = 'oembed/youtube-video-short.json';
-      } else if (urlParam.includes('youtu.be/lwuMTMhY85c') || urlParam.includes('youtube.com/watch?v=lwuMTMhY85c')) {
+      } else if (
+        urlParam.includes('youtu.be/lwuMTMhY85c') ||
+        urlParam.includes('youtube.com/watch?v=lwuMTMhY85c')
+      ) {
         responseFile = 'oembed/youtube-video-43.json';
       } else {
         // Return a generic 404 for unsupported URLs
@@ -205,6 +222,6 @@ export function createTestServer(preferredPort: number = 12345): TestServer {
           resolve();
         }
       });
-    }
+    },
   };
 }

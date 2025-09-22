@@ -25,7 +25,7 @@ describe('Markdown Processor', () => {
   it('should process basic markdown file', async () => {
     const processor = createMarkdownProcessor({
       plugins: [],
-      fetcher: createCachedFetcher('test-userAgent', 10000)
+      fetcher: createCachedFetcher('test-userAgent', 10000),
     });
 
     const markdown = `---
@@ -41,49 +41,55 @@ This is a test document.
 
 More content here.`;
 
-    const result = await processor.process(markdown, "id", { useContentStringHeaderId: true });
+    const result = await processor.process(markdown, 'id', {
+      useContentStringHeaderId: true,
+    });
 
     expect(result.frontmatter).toEqual({
-      title: "Test Document",
-      author: "Test Author"
+      title: 'Test Document',
+      author: 'Test Author',
     });
 
     expect(result.headingTree).toHaveLength(2);
-    expect(result.headingTree[0].text).toBe("Main Title");
-    expect(result.headingTree[1].text).toBe("Another Title");
+    expect(result.headingTree[0]?.text).toBe('Main Title');
+    expect(result.headingTree[1]?.text).toBe('Another Title');
 
     expect(result.html).toContain('<h1 id="id-main-title">Main Title</h1>');
-    expect(result.html).toContain('<h1 id="id-another-title">Another Title</h1>');
+    expect(result.html).toContain(
+      '<h1 id="id-another-title">Another Title</h1>'
+    );
     expect(result.html).toContain('<p>This is a test document.</p>');
   });
 
   it('should process markdown with no frontmatter', async () => {
     const processor = createMarkdownProcessor({
       plugins: [],
-      fetcher: createCachedFetcher('test-userAgent', 10000)
+      fetcher: createCachedFetcher('test-userAgent', 10000),
     });
 
     const markdown = `# Simple Title
 
 Just some content.`;
 
-    const result = await processor.process(markdown, "id", { useContentStringHeaderId: true });
+    const result = await processor.process(markdown, 'id', {
+      useContentStringHeaderId: true,
+    });
 
     expect(result.frontmatter).toEqual({});
     expect(result.headingTree).toHaveLength(1);
-    expect(result.headingTree[0].text).toBe("Simple Title");
+    expect(result.headingTree[0]?.text).toBe('Simple Title');
     expect(result.html).toContain('<h1 id="id-simple-title">Simple Title</h1>');
   });
 
   it('should handle empty markdown', async () => {
     const processor = createMarkdownProcessor({
       plugins: [],
-      fetcher: createCachedFetcher('test-userAgent', 10000)
+      fetcher: createCachedFetcher('test-userAgent', 10000),
     });
 
     const markdown = '';
 
-    const result = await processor.process(markdown, "id");
+    const result = await processor.process(markdown, 'id');
 
     expect(result.frontmatter).toEqual({});
     expect(result.headingTree).toEqual([]);
@@ -93,7 +99,7 @@ Just some content.`;
   it('should handle markdown with only frontmatter', async () => {
     const processor = createMarkdownProcessor({
       plugins: [],
-      fetcher: createCachedFetcher('test-userAgent', 10000)
+      fetcher: createCachedFetcher('test-userAgent', 10000),
     });
 
     const markdown = `---
@@ -101,11 +107,11 @@ title: "Only Frontmatter"
 tags: ["test"]
 ---`;
 
-    const result = await processor.process(markdown, "id");
+    const result = await processor.process(markdown, 'id');
 
     expect(result.frontmatter).toEqual({
-      title: "Only Frontmatter",
-      tags: ["test"]
+      title: 'Only Frontmatter',
+      tags: ['test'],
     });
     expect(result.headingTree).toEqual([]);
     expect(result.html).toBe('');
@@ -114,7 +120,7 @@ tags: ["test"]
   it('should process markdown with multiple h1 elements', async () => {
     const processor = createMarkdownProcessor({
       plugins: [],
-      fetcher: createCachedFetcher('test-userAgent', 10000)
+      fetcher: createCachedFetcher('test-userAgent', 10000),
     });
 
     const markdown = `# First Title
@@ -129,12 +135,14 @@ Content 2
 
 Content 3`;
 
-    const result = await processor.process(markdown, "id", { useContentStringHeaderId: true });
+    const result = await processor.process(markdown, 'id', {
+      useContentStringHeaderId: true,
+    });
 
     expect(result.headingTree).toHaveLength(3);
-    expect(result.headingTree[0].text).toBe("First Title");
-    expect(result.headingTree[1].text).toBe("Second Title");
-    expect(result.headingTree[2].text).toBe("Third Title");
+    expect(result.headingTree[0]?.text).toBe('First Title');
+    expect(result.headingTree[1]?.text).toBe('Second Title');
+    expect(result.headingTree[2]?.text).toBe('Third Title');
 
     expect(result.html).toContain('<h1 id="id-first-title">First Title</h1>');
     expect(result.html).toContain('<h1 id="id-second-title">Second Title</h1>');
@@ -144,7 +152,7 @@ Content 3`;
   it('should handle complex frontmatter', async () => {
     const processor = createMarkdownProcessor({
       plugins: [],
-      fetcher: createCachedFetcher('test-userAgent', 10000)
+      fetcher: createCachedFetcher('test-userAgent', 10000),
     });
 
     const markdown = `---
@@ -165,21 +173,21 @@ number: 42
 
 This is test content.`;
 
-    const result = await processor.process(markdown, "id");
+    const result = await processor.process(markdown, 'id');
 
     expect(result.frontmatter).toEqual({
-      title: "Complex Test",
+      title: 'Complex Test',
       date: new Date('2024-01-01T00:00:00.000Z'),
-      tags: ["markdown", "test", "processor"],
+      tags: ['markdown', 'test', 'processor'],
       nested: {
-        key1: "value1",
-        key2: "value2"
+        key1: 'value1',
+        key2: 'value2',
       },
       boolean: true,
-      number: 42
+      number: 42,
     });
 
     expect(result.headingTree).toHaveLength(1);
-    expect(result.headingTree[0].text).toBe("Test Content");
+    expect(result.headingTree[0]?.text).toBe('Test Content');
   });
 });

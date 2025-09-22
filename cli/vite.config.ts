@@ -1,6 +1,8 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
+import prettierMax from 'prettier-max';
+import screwUp from 'screw-up';
 
 // Read version from package.json at build time
 const packageJsonPath = resolve(__dirname, 'package.json');
@@ -8,13 +10,14 @@ const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
 const version = packageJson.version;
 
 export default defineConfig({
+  plugins: [prettierMax(), screwUp()],
   build: {
     target: 'node18',
     lib: {
       entry: 'src/cli.ts',
       name: 'MarkDecoCLI',
       formats: ['cjs'],
-      fileName: (format) => `cli.${format === 'cjs' ? 'cjs' : 'js'}`
+      fileName: (format) => `cli.${format === 'cjs' ? 'cjs' : 'js'}`,
     },
     rollupOptions: {
       external: [
@@ -33,29 +36,29 @@ export default defineConfig({
         'stream',
         'node:stream',
         'events',
-        'node:events'
+        'node:events',
       ],
       output: {
-        banner: '#!/usr/bin/env node'
-      }
+        banner: '#!/usr/bin/env node',
+      },
     },
     minify: false,
-    sourcemap: true
+    sourcemap: true,
   },
   define: {
     global: 'globalThis',
-    __VERSION__: JSON.stringify(version)
+    __VERSION__: JSON.stringify(version),
   },
   resolve: {
     alias: {
       // Prevent Vite from treating Node.js built-ins as browser modules
       fs: 'fs',
       path: 'path',
-      process: 'process'
+      process: 'process',
     },
-    conditions: ['node']
+    conditions: ['node'],
   },
   esbuild: {
-    platform: 'node'
-  }
+    platform: 'node',
+  },
 });

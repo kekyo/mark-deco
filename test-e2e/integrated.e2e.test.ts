@@ -2,10 +2,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
-import { normalizeHtml, extractMermaidInfo } from '../test-shared/test-helpers.js';
-import { createTestServer, createViteServer, type TestServer, type ViteServer } from '../test-shared/test-server.js';
+import * as testHelpers from '../test-shared/test-helpers.js';
+import * as testServerModule from '../test-shared/test-server.js';
+import type { TestServer, ViteServer } from '../test-shared/test-server.js';
+
 import { getBrowserInjectionScript } from './browser-utils';
 import type { MarkdownProcessor } from 'mark-deco';
+const { normalizeHtml, extractMermaidInfo } = testHelpers;
+const { createTestServer, createViteServer } = testServerModule;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,20 +25,23 @@ let testServer: TestServer;
 let viteServer: ViteServer;
 
 test.describe('Integrated E2E Tests', () => {
-  test.beforeAll(async ({ }, testInfo: TestInfo) => {
+  test.beforeAll(async ({}, testInfo: TestInfo) => {
     // Start test server with worker-specific port to avoid conflicts
     const basePort = 12347;
     const workerIndex = testInfo.workerIndex || 0;
     const preferredPort = basePort + workerIndex;
 
     // Additional wait to ensure previous processes are fully cleaned up
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    const contentsDir = path.join(__dirname, '../test-shared/test-server-contents');
+    const contentsDir = path.join(
+      __dirname,
+      '../test-shared/test-server-contents'
+    );
     testServer = createTestServer({
       preferredPort: preferredPort,
       contentsDir: contentsDir,
-      enableTemplateReplacement: true
+      enableTemplateReplacement: true,
     });
     await testServer.start();
     console.log(`E2E test server running on ${testServer.url}`);
@@ -48,19 +55,19 @@ test.describe('Integrated E2E Tests', () => {
     console.log(`Vite development server running on ${viteServer.url}`);
 
     // Wait a bit more to ensure servers are fully ready
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   });
 
   test.afterAll(async () => {
     if (testServer) {
       await testServer.stop();
       // Wait for server to fully stop
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
     if (viteServer) {
       await viteServer.stop();
       // Wait for Vite server to fully stop
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   });
 
@@ -72,42 +79,60 @@ test.describe('Integrated E2E Tests', () => {
   // Helper function to wait for processing to complete
   const waitForProcessingComplete = async (page: Page) => {
     // Wait for processing to complete by checking for expected content
-    await page.waitForFunction(() => {
-      const output = document.querySelector('#html-output');
-      const content = output?.innerHTML || '';
-      // Check that content is not just "Processing..." and has substantial content
-      return output &&
-             content.trim().length > 50 &&
-             !content.includes('class="loading"') &&
-             !content.includes('Processing...');
-    }, { timeout: 30000 }); // Increased timeout for oEmbed processing
+    await page.waitForFunction(
+      () => {
+        const output = document.querySelector('#html-output');
+        const content = output?.innerHTML || '';
+        // Check that content is not just "Processing..." and has substantial content
+        return (
+          output &&
+          content.trim().length > 50 &&
+          !content.includes('class="loading"') &&
+          !content.includes('Processing...')
+        );
+      },
+      { timeout: 30000 }
+    ); // Increased timeout for oEmbed processing
   };
 
   // Helper function to wait for processor initialization
   const waitForProcessorInitialization = async (page: Page) => {
     // Wait for processor to be initialized by checking window.processor
-    await page.waitForFunction(() => {
-      return window.processor !== null && window.processor !== undefined;
-    }, { timeout: 30000 });
+    await page.waitForFunction(
+      () => {
+        return window.processor !== null && window.processor !== undefined;
+      },
+      { timeout: 30000 }
+    );
 
     // Additional wait to ensure processor is fully ready
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   };
 
   // Helper function to run a specific test case
   async function runTestCase(page: Page, testName: string) {
     // Enable console logging for debugging
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       // Show all console logs for debugging
       console.log('BROWSER LOG:', msg.text());
     });
 
     // Check if test files exist locally
-    const markdownPath = path.join(__dirname, '../test-shared/test-files', `${testName}.md`);
-    const snapshotPath = path.join(__dirname, 'test-expected', `${testName}.html`);
+    const markdownPath = path.join(
+      __dirname,
+      '../test-shared/test-files',
+      `${testName}.md`
+    );
+    const snapshotPath = path.join(
+      __dirname,
+      'test-expected',
+      `${testName}.html`
+    );
 
     if (!fs.existsSync(markdownPath)) {
-      console.warn(`Skipping test '${testName}': missing markdown file (${markdownPath})`);
+      console.warn(
+        `Skipping test '${testName}': missing markdown file (${markdownPath})`
+      );
       test.skip();
       return;
     }
@@ -127,8 +152,10 @@ test.describe('Integrated E2E Tests', () => {
         if (attempts >= maxAttempts) {
           throw error;
         }
-        console.log(`Retrying navigation to E2E test page (attempt ${attempts + 1}/${maxAttempts})`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log(
+          `Retrying navigation to E2E test page (attempt ${attempts + 1}/${maxAttempts})`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 2000));
       }
     }
 
@@ -142,7 +169,10 @@ test.describe('Integrated E2E Tests', () => {
 
     // Read test file content and replace PORT placeholder
     let markdownContent = fs.readFileSync(markdownPath, 'utf8');
-    markdownContent = markdownContent.replace(/\{\{PORT\}\}/g, testServer.port.toString());
+    markdownContent = markdownContent.replace(
+      /\{\{PORT\}\}/g,
+      testServer.port.toString()
+    );
 
     // Clear existing content and input test markdown
     await page.fill('#markdown-input', '');
@@ -168,21 +198,34 @@ test.describe('Integrated E2E Tests', () => {
       // Debug output on failure
       if (normalizedActual !== normalizedExpected) {
         console.log(`\n=== Test Case: ${testName} ===`);
-        console.log('Expected (normalized):', normalizedExpected.substring(0, 500) + '...');
-        console.log('Actual (normalized):', normalizedActual.substring(0, 500) + '...');
+        console.log(
+          'Expected (normalized):',
+          normalizedExpected.substring(0, 500) + '...'
+        );
+        console.log(
+          'Actual (normalized):',
+          normalizedActual.substring(0, 500) + '...'
+        );
         console.log('Raw expected:', expectedHtml.substring(0, 300) + '...');
         console.log('Raw actual:', actualHtml.substring(0, 300) + '...');
 
         // Additional debug for processing issues
-        if (actualHtml.includes('Processing...') || actualHtml.includes('class="loading"')) {
-          console.log('⚠️ Processing appears to be incomplete - content still shows loading state');
+        if (
+          actualHtml.includes('Processing...') ||
+          actualHtml.includes('class="loading"')
+        ) {
+          console.log(
+            '⚠️ Processing appears to be incomplete - content still shows loading state'
+          );
         }
       }
 
       expect(normalizedActual).toBe(normalizedExpected);
     } else {
       // No snapshot - just validate structure and plugins
-      console.log(`📝 No snapshot for '${testName}' - validating structure only`);
+      console.log(
+        `📝 No snapshot for '${testName}' - validating structure only`
+      );
 
       // Basic structure validation
       expect(actualHtml.trim().length).toBeGreaterThan(50);
@@ -212,9 +255,10 @@ test.describe('Integrated E2E Tests', () => {
 
   // Auto-discover and test all markdown files
   const testFilesDir = path.join(__dirname, '../test-shared/test-files');
-  const testFiles = fs.readdirSync(testFilesDir)
-    .filter(file => file.endsWith('.md'))
-    .map(file => file.replace('.md', ''));
+  const testFiles = fs
+    .readdirSync(testFilesDir)
+    .filter((file) => file.endsWith('.md'))
+    .map((file) => file.replace('.md', ''));
 
   // Create individual test cases for each file
   for (const testName of testFiles) {
@@ -224,11 +268,17 @@ test.describe('Integrated E2E Tests', () => {
   }
 
   // Special test for mermaid functionality
-  test('should render mermaid diagrams as interactive elements', async ({ page }) => {
+  test('should render mermaid diagrams as interactive elements', async ({
+    page,
+  }) => {
     const testFiles = ['mermaid-basic', 'mermaid-complex', 'mermaid-multiple'];
 
     for (const testName of testFiles) {
-      const markdownPath = path.join(__dirname, '../test-shared/test-files', `${testName}.md`);
+      const markdownPath = path.join(
+        __dirname,
+        '../test-shared/test-files',
+        `${testName}.md`
+      );
       if (!fs.existsSync(markdownPath)) continue;
 
       console.log(`🔍 Testing mermaid functionality for: ${testName}`);
@@ -239,7 +289,10 @@ test.describe('Integrated E2E Tests', () => {
       await waitForProcessorInitialization(page);
 
       let markdownContent = fs.readFileSync(markdownPath, 'utf8');
-      markdownContent = markdownContent.replace(/\{\{PORT\}\}/g, testServer.port.toString());
+      markdownContent = markdownContent.replace(
+        /\{\{PORT\}\}/g,
+        testServer.port.toString()
+      );
       await page.fill('#markdown-input', '');
       await page.fill('#markdown-input', markdownContent);
       await page.click('#process-button');
@@ -252,7 +305,9 @@ test.describe('Integrated E2E Tests', () => {
       const mermaidInfo = extractMermaidInfo(actualHtml);
 
       expect(mermaidInfo.count).toBeGreaterThan(0);
-      console.log(`  ✅ ${testName}: Found ${mermaidInfo.count} mermaid diagrams`);
+      console.log(
+        `  ✅ ${testName}: Found ${mermaidInfo.count} mermaid diagrams`
+      );
 
       // Check if mermaid content is properly structured
       const mermaidDivs = await page.locator('.mermaid').count();

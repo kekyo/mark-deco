@@ -10,15 +10,11 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-dist-demo-pages
+demo-pages/dist
 *.local
 bin/
 
-# CLI bundle directories
-cli/dist-bundle/
-cli/dist-ncc/
-cli/dist-esbuild/
-cli/dist-rollup/
+test-shared/*.js
 
 # Editor directories and files
 .vscode/*
@@ -31,7 +27,9 @@ cli/dist-rollup/
 *.sln
 *.sw?
 
-test-results/
+**/test-results/
 playwright-report/
 .cache/
 .test-cache-*/
+
+artifacts/

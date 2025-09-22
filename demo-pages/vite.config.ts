@@ -1,18 +1,20 @@
 import path from 'path';
 import { defineConfig } from 'vite';
+import prettierMax from 'prettier-max';
 
 export default defineConfig({
+  plugins: [prettierMax()],
   resolve: {
     alias: {
       // Directly reference library source files during development
-      'mark-deco': path.resolve(__dirname, '../src/index.ts'),
+      'mark-deco': path.resolve(__dirname, '../mark-deco/src/index.ts'),
       // Node.js modules polyfills (remove buffer as it will be handled by define)
-      'stream': 'stream-browserify',
-      'util': 'util',
-      'events': 'events',
-      'path': 'path-browserify',
-      'url': 'url',
-      'querystring': 'querystring-es3',
+      stream: 'stream-browserify',
+      util: 'util',
+      events: 'events',
+      path: 'path-browserify',
+      url: 'url',
+      querystring: 'querystring-es3',
     },
   },
   optimizeDeps: {
@@ -34,7 +36,7 @@ export default defineConfig({
       'events',
       'path-browserify',
       'url',
-      'querystring-es3'
+      'querystring-es3',
     ],
   },
   define: {
@@ -55,7 +57,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../dist-demo-pages',
+    outDir: './dist',
     emptyOutDir: true,
     rollupOptions: {
       external: (id: string) => {
@@ -64,7 +66,7 @@ export default defineConfig({
           return true; // Mark as external to prevent bundling
         }
         return false;
-      }
-    }
-  }
+      },
+    },
+  },
 });

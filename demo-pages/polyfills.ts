@@ -19,7 +19,9 @@ class CustomBuffer {
     }
   }
 
-  static from(data: string | ArrayBuffer | Uint8Array | number[]): CustomBuffer {
+  static from(
+    data: string | ArrayBuffer | Uint8Array | number[]
+  ): CustomBuffer {
     if (typeof data === 'string') {
       return new CustomBuffer(data);
     }
@@ -78,7 +80,7 @@ class CustomBuffer {
   toString(encoding = 'utf8'): string {
     if (encoding === 'hex') {
       return Array.from(this.data)
-        .map(b => b.toString(16).padStart(2, '0'))
+        .map((b) => b.toString(16).padStart(2, '0'))
         .join('');
     }
     return new TextDecoder(encoding).decode(this.data);
@@ -102,7 +104,8 @@ class CustomBuffer {
 }
 
 // Set up global variables that mark-deco expects
-(globalThis as unknown as { Buffer: typeof CustomBuffer }).Buffer = CustomBuffer;
+(globalThis as unknown as { Buffer: typeof CustomBuffer }).Buffer =
+  CustomBuffer;
 (globalThis as unknown as { global: typeof globalThis }).global = globalThis;
 
 // Process polyfill
@@ -126,7 +129,7 @@ const processPolyfill: Process = {
   version: 'v18.0.0',
   nextTick: (fn: () => void) => setTimeout(fn, 0),
   cwd: () => '/',
-  versions: { node: 'v18.0.0' }
+  versions: { node: 'v18.0.0' },
 };
 
 (globalThis as unknown as { process: Process }).process = processPolyfill;
@@ -140,9 +143,12 @@ if (typeof window !== 'undefined') {
 
 console.log('✅ Polyfills loaded successfully:', {
   Buffer: typeof CustomBuffer !== 'undefined',
-  'globalThis.Buffer': typeof (globalThis as { Buffer?: unknown }).Buffer !== 'undefined',
-  'globalThis.process': typeof (globalThis as { process?: unknown }).process !== 'undefined',
-  'globalThis.global': typeof (globalThis as { global?: unknown }).global !== 'undefined'
+  'globalThis.Buffer':
+    typeof (globalThis as { Buffer?: unknown }).Buffer !== 'undefined',
+  'globalThis.process':
+    typeof (globalThis as { process?: unknown }).process !== 'undefined',
+  'globalThis.global':
+    typeof (globalThis as { global?: unknown }).global !== 'undefined',
 });
 
 // Minimal fs polyfill to prevent errors from libraries
@@ -167,8 +173,9 @@ const fs: FsPolyfill = {
   },
   mkdirSync: (): never => {
     throw new Error('fs.mkdirSync is not available in browser environment');
-  }
+  },
 };
 
 export default fs;
-export const { readFileSync, writeFileSync, existsSync, statSync, mkdirSync } = fs;
+export const { readFileSync, writeFileSync, existsSync, statSync, mkdirSync } =
+  fs;

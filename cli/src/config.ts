@@ -43,7 +43,9 @@ export async function loadConfig(configPath?: string): Promise<Config> {
       return JSON.parse(configContent);
     }
   } catch (error) {
-    throw new Error(`Failed to load config file "${configPath}": ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to load config file "${configPath}": ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -57,13 +59,13 @@ export function getDefaultConfig(): Config {
     hierarchicalHeadingId: true,
     contentBasedHeadingId: false,
     oembed: {
-      enabled: true
+      enabled: true,
     },
     card: {
-      enabled: true
+      enabled: true,
     },
     mermaid: {
-      enabled: true
-    }
+      enabled: true,
+    },
   };
 }

@@ -7,13 +7,13 @@ export default defineConfig({
     environment: 'node',
     include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: ['node_modules', 'dist'],
-    testTimeout: 30000
+    testTimeout: 30000,
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
       // Directly reference library source files during development
-      'mark-deco': path.resolve(__dirname, '../src/index.ts')
-    }
-  }
+      'mark-deco': path.resolve(__dirname, '../mark-deco/src/index.ts'),
+    },
+  },
 });

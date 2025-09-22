@@ -16,4 +16,4 @@ This should create a card for a website.
 https://github.com/microsoft/vscode
 ```
 
-This should create a card for an article. 
+This should create a card for an article.

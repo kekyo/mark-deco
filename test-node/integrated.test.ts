@@ -1,9 +1,27 @@
 import { readFile, readdir, writeFile, mkdir, rm } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
-import { createTestProcessor, normalizeHtml, extractMermaidInfo, validatePluginOutputs, countTotalHeadings } from '../test-shared/test-helpers.js';
-import { createTestServer, type TestServer } from '../test-shared/test-server.js';
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+  beforeAll,
+  afterAll,
+} from 'vitest';
+import * as testHelpers from '../test-shared/test-helpers.js';
+import * as testServerModule from '../test-shared/test-server.js';
+import type { TestServer } from '../test-shared/test-server.js';
+
+const {
+  createTestProcessor,
+  normalizeHtml,
+  extractMermaidInfo,
+  validatePluginOutputs,
+  countTotalHeadings,
+} = testHelpers;
+const { createTestServer } = testServerModule;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,11 +36,14 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
 
   beforeAll(async () => {
     // Start test server
-    const contentsDir = path.join(__dirname, '../test-shared/test-server-contents');
+    const contentsDir = path.join(
+      __dirname,
+      '../test-shared/test-server-contents'
+    );
     testServer = createTestServer({
       preferredPort: 12345,
       contentsDir: contentsDir,
-      enableTemplateReplacement: true
+      enableTemplateReplacement: true,
     });
     await testServer.start();
     console.log(`Node.js test server running on ${testServer.url}`);
@@ -54,7 +75,7 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
   async function getMarkdownFiles(): Promise<string[]> {
     try {
       const files = await readdir(testFilesDir);
-      return files.filter(file => file.endsWith('.md'));
+      return files.filter((file) => file.endsWith('.md'));
     } catch (error) {
       console.warn('Could not read test-files directory:', error);
       return [];
@@ -64,37 +85,51 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
   /**
    * Process a markdown file with plugins enabled
    */
-  async function processMarkdownFile(filename: string): Promise<{html: string, frontmatter: Record<string, unknown>, headingTree: unknown[]}> {
+  async function processMarkdownFile(filename: string): Promise<{
+    html: string;
+    frontmatter: Record<string, unknown>;
+    headingTree: unknown[];
+  }> {
     const filePath = path.join(testFilesDir, filename);
     let markdownContent = await readFile(filePath, 'utf-8');
 
     // Replace {{PORT}} placeholder with actual test server port
-    markdownContent = markdownContent.replace(/\{\{PORT\}\}/g, testServer.port.toString());
+    markdownContent = markdownContent.replace(
+      /\{\{PORT\}\}/g,
+      testServer.port.toString()
+    );
 
     // Create processor with all plugins enabled and local server configured
     const processor = createTestProcessor(testServer.port, {
       enableOembed: true,
       enableCard: true,
       enableMermaid: true,
-      timeout: 10000
+      timeout: 10000,
     });
 
     // Process the markdown
-    const result = await processor.process(markdownContent, "id", {
-      useContentStringHeaderId: true
+    const result = await processor.process(markdownContent, 'id', {
+      useContentStringHeaderId: true,
     });
 
     return {
       html: result.html,
       frontmatter: result.frontmatter,
-      headingTree: result.headingTree
+      headingTree: result.headingTree,
     };
   }
 
   /**
    * Save processing results to test-output directory
    */
-  async function saveResults(filename: string, result: {html: string, frontmatter: Record<string, unknown>, headingTree: unknown[]}): Promise<string> {
+  async function saveResults(
+    filename: string,
+    result: {
+      html: string;
+      frontmatter: Record<string, unknown>;
+      headingTree: unknown[];
+    }
+  ): Promise<string> {
     const baseName = path.parse(filename).name;
     const outputDir = path.join(testOutputDir, baseName);
     await mkdir(outputDir, { recursive: true });
@@ -122,7 +157,14 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
   /**
    * Compare with snapshots if they exist
    */
-  async function compareWithSnapshots(filename: string, result: {html: string, frontmatter: Record<string, unknown>, headingTree: unknown[]}): Promise<void> {
+  async function compareWithSnapshots(
+    filename: string,
+    result: {
+      html: string;
+      frontmatter: Record<string, unknown>;
+      headingTree: unknown[];
+    }
+  ): Promise<void> {
     const baseName = path.parse(filename).name;
     const snapshotPath = path.join(testSnapshotsDir, `${baseName}.html`);
 
@@ -135,17 +177,32 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
         console.log(`\n⚠️ Snapshot mismatch for ${baseName}:`);
         console.log('Expected length:', normalizedExpected.length);
         console.log('Actual length:', normalizedActual.length);
-        console.log('Expected (first 200 chars):', normalizedExpected.substring(0, 200));
-        console.log('Actual (first 200 chars):', normalizedActual.substring(0, 200));
+        console.log(
+          'Expected (first 200 chars):',
+          normalizedExpected.substring(0, 200)
+        );
+        console.log(
+          'Actual (first 200 chars):',
+          normalizedActual.substring(0, 200)
+        );
 
         // Don't fail on snapshot mismatch for now, just log the difference
-        console.log(`📝 Snapshot differs for ${baseName} - consider updating snapshots`);
+        console.log(
+          `📝 Snapshot differs for ${baseName} - consider updating snapshots`
+        );
       } else {
         console.log(`✅ Snapshot matches for ${baseName}`);
       }
     } catch (error: unknown) {
-      if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
-        console.log(`📝 No snapshot found for ${baseName} - first time running this test`);
+      if (
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        error.code === 'ENOENT'
+      ) {
+        console.log(
+          `📝 No snapshot found for ${baseName} - first time running this test`
+        );
       } else {
         throw error;
       }
@@ -155,7 +212,15 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
   /**
    * Validate plugin-specific functionality
    */
-  function validatePluginFunctionality(filename: string, markdownContent: string, result: {html: string, frontmatter: Record<string, unknown>, headingTree: unknown[]}): void {
+  function validatePluginFunctionality(
+    filename: string,
+    markdownContent: string,
+    result: {
+      html: string;
+      frontmatter: Record<string, unknown>;
+      headingTree: unknown[];
+    }
+  ): void {
     const baseName = path.parse(filename).name;
 
     // Count expected plugins based on markdown content
@@ -172,16 +237,24 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
     const validation = validatePluginOutputs(result.html, expectedPlugins);
 
     if (!validation.valid) {
-      console.log(`⚠️ Plugin validation issues for ${baseName}:`, validation.errors);
+      console.log(
+        `⚠️ Plugin validation issues for ${baseName}:`,
+        validation.errors
+      );
     } else if (Object.keys(expectedPlugins).length > 0) {
-      console.log(`✅ Plugin validation passed for ${baseName}:`, validation.results);
+      console.log(
+        `✅ Plugin validation passed for ${baseName}:`,
+        validation.results
+      );
     }
 
     // Special validation for mermaid files
     if (baseName.startsWith('mermaid-')) {
       const mermaidInfo = extractMermaidInfo(result.html);
       expect(mermaidInfo.count).toBeGreaterThan(0);
-      console.log(`  🎨 Mermaid: Found ${mermaidInfo.count} diagrams with IDs: [${mermaidInfo.ids.join(', ')}]`);
+      console.log(
+        `  🎨 Mermaid: Found ${mermaidInfo.count} diagrams with IDs: [${mermaidInfo.ids.join(', ')}]`
+      );
     }
   }
 
@@ -190,7 +263,7 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
     expect(markdownFiles.length).toBeGreaterThan(0);
 
     console.log(`\n📋 Found ${markdownFiles.length} markdown files to test:`);
-    markdownFiles.forEach(file => console.log(`  - ${file}`));
+    markdownFiles.forEach((file) => console.log(`  - ${file}`));
 
     let successCount = 0;
     let errorCount = 0;
@@ -201,18 +274,24 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
 
       try {
         // Read markdown content for validation
-        let markdownContent = await readFile(path.join(testFilesDir, filename), 'utf-8');
-        markdownContent = markdownContent.replace(/\{\{PORT\}\}/g, testServer.port.toString());
+        let markdownContent = await readFile(
+          path.join(testFilesDir, filename),
+          'utf-8'
+        );
+        markdownContent = markdownContent.replace(
+          /\{\{PORT\}\}/g,
+          testServer.port.toString()
+        );
 
         // Add delays for network-dependent tests
         if (filename.includes('card') && !filename.includes('local')) {
           console.log('  🔗 Testing card plugin with external URLs...');
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
         if (filename.includes('oembed') && !filename.includes('local')) {
           console.log('  🔗 Testing oEmbed plugin with external URLs...');
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
         // Process the markdown file
@@ -223,9 +302,11 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
         expect(typeof result.frontmatter).toBe('object');
         expect(Array.isArray(result.headingTree)).toBe(true);
 
-        console.log(`  📊 Results: HTML=${result.html.length}chars, ` +
-                    `Frontmatter=${Object.keys(result.frontmatter).length}keys, ` +
-                    `Headings=${countTotalHeadings(result.headingTree)}`);
+        console.log(
+          `  📊 Results: HTML=${result.html.length}chars, ` +
+            `Frontmatter=${Object.keys(result.frontmatter).length}keys, ` +
+            `Headings=${countTotalHeadings(result.headingTree)}`
+        );
 
         // Validate plugin functionality
         validatePluginFunctionality(filename, markdownContent, result);
@@ -238,22 +319,26 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
 
         console.log(`  ✅ ${filename} processed successfully`);
         successCount++;
-
       } catch (error) {
-        console.error(`  ❌ Processing failed for ${filename}:`, error.message);
+        const message = error instanceof Error ? error.message : String(error);
+        console.error(`  ❌ Processing failed for ${filename}:`, message);
         errorCount++;
         // Continue with next file instead of throwing
       }
     }
 
-    console.log(`\n📊 Summary: ${successCount} successful, ${errorCount} errors out of ${markdownFiles.length} files`);
+    console.log(
+      `\n📊 Summary: ${successCount} successful, ${errorCount} errors out of ${markdownFiles.length} files`
+    );
 
     // Only fail if no files were processed successfully
     expect(successCount).toBeGreaterThan(0);
   }, 120000); // Increased timeout for network requests
 
   it('should validate mermaid-specific functionality', async () => {
-    const mermaidFiles = (await getMarkdownFiles()).filter(file => file.startsWith('mermaid-'));
+    const mermaidFiles = (await getMarkdownFiles()).filter((file) =>
+      file.startsWith('mermaid-')
+    );
 
     if (mermaidFiles.length === 0) {
       console.log('No mermaid test files found');
@@ -273,7 +358,9 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
       expect(result.html).toContain('class="mermaid"');
 
       console.log(`  ✅ Found ${mermaidInfo.count} mermaid diagrams`);
-      console.log(`  📋 Diagram IDs: [${mermaidInfo.ids.join(', ') || 'auto-generated'}]`);
+      console.log(
+        `  📋 Diagram IDs: [${mermaidInfo.ids.join(', ') || 'auto-generated'}]`
+      );
 
       // For multiple diagrams, ensure they have unique IDs
       if (mermaidInfo.count > 1) {
@@ -285,8 +372,8 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
   });
 
   it('should handle local server endpoints correctly', async () => {
-    const localFiles = (await getMarkdownFiles()).filter(file =>
-      file.includes('local') || file.includes('dynamic-content')
+    const localFiles = (await getMarkdownFiles()).filter(
+      (file) => file.includes('local') || file.includes('dynamic-content')
     );
 
     if (localFiles.length === 0) {
@@ -305,7 +392,9 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
       expect(result.html.length).toBeGreaterThan(100);
       expect(result.html).toContain(testServer.port.toString());
 
-      console.log(`  ✅ Local server content processed (port ${testServer.port})`);
+      console.log(
+        `  ✅ Local server content processed (port ${testServer.port})`
+      );
     }
   });
 

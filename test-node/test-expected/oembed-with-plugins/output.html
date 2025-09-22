@@ -8,7 +8,12 @@
     <div class="oembed-provider">localhost</div>
   </div>
   <div class="oembed-content">
-    <img src="http://localhost:12345/test-photo.jpg" alt="Test Photo" width="800" height="600" />
+    <img
+      src="http://localhost:12345/test-photo.jpg"
+      alt="Test Photo"
+      width="800"
+      height="600"
+    />
   </div>
 </div>
 <h2>Video Type</h2>
@@ -19,7 +24,6 @@
     <div class="oembed-provider">localhost</div>
   </div>
   <div class="oembed-content">
-
     <style>
       .oembed-responsive-wrapper {
         position: relative;
@@ -42,8 +46,16 @@
         border: none !important;
       }
     </style>
-    <div class="oembed-responsive-wrapper" style="padding-bottom: 56.25%;">
-      <div class="oembed-iframe-container"><iframe width="560" height="315" src="http://localhost:12345/embed/video" frameborder="0" allowfullscreen></iframe></div>
+    <div class="oembed-responsive-wrapper" style="padding-bottom: 56.25%">
+      <div class="oembed-iframe-container">
+        <iframe
+          width="560"
+          height="315"
+          src="http://localhost:12345/embed/video"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      </div>
     </div>
   </div>
 </div>
@@ -55,7 +67,7 @@
     <div class="oembed-provider">localhost</div>
   </div>
   <div class="oembed-content">
-    <div style="background: #f0f0f0; padding: 20px; border-radius: 8px;">
+    <div style="background: #f0f0f0; padding: 20px; border-radius: 8px">
       <h3>Rich Embedded Content</h3>
       <p>This is rich content with custom HTML</p>
     </div>
@@ -71,7 +83,12 @@
   <div class="oembed-content">
     <div class="oembed-thumbnail">
       <img src="http://localhost:12345/link-thumb.jpg" alt="Test Link" />
-    </div><a href="http://localhost:12345/content/link" target="_blank" rel="noopener noreferrer">
+    </div>
+    <a
+      href="http://localhost:12345/content/link"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       Visit localhost
     </a>
   </div>
@@ -80,10 +97,16 @@
 <div class="oembed-container oembed-fallback">
   <div class="oembed-header">
     <div class="oembed-title">External Content</div>
-    <div class="oembed-provider">localhost (Failed by Error[HTTP error, status: 404])</div>
+    <div class="oembed-provider">
+      localhost (Failed by Error[HTTP error, status: 404])
+    </div>
   </div>
   <div class="oembed-content">
-    <a href="http://localhost:12345/content/error" target="_blank" rel="noopener noreferrer">
+    <a
+      href="http://localhost:12345/content/error"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       View content on localhost
     </a>
   </div>

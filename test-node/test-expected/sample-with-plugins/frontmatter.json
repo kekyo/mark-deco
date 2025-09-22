@@ -2,9 +2,6 @@
   "title": "Sample Article",
   "author": "Test User",
   "date": "2024-01-01T00:00:00.000Z",
-  "tags": [
-    "markdown",
-    "test"
-  ],
+  "tags": ["markdown", "test"],
   "description": "Test page for MarkDeco"
 }

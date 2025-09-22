@@ -9,7 +9,7 @@ import {
   createCachedFetcher,
   createLocalCacheStorage,
   createMemoryCacheStorage,
-  defaultProviderList
+  defaultProviderList,
 } from 'mark-deco';
 import type { MarkdownProcessor } from 'mark-deco';
 
@@ -61,7 +61,8 @@ if (typeof globalThis.Buffer === 'undefined') {
 
   const BufferConstructor = MinimalBuffer as unknown as BufferConstructor;
   globalThis.Buffer = BufferConstructor;
-  (window as unknown as { Buffer: BufferConstructor }).Buffer = BufferConstructor;
+  (window as unknown as { Buffer: BufferConstructor }).Buffer =
+    BufferConstructor;
 }
 
 // Debug polyfills setup
@@ -69,24 +70,41 @@ console.log('🔧 Checking polyfills setup:', {
   'globalThis.Buffer': typeof globalThis.Buffer !== 'undefined',
   'globalThis.process': typeof globalThis.process !== 'undefined',
   'globalThis.global': typeof globalThis.global !== 'undefined',
-  'window.Buffer': typeof (window as { Buffer?: unknown }).Buffer !== 'undefined'
+  'window.Buffer':
+    typeof (window as { Buffer?: unknown }).Buffer !== 'undefined',
 });
 
 // Get DOM elements early
-const markdownInput = document.getElementById('markdown-input') as HTMLTextAreaElement | null;
-const processButton = document.getElementById('process-button') as HTMLButtonElement | null;
-const frontmatterOutput = document.getElementById('frontmatter-output') as HTMLPreElement | null;
-const htmlOutput = document.getElementById('html-output') as HTMLDivElement | null;
-const htmlSourceOutput = document.getElementById('html-source-output') as HTMLPreElement | null;
+const markdownInput = document.getElementById(
+  'markdown-input'
+) as HTMLTextAreaElement | null;
+const processButton = document.getElementById(
+  'process-button'
+) as HTMLButtonElement | null;
+const frontmatterOutput = document.getElementById(
+  'frontmatter-output'
+) as HTMLPreElement | null;
+const htmlOutput = document.getElementById(
+  'html-output'
+) as HTMLDivElement | null;
+const htmlSourceOutput = document.getElementById(
+  'html-source-output'
+) as HTMLPreElement | null;
 
 // Check if DOM elements exist
-if (!markdownInput || !processButton || !frontmatterOutput || !htmlOutput || !htmlSourceOutput) {
+if (
+  !markdownInput ||
+  !processButton ||
+  !frontmatterOutput ||
+  !htmlOutput ||
+  !htmlSourceOutput
+) {
   console.error('❌ Required DOM elements not found:', {
     markdownInput: !!markdownInput,
     processButton: !!processButton,
     frontmatterOutput: !!frontmatterOutput,
     htmlOutput: !!htmlOutput,
-    htmlSourceOutput: !!htmlSourceOutput
+    htmlSourceOutput: !!htmlSourceOutput,
   });
 }
 
@@ -97,18 +115,18 @@ function initializeTabs(): void {
 
   console.log('🔧 Initializing tabs:', {
     tabButtons: tabButtons.length,
-    tabContents: tabContents.length
+    tabContents: tabContents.length,
   });
 
-  tabButtons.forEach(button => {
+  tabButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const targetTab = button.getAttribute('data-tab');
 
       console.log('🖱️ Tab clicked:', targetTab);
 
       // Remove active class from all tab buttons and contents
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
+      tabButtons.forEach((btn) => btn.classList.remove('active'));
+      tabContents.forEach((content) => content.classList.remove('active'));
 
       // Add active class to clicked tab button
       button.classList.add('active');
@@ -480,9 +498,9 @@ function initializeProcessor(): boolean {
     const cacheStorage = checkLocalStorageAvailability()
       ? createLocalCacheStorage()
       : (() => {
-        console.log('📦 Using in-memory cache as localStorage fallback');
-        return createMemoryCacheStorage();
-      })();
+          console.log('📦 Using in-memory cache as localStorage fallback');
+          return createMemoryCacheStorage();
+        })();
     console.log('✅ Cache storage initialized');
 
     // Create cached fetcher
@@ -492,7 +510,7 @@ function initializeProcessor(): boolean {
       60000, // timeout (60 seconds)
       cacheStorage, // cacheStorage
       {
-        cacheTTL: 30 * 60 * 1000 // 30 minutes
+        cacheTTL: 30 * 60 * 1000, // 30 minutes
       }
     );
     console.log('✅ Cached fetcher created');
@@ -501,7 +519,7 @@ function initializeProcessor(): boolean {
     console.log('🔌 Creating plugins...');
     const oembedPlugin = createOEmbedPlugin(defaultProviderList, {
       maxRedirects: 5,
-      timeoutEachRedirect: 15000
+      timeoutEachRedirect: 15000,
     });
     const cardPlugin = createCardPlugin();
     const mermaidPlugin = createMermaidPlugin();
@@ -512,7 +530,7 @@ function initializeProcessor(): boolean {
     processor = createMarkdownProcessor({
       plugins: [oembedPlugin, cardPlugin, mermaidPlugin],
       logger: getConsoleLogger(),
-      fetcher: cachedFetcher
+      fetcher: cachedFetcher,
     });
     console.log('✅ Processor created with plugins');
 
@@ -524,7 +542,6 @@ function initializeProcessor(): boolean {
     console.log('- Plugins: oEmbed, Card, Mermaid');
 
     return true;
-
   } catch (error) {
     console.error('❌ Failed to initialize processor:', error);
     return false;
@@ -538,7 +555,12 @@ async function processMarkdown(): Promise<void> {
     return;
   }
 
-  if (!markdownInput || !frontmatterOutput || !htmlOutput || !htmlSourceOutput) {
+  if (
+    !markdownInput ||
+    !frontmatterOutput ||
+    !htmlOutput ||
+    !htmlSourceOutput
+  ) {
     console.error('❌ Required DOM elements not found');
     return;
   }
@@ -552,7 +574,9 @@ async function processMarkdown(): Promise<void> {
     console.log('✅ Processing completed:', result);
 
     // Display frontmatter with syntax highlighting
-    const frontmatterJson = result.frontmatter ? JSON.stringify(result.frontmatter, undefined, 2) : '{}';
+    const frontmatterJson = result.frontmatter
+      ? JSON.stringify(result.frontmatter, undefined, 2)
+      : '{}';
     frontmatterOutput.innerHTML = `<code class="language-json">${escapeHtml(frontmatterJson)}</code>`;
 
     // Display HTML source with syntax highlighting
@@ -563,16 +587,29 @@ async function processMarkdown(): Promise<void> {
     htmlOutput.innerHTML = result.html;
 
     // Re-render mermaid diagrams if they exist
-    if (result.html.includes('class="mermaid"') && 'rerenderMermaid' in window && typeof (window as unknown as { rerenderMermaid: () => void }).rerenderMermaid === 'function') {
+    if (
+      result.html.includes('class="mermaid"') &&
+      'rerenderMermaid' in window &&
+      typeof (window as unknown as { rerenderMermaid: () => void })
+        .rerenderMermaid === 'function'
+    ) {
       setTimeout(() => {
-        (window as unknown as { rerenderMermaid: () => void }).rerenderMermaid();
+        (
+          window as unknown as { rerenderMermaid: () => void }
+        ).rerenderMermaid();
       }, 100);
     }
 
     // Re-highlight code blocks if they exist (including frontmatter and source)
-    if ('rehighlightCode' in window && typeof (window as unknown as { rehighlightCode: () => void }).rehighlightCode === 'function') {
+    if (
+      'rehighlightCode' in window &&
+      typeof (window as unknown as { rehighlightCode: () => void })
+        .rehighlightCode === 'function'
+    ) {
       setTimeout(() => {
-        (window as unknown as { rehighlightCode: () => void }).rehighlightCode();
+        (
+          window as unknown as { rehighlightCode: () => void }
+        ).rehighlightCode();
       }, 150);
     }
 
@@ -581,13 +618,17 @@ async function processMarkdown(): Promise<void> {
       if (frontmatterOutput) {
         const frontmatterCode = frontmatterOutput.querySelector('code');
         if (frontmatterCode && 'hljs' in window) {
-          (window as { hljs: { highlightElement: (element: Element) => void } }).hljs.highlightElement(frontmatterCode);
+          (
+            window as { hljs: { highlightElement: (element: Element) => void } }
+          ).hljs.highlightElement(frontmatterCode);
         }
       }
       if (htmlSourceOutput) {
         const htmlSourceCode = htmlSourceOutput.querySelector('code');
         if (htmlSourceCode && 'hljs' in window) {
-          (window as { hljs: { highlightElement: (element: Element) => void } }).hljs.highlightElement(htmlSourceCode);
+          (
+            window as { hljs: { highlightElement: (element: Element) => void } }
+          ).hljs.highlightElement(htmlSourceCode);
         }
       }
     }, 200);
@@ -597,7 +638,8 @@ async function processMarkdown(): Promise<void> {
     console.error('❌ Failed to process markdown:', error);
 
     // Display error in outputs
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     frontmatterOutput.innerHTML = `<code class="language-json">${escapeHtml(`{"error": "${errorMessage}"}`)}</code>`;
     htmlOutput.innerHTML = `<div style="color: red; padding: 10px; border: 1px solid red; border-radius: 4px;">
       <strong>Error:</strong> ${escapeHtml(errorMessage)}

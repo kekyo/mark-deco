@@ -1,18 +1,9 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-// @ts-expect-error - vite-plugin-eslint has type definition issues
-import eslint from 'vite-plugin-eslint';
+import prettierMax from 'prettier-max';
 
 export default defineConfig({
-  plugins: [
-    eslint({
-      include: ['**/*.ts', '**/*.tsx'],
-      exclude: ['node_modules', 'dist'],
-      failOnWarning: true,
-      failOnError: true,
-      overrideConfigFile: resolve(__dirname, '../eslint.config.js')
-    })
-  ],
+  plugins: [prettierMax()],
   root: '.',
   build: {
     outDir: './dist',
@@ -21,29 +12,24 @@ export default defineConfig({
       entry: resolve(__dirname, 'index.ts'),
       name: 'MarkDecoNode',
       fileName: 'index',
-      formats: ['es']
+      formats: ['es'],
     },
     rollupOptions: {
-      external: [
-        'commander',
-        'mark-deco',
-        'fs/promises',
-        'path'
-      ],
+      external: ['commander', 'mark-deco', 'fs/promises', 'path'],
       output: {
         globals: {
-          'commander': 'commander',
-          'mark-deco': 'markDeco'
-        }
-      }
+          commander: 'commander',
+          'mark-deco': 'markDeco',
+        },
+      },
     },
-    target: 'node18'
+    target: 'node18',
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, '.'),
       // Directly reference library source files during development
-      'mark-deco': resolve(__dirname, '../src/index.ts')
-    }
-  }
+      'mark-deco': resolve(__dirname, '../mark-deco/src/index.ts'),
+    },
+  },
 });

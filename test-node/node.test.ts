@@ -8,13 +8,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Helper function to run Node.js command
-async function runNode(args: string[]): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+async function runNode(
+  args: string[]
+): Promise<{ stdout: string; stderr: string; exitCode: number }> {
   return new Promise((resolve) => {
     const nodePath = path.resolve(__dirname, './dist/index.js');
 
     const child = spawn('node', [nodePath, ...args], {
       cwd: __dirname,
-      stdio: 'pipe'
+      stdio: 'pipe',
     });
 
     let stdout = '';
@@ -32,7 +34,7 @@ async function runNode(args: string[]): Promise<{ stdout: string; stderr: string
       resolve({
         stdout,
         stderr,
-        exitCode: code || 0
+        exitCode: code || 0,
       });
     });
   });
@@ -41,7 +43,10 @@ async function runNode(args: string[]): Promise<{ stdout: string; stderr: string
 describe('Node.js Integration', () => {
   const testOutputDir = path.join(__dirname, './test-node-output');
   // Use unique Node.js-specific test file to support parallel testing
-  const testMarkdownFile = path.join(__dirname, `./test-node-temp-${process.pid}-${Date.now()}.md`);
+  const testMarkdownFile = path.join(
+    __dirname,
+    `./test-node-temp-${process.pid}-${Date.now()}.md`
+  );
 
   beforeEach(async () => {
     await mkdir(testOutputDir, { recursive: true });
@@ -73,10 +78,7 @@ More content.`;
   });
 
   it('should process markdown file and create output files', async () => {
-    const result = await runNode([
-      testMarkdownFile,
-      '--output', testOutputDir
-    ]);
+    const result = await runNode([testMarkdownFile, '--output', testOutputDir]);
 
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('🎉 Processing complete!');
@@ -100,20 +102,22 @@ More content.`;
     expect(html).toContain('<h1 id="id-another-title">Another Title</h1>');
 
     expect(frontmatter).toEqual({
-      title: "Node.js Test",
-      author: "Test"
+      title: 'Node.js Test',
+      author: 'Test',
     });
 
     expect(headingTree).toHaveLength(2);
-    expect(headingTree[0].text).toBe("Test Title");
-    expect(headingTree[1].text).toBe("Another Title");
+    expect(headingTree[0].text).toBe('Test Title');
+    expect(headingTree[1].text).toBe('Another Title');
   });
 
   it('should show help when no arguments provided', async () => {
     const result = await runNode(['--help']);
 
     expect(result.exitCode).toBe(0);
-    expect(result.stdout).toContain('Enhanced markdown processor with plugin support');
+    expect(result.stdout).toContain(
+      'Enhanced markdown processor with plugin support'
+    );
     expect(result.stdout).toContain('--enable-oembed');
     expect(result.stdout).toContain('--enable-card');
   });
@@ -128,10 +132,7 @@ More content.`;
   it('should handle non-existent file gracefully', async () => {
     const nonExistentFile = path.join(__dirname, 'non-existent.md');
 
-    const result = await runNode([
-      nonExistentFile,
-      '--output', testOutputDir
-    ]);
+    const result = await runNode([nonExistentFile, '--output', testOutputDir]);
 
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain('Error processing markdown file');
@@ -140,10 +141,7 @@ More content.`;
   it('should create output directory if it does not exist', async () => {
     const newOutputDir = path.join(testOutputDir, 'new-dir');
 
-    const result = await runNode([
-      testMarkdownFile,
-      '--output', newOutputDir
-    ]);
+    const result = await runNode([testMarkdownFile, '--output', newOutputDir]);
 
     expect(result.exitCode).toBe(0);
 

@@ -22,7 +22,7 @@ This is a test page for **MarkDeco**.
 
 ```javascript
 console.log('Hello, World!');
-const message = "MarkDeco";
+const message = 'MarkDeco';
 console.log(message);
 ```
 
@@ -30,7 +30,7 @@ console.log(message);
 
 1. Ordered list
 2. **Bold** text
-3. *Italic* text
+3. _Italic_ text
 
 - Unordered list
 - [Link example](https://example.com)
@@ -43,20 +43,20 @@ console.log(message);
 
 ### Tables
 
-| Item | Description | Value |
-|------|-------------|-------|
-| Processor | Markdown Enhanced | 1.0.0 |
-| Plugin | OEmbed | Enabled |
-| Plugin | Card | Enabled |
-| Frontmatter | YAML | Supported |
+| Item        | Description       | Value     |
+| ----------- | ----------------- | --------- |
+| Processor   | Markdown Enhanced | 1.0.0     |
+| Plugin      | OEmbed            | Enabled   |
+| Plugin      | Card              | Enabled   |
+| Frontmatter | YAML              | Supported |
 
 ## Text Formatting
 
 This section tests various **text formatting** options:
 
-- *Italic text*
+- _Italic text_
 - **Bold text**
-- ***Bold and italic***
+- **_Bold and italic_**
 - `inline code`
 - ~~Strikethrough text~~
 
@@ -73,7 +73,7 @@ This section tests various **text formatting** options:
 
 This is the first paragraph.
 
-This is the second paragraph with some **bold** and *italic* text.
+This is the second paragraph with some **bold** and _italic_ text.
 
 ### Horizontal Rule
 
@@ -86,6 +86,7 @@ Below the rule.
 ## Summary
 
 This file tests the core Markdown processing capabilities:
+
 - Frontmatter parsing with various data types
 - Headers and subheaders
 - Text formatting (bold, italic, code)
@@ -95,4 +96,4 @@ This file tests the core Markdown processing capabilities:
 - Quotes
 - Links
 
-All content is static and produces consistent output across runs. 
+All content is static and produces consistent output across runs.
