@@ -7,7 +7,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "test": "playwright test"
+    "test": "npm run build && playwright test",
+    "pack": "echo \"mark-deco-e2e-tests does not have packing rule.\""
   },
   "dependencies": {
     "mark-deco": "*"

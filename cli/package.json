@@ -26,10 +26,10 @@
     "dist"
   ],
   "scripts": {
+    "dev": "vite build --watch",
     "build": "vite build",
     "build:esbuild": "esbuild src/cli.ts --bundle --platform=node --target=node18 --outfile=dist/cli-esbuild.js --format=cjs --minify",
-    "dev": "vite build --watch",
-    "test": "vitest run",
+    "test": "npm run build && vitest run",
     "pack": "npm run build && screw-up pack --pack-destination ../artifacts/"
   },
   "dependencies": {

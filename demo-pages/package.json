@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 63892",
-    "test": "vite --port 63783",
-    "build": "vite build"
+    "build": "vite build",
+    "test": "echo \"demo-pages does not have test rule.\"",
+    "pack": "echo \"demo-pages does not have packing rule.\""
   },
   "dependencies": {
     "buffer": ">=6.0.3",

@@ -19,7 +19,8 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "start": "node dist/index.js",
-    "test": "vitest run"
+    "test": "npm run build && vitest run",
+    "pack": "echo \"mark-deco-node-tests does not have packing rule.\""
   },
   "dependencies": {
     "commander": ">=12.1.0",

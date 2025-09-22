@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc --project tsconfig.json"
+    "build": "tsc --project tsconfig.json",
+    "dev": "echo \"mark-deco-test-shared does not have dev rule.\"",
+    "test": "echo \"mark-deco-test-shared does not have test rule.\"",
+    "pack": "echo \"mark-deco-test-shared does not have packing rule.\""
   }
 }

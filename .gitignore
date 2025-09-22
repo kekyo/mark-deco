@@ -31,3 +31,5 @@ test-shared/*.js
 playwright-report/
 .cache/
 .test-cache-*/
+
+artifacts/

@@ -1,6 +1,6 @@
 {
   "name": "mark-deco-workspace",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "Workspace for mark-deco library and related tooling",
   "workspaces": [
@@ -12,14 +12,9 @@
     "test-shared"
   ],
   "scripts": {
-    "build": "npm run build --workspace=mark-deco-test-shared && npm run build --workspace=mark-deco && npm run build --workspace=mark-deco-node-tests && npm run build --workspace=mark-deco-demo-pages && npm run build --workspace=mark-deco-e2e-tests && npm run build --workspace=mark-deco-cli",
-    "build:library": "npm run build --workspace=mark-deco",
-    "dev": "npm run build --workspace=mark-deco && npm run dev --workspace=mark-deco-demo-pages",
-    "test": "npm run build --workspace=mark-deco-test-shared && npm run test:library && npm run test:cli && npm run test:node && npm run test:e2e",
-    "test:library": "npm run build --workspace=mark-deco && npm run test --workspace=mark-deco",
-    "test:node": "npm run build --workspace=mark-deco-test-shared && npm run build --workspace=mark-deco-node-tests && npm run test --workspace=mark-deco-node-tests",
-    "test:e2e": "npm run build --workspace=mark-deco-test-shared && npm run build --workspace=mark-deco-e2e-tests && npm run test --workspace=mark-deco-e2e-tests",
-    "test:cli": "npm run build --workspace=mark-deco-cli && npm run test --workspace=mark-deco-cli",
-    "prepublishOnly": "npm run build && npm run test"
+    "build": "npm run build --workspaces",
+    "dev": "npm run dev --workspaces",
+    "test": "npm run test --workspaces",
+    "pack": "npm run pack --workspaces"
   }
 }
