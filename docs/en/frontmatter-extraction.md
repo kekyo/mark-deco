@@ -22,7 +22,7 @@ const result = await processor.process(markdown, 'id');
 // Access frontmatter data
 console.log(result.frontmatter.title); // "Sample Article"
 console.log(result.frontmatter.author); // "John Doe"
-console.log(result.frontmatter.date); // Date object: 2024-01-15T00:00:00.000Z
+console.log(result.frontmatter.date); // "2024-01-15"
 console.log(result.frontmatter.tags); // ["markdown", "processor"]
 console.log(result.frontmatter.published); // true
 
@@ -38,7 +38,7 @@ Frontmatter data can be utilized for:
 - SEO information extraction
 - Custom rendering logic control
 
-Note: The MarkDeco processor itself doesn't use frontmatter information. Plugins may use this information depending on their implementation.
+Note: The MarkDeco processor itself doesn't use frontmatter information. Plugins may use this information depending on their implementation. Frontmatter scalars are parsed with the JSON schema, so you receive JSON-compatible types (`null`, `true`/`false`, numbers, strings).
 
 ### Updating Frontmatter During Processing
 

@@ -177,7 +177,7 @@ This is test content.`;
 
     expect(result.frontmatter).toEqual({
       title: 'Complex Test',
-      date: new Date('2024-01-01T00:00:00.000Z'),
+      date: '2024-01-01',
       tags: ['markdown', 'test', 'processor'],
       nested: {
         key1: 'value1',
