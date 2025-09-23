@@ -38,28 +38,40 @@ Frontmatter data can be utilized for:
 - SEO information extraction
 - Custom rendering logic control
 
-Note: The MarkDeco processor itself doesn't use frontmatter information. Plugins may use this information depending on their implementation. Frontmatter scalars are parsed with the JSON schema, so you receive JSON-compatible types (`null`, `true`/`false`, numbers, strings).
+Note: The MarkDeco processor itself doesn't use frontmatter information.
+Plugins may use this information depending on their implementation.
+Frontmatter scalars are parsed with the JSON schema, so you receive JSON-compatible types (`null`, `true`/`false`, numbers, strings).
 
 ### Updating Frontmatter During Processing
 
-When you need to tweak metadata before rendering, use `processor.processWithFrontmatterTransform`. Pass the transform callback as the third argument; it receives the parsed frontmatter (by reference) and the Markdown body without the frontmatter block. Return the same frontmatter object to mark the metadata as unchanged, a new object with any modifications to continue rendering, or `undefined` to cancel processing altogether.
+When you need to tweak metadata before rendering, use `processor.processWithFrontmatterTransform`.
+The function accepts a **pre** transform (third argument) that runs before HTML conversion and an optional **post** transform (fourth argument) that executes after the heading tree is built.
+The pre transform receives the parsed frontmatter (by reference), the caller's `uniqueIdPrefix`, and the Markdown body without the frontmatter block.
+Return `undefined` from the pre transform to cancel processing altogether, or a `FrontmatterTransformResult` describing the frontmatter and prefix to continue with.
 
 ```typescript
 const result = await processor.processWithFrontmatterTransform(
   markdown,
   'id',
-  ({ originalFrontmatter }) => {
+  ({ originalFrontmatter, uniqueIdPrefix }) => {
     if (!originalFrontmatter || originalFrontmatter.status !== 'draft') {
       // Cancel processing (skip Markdown -> HTML) when not a draft.
       return undefined;
     }
 
     return {
-      ...originalFrontmatter,
-      status: 'published',
-      updatedAt: new Date().toISOString(),
+      frontmatter: {
+        ...originalFrontmatter,
+        status: 'published',
+        updatedAt: new Date().toISOString(),
+      },
+      uniqueIdPrefix,
     };
-  }
+  },
+  ({ frontmatter, headingTree }) => ({
+    ...frontmatter,
+    headingCount: headingTree.length,
+  })
 );
 
 if (!result) {
@@ -71,8 +83,16 @@ if (result.changed) {
   const updatedMarkdown = result.composeMarkdown();
   // Persist the updated markdown string when metadata changed.
 }
+
+// Inspect the actual prefix used after the transform (helpful when overrides apply).
+console.log(result.uniqueIdPrefix);
 ```
 
-Need to tweak rendering flags as well? Pass regular `ProcessOptions` as the optional fourth argument.
+Need to tweak rendering flags as well? Pass regular `ProcessOptions` as the final argument.
+The pre transform can keep the original metadata by returning `{ frontmatter: originalFrontmatter, uniqueIdPrefix: 'id' }` or swap the prefix entirely.
 
-`ProcessResult.changed` reports whether the transform altered the metadata. When changes occurred, `composeMarkdown()` returns a Markdown string whose frontmatter reflects the final state; otherwise it returns the original input untouched, allowing you to skip unnecessary writes.
+`result.changed` reports whether the transform altered the metadata. When changes occurred,
+`composeMarkdown()` returns a Markdown string whose frontmatter reflects the final state;
+otherwise it returns the original input untouched, allowing you to skip unnecessary writes.
+`result.uniqueIdPrefix` exposes the prefix actually used for heading IDs after any overrides.
+The post transform runs after HTML conversion, receives `{ frontmatter, headingTree }`, and can further refine metadata (return the same reference to indicate no changes).
