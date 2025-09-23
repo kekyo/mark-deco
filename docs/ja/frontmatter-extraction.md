@@ -38,11 +38,17 @@ Frontmatterデータは以下のような用途で活用できます:
 - SEO情報の抽出
 - カスタムレンダリングロジックの制御
 
-注意: MarkDecoプロセッサ自身は、Frontmatterの情報を使用しません。後述のプラグインは、プラグインの実装によっては情報を使用する可能性があります。Frontmatter のスカラー値は JSON スキーマで解析され、`null` / `true` / `false` / 数値 / 文字列といった JSON 互換型で受け取れます。
+注意: MarkDecoプロセッサ自身は、Frontmatterの情報を使用しません。
+後述のプラグインは、プラグインの実装によっては情報を使用する可能性があります。
+Frontmatter のスカラー値は JSON スキーマで解析され、`null` / `true` / `false` / 数値 / 文字列といった JSON 互換型で受け取れます。
 
 ### 処理中にFrontmatterを更新する
 
-レンダリング前にメタデータを調整したい場合は、`processor.processWithFrontmatterTransform` を利用します。変換関数には解析済みの frontmatter（参照渡し）と、frontmatter を取り除いた Markdown 本文が渡されます。同じオブジェクトをそのまま返せば「変更なし」と見なされ、新しいオブジェクトを返せばその内容で処理が続行されます。`undefined` を返した場合は処理全体が中断され、Markdown→HTML 変換は行われません。
+レンダリング前にメタデータを調整したい場合は、`processor.processWithFrontmatterTransform` を利用します。
+変換関数には解析済みの frontmatter（参照渡し）、呼び出し元から渡された `uniqueIdPrefix`、そして frontmatter を取り除いた Markdown 本文が渡されます。
+
+`undefined` を返すと処理全体が中断され、Markdown→HTML 変換は行われません。
+処理を続行する場合は、レンダリングに使用する frontmatter と見出し・プラグインに適用したい `uniqueIdPrefix` を含む `FrontmatterTransformResult` オブジェクトを返します。
 
 ```typescript
 const result = await processor.processWithFrontmatterTransform(
@@ -55,9 +61,12 @@ const result = await processor.processWithFrontmatterTransform(
     }
 
     return {
-      ...originalFrontmatter,
-      status: 'published',
-      updatedAt: new Date().toISOString(),
+      frontmatter: {
+        ...originalFrontmatter,
+        status: 'published',
+        updatedAt: new Date().toISOString(),
+      },
+      uniqueIdPrefix: 'draft',
     };
   }
 );
@@ -74,5 +83,7 @@ if (result.changed) {
 ```
 
 レンダリング時の各種オプションを併用したい場合は、4番目の引数に従来どおり `ProcessOptions` を渡せます。
+同様に `{ frontmatter: originalFrontmatter, uniqueIdPrefix: 'id' }` を返せばメタデータは変更せず、プレフィックスだけを切り替えることも可能です。
 
-`ProcessResult.changed` は変換関数がメタデータを変更したかを示します。変更があった場合は `composeMarkdown()` が反映済みの frontmatter を含む Markdown を返し、変更がない場合は入力された Markdown をそのまま返すため、不要な書き込みを避けられます。
+`result.changed` は変換関数がメタデータを変更したかを示します。
+変更があった場合は `composeMarkdown()` が反映済みの frontmatter を含む Markdown を返し、変更がない場合は入力された Markdown をそのまま返すため、不要な書き込みを避けられます。

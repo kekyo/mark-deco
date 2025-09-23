@@ -28,6 +28,18 @@ export interface FrontmatterTransformContext {
   readonly originalFrontmatter: FrontmatterData;
   /** Markdown content body without the frontmatter block */
   readonly markdownContent: string;
+  /** Unique ID prefix requested by the caller */
+  readonly uniqueIdPrefix: string;
+}
+
+/**
+ * Result returned from a frontmatter transform callback
+ */
+export interface FrontmatterTransformResult {
+  /** Frontmatter data that will be used for rendering */
+  readonly frontmatter: FrontmatterData;
+  /** Unique ID prefix applied to generated nodes */
+  readonly uniqueIdPrefix: string;
 }
 
 /**
@@ -35,7 +47,7 @@ export interface FrontmatterTransformContext {
  */
 export type FrontmatterTransform = (
   ctx: FrontmatterTransformContext
-) => FrontmatterData | undefined;
+) => FrontmatterTransformResult | undefined;
 
 /**
  * Heading node (representing a hierarchical structure)
@@ -185,7 +197,7 @@ export interface MarkdownProcessor {
    * Process markdown content with frontmatter transformation control
    * @param markdown - Raw markdown content with frontmatter
    * @param uniqueIdPrefix - ID prefix for generating unique IDs within this processing scope
-   * @param frontmatterTransform - Callback that can mutate or replace frontmatter
+   * @param frontmatterTransform - Callback that can mutate or replace frontmatter and override the unique ID prefix
    * @param options - Processing options excluding transform
    * @returns Promise resolving to processed result or undefined when transformation cancels processing
    */

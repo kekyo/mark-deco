@@ -559,6 +559,7 @@ export const createMarkdownProcessor = (
       const context: FrontmatterTransformContext = {
         originalFrontmatter: parsedFrontmatter,
         markdownContent: content,
+        uniqueIdPrefix,
       };
 
       const transformed = frontmatterTransform(context);
@@ -566,15 +567,18 @@ export const createMarkdownProcessor = (
         return undefined;
       }
 
-      const frontmatter = transformed;
-      const changed =
-        (transformed === parsedFrontmatter
-          ? snapshotFrontmatter(parsedFrontmatter)
-          : snapshotFrontmatter(transformed)) !== originalSnapshot;
+      const { frontmatter, uniqueIdPrefix: overrideUniqueIdPrefix } =
+        transformed;
+      const nextUniqueIdPrefix = overrideUniqueIdPrefix ?? uniqueIdPrefix;
+      const snapshot =
+        frontmatter === parsedFrontmatter
+          ? originalSnapshot
+          : snapshotFrontmatter(frontmatter);
+      const changed = snapshot !== originalSnapshot;
 
       return await processCore(
         markdown,
-        uniqueIdPrefix,
+        nextUniqueIdPrefix,
         options,
         frontmatter,
         content,

@@ -221,10 +221,18 @@ title: "Same"
 
 # Heading`;
 
+      let receivedPrefix: string | undefined;
+
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        ({ originalFrontmatter }) => originalFrontmatter,
+        ({ originalFrontmatter, uniqueIdPrefix }) => {
+          receivedPrefix = uniqueIdPrefix;
+          return {
+            frontmatter: originalFrontmatter,
+            uniqueIdPrefix: 'id',
+          };
+        },
         { useContentStringHeaderId: true }
       );
 
@@ -232,6 +240,7 @@ title: "Same"
       expect(result?.changed).toBe(false);
       expect(result?.html).toContain('<h1 id="id-heading">Heading</h1>');
       expect(result?.composeMarkdown()).toBe(markdown);
+      expect(receivedPrefix).toBe('id');
     });
 
     it('should apply changes when transform returns modified frontmatter', async () => {
@@ -246,13 +255,21 @@ title: "Original"
 
 # Heading`;
 
+      let receivedPrefix: string | undefined;
+
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        ({ originalFrontmatter }) => ({
-          ...originalFrontmatter,
-          category: 'news',
-        })
+        ({ originalFrontmatter, uniqueIdPrefix }) => {
+          receivedPrefix = uniqueIdPrefix;
+          return {
+            frontmatter: {
+              ...originalFrontmatter,
+              category: 'news',
+            },
+            uniqueIdPrefix: 'id',
+          };
+        }
       );
 
       expect(result).not.toBeUndefined();
@@ -267,6 +284,35 @@ category: news
 ---
 
 # Heading`);
+      expect(receivedPrefix).toBe('id');
+    });
+
+    it('should allow transform to override uniqueIdPrefix', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = '# Heading';
+
+      let receivedPrefix: string | undefined;
+
+      const result = await processor.processWithFrontmatterTransform(
+        markdown,
+        'id',
+        ({ originalFrontmatter, uniqueIdPrefix }) => {
+          receivedPrefix = uniqueIdPrefix;
+          return {
+            frontmatter: originalFrontmatter,
+            uniqueIdPrefix: 'custom',
+          };
+        },
+        { useContentStringHeaderId: true }
+      );
+
+      expect(result).not.toBeUndefined();
+      expect(result?.headingTree[0]?.id.startsWith('custom-')).toBe(true);
+      expect(receivedPrefix).toBe('id');
     });
   });
 });

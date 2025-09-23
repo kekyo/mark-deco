@@ -1702,15 +1702,24 @@ title: Post
 # Heading
 `;
 
+      let receivedPrefix: string | undefined;
+
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        ({ originalFrontmatter }) => originalFrontmatter
+        ({ originalFrontmatter, uniqueIdPrefix }) => {
+          receivedPrefix = uniqueIdPrefix;
+          return {
+            frontmatter: originalFrontmatter,
+            uniqueIdPrefix: 'id',
+          };
+        }
       );
 
       expect(result).not.toBeUndefined();
       expect(result?.changed).toBe(false);
       expect(result?.composeMarkdown()).toBe(markdown);
+      expect(receivedPrefix).toBe('id');
     });
 
     it('composes updated markdown when transformer modifies frontmatter', async () => {
@@ -1721,13 +1730,21 @@ title: Post
 # Heading
 `;
 
+      let receivedPrefix: string | undefined;
+
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        ({ originalFrontmatter }) => ({
-          ...originalFrontmatter,
-          category: 'release',
-        })
+        ({ originalFrontmatter, uniqueIdPrefix }) => {
+          receivedPrefix = uniqueIdPrefix;
+          return {
+            frontmatter: {
+              ...originalFrontmatter,
+              category: 'release',
+            },
+            uniqueIdPrefix: 'id',
+          };
+        }
       );
 
       expect(result).not.toBeUndefined();
@@ -1744,6 +1761,31 @@ category: release
 # Heading
 `;
       expect(result?.composeMarkdown()).toBe(expectedMarkdown);
+      expect(receivedPrefix).toBe('id');
+    });
+
+    it('applies uniqueIdPrefix override from transform result', async () => {
+      const markdown = '# Heading\n';
+
+      let receivedPrefix: string | undefined;
+
+      const result = await processor.processWithFrontmatterTransform(
+        markdown,
+        'id',
+        ({ originalFrontmatter, uniqueIdPrefix }) => {
+          receivedPrefix = uniqueIdPrefix;
+          return {
+            frontmatter: originalFrontmatter,
+            uniqueIdPrefix: 'custom',
+          };
+        },
+        { useContentStringHeaderId: true }
+      );
+
+      expect(result).not.toBeUndefined();
+      expect(result?.headingTree[0]?.id.startsWith('custom-')).toBe(true);
+      expect(result?.changed).toBe(false);
+      expect(receivedPrefix).toBe('id');
     });
   });
 });

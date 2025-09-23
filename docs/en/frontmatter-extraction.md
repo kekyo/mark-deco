@@ -38,11 +38,18 @@ Frontmatter data can be utilized for:
 - SEO information extraction
 - Custom rendering logic control
 
-Note: The MarkDeco processor itself doesn't use frontmatter information. Plugins may use this information depending on their implementation. Frontmatter scalars are parsed with the JSON schema, so you receive JSON-compatible types (`null`, `true`/`false`, numbers, strings).
+Note: The MarkDeco processor itself doesn't use frontmatter information.
+Plugins may use this information depending on their implementation.
+Frontmatter scalars are parsed with the JSON schema, so you receive JSON-compatible types (`null`, `true`/`false`, numbers, strings).
 
 ### Updating Frontmatter During Processing
 
-When you need to tweak metadata before rendering, use `processor.processWithFrontmatterTransform`. Pass the transform callback as the third argument; it receives the parsed frontmatter (by reference) and the Markdown body without the frontmatter block. Return the same frontmatter object to mark the metadata as unchanged, a new object with any modifications to continue rendering, or `undefined` to cancel processing altogether.
+When you need to tweak metadata before rendering, use `processor.processWithFrontmatterTransform`.
+Pass the transform callback as the third argument;
+it receives the parsed frontmatter (by reference), the `uniqueIdPrefix` requested by the caller, and the Markdown body without the frontmatter block.
+
+Return `undefined` to cancel processing altogether,
+or a `FrontmatterTransformResult` object containing the frontmatter to continue with and the `uniqueIdPrefix` that should be used for heading IDs and plugin-generated anchors.
 
 ```typescript
 const result = await processor.processWithFrontmatterTransform(
@@ -55,9 +62,12 @@ const result = await processor.processWithFrontmatterTransform(
     }
 
     return {
-      ...originalFrontmatter,
-      status: 'published',
-      updatedAt: new Date().toISOString(),
+      frontmatter: {
+        ...originalFrontmatter,
+        status: 'published',
+        updatedAt: new Date().toISOString(),
+      },
+      uniqueIdPrefix: 'draft',
     };
   }
 );
@@ -74,5 +84,8 @@ if (result.changed) {
 ```
 
 Need to tweak rendering flags as well? Pass regular `ProcessOptions` as the optional fourth argument.
+The transform can also keep the original metadata by returning `{ frontmatter: originalFrontmatter, uniqueIdPrefix: 'id' }` or swap the prefix entirely.
 
-`ProcessResult.changed` reports whether the transform altered the metadata. When changes occurred, `composeMarkdown()` returns a Markdown string whose frontmatter reflects the final state; otherwise it returns the original input untouched, allowing you to skip unnecessary writes.
+`result.changed` reports whether the transform altered the metadata. When changes occurred,
+`composeMarkdown()` returns a Markdown string whose frontmatter reflects the final state;
+otherwise it returns the original input untouched, allowing you to skip unnecessary writes.
