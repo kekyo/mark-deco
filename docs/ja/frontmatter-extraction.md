@@ -42,12 +42,15 @@ Frontmatterデータは以下のような用途で活用できます:
 
 ### 処理中にFrontmatterを更新する
 
-レンダリング前にメタデータを調整したい場合は、`ProcessOptions` の `frontmatterTransform` を利用します。コールバックには解析済みの frontmatter と、frontmatter を取り除いた Markdown 本文が渡されます。変更が不要なときは `undefined` を返し、更新したい場合は新しいオブジェクトを返します。
+レンダリング前にメタデータを調整したい場合は、`processor.processWithFrontmatterTransform` を利用します。変換関数には解析済みの frontmatter（参照渡し）と、frontmatter を取り除いた Markdown 本文が渡されます。同じオブジェクトをそのまま返せば「変更なし」と見なされ、新しいオブジェクトを返せばその内容で処理が続行されます。`undefined` を返した場合は処理全体が中断され、Markdown→HTML 変換は行われません。
 
 ```typescript
-const result = await processor.process(markdown, 'id', {
-  frontmatterTransform: ({ originalFrontmatter }) => {
+const result = await processor.processWithFrontmatterTransform(
+  markdown,
+  'id',
+  ({ originalFrontmatter }) => {
     if (!originalFrontmatter || originalFrontmatter.status !== 'draft') {
+      // 下書きでなければ処理をキャンセル（変換をスキップ）
       return undefined;
     }
 
@@ -56,13 +59,20 @@ const result = await processor.process(markdown, 'id', {
       status: 'published',
       updatedAt: new Date().toISOString(),
     };
-  },
-});
+  }
+);
+
+if (!result) {
+  // undefined が返されたため、HTML は生成されません。
+  return;
+}
 
 if (result.changed) {
   const updatedMarkdown = result.composeMarkdown();
-  // メタデータが変化したときだけ、更新後のMarkdown文字列を保存します
+  // メタデータが変化したときだけ、更新後の Markdown 文字列を保存します。
 }
 ```
 
-`ProcessResult.changed` は `frontmatterTransform` がメタデータを変更したかを示します。変更があった場合は `composeMarkdown()` が反映済みの frontmatter を含む Markdown を返し、変更がない場合は入力された Markdown をそのまま返すため、不要な書き込みを避けられます。
+レンダリング時の各種オプションを併用したい場合は、4番目の引数に従来どおり `ProcessOptions` を渡せます。
+
+`ProcessResult.changed` は変換関数がメタデータを変更したかを示します。変更があった場合は `composeMarkdown()` が反映済みの frontmatter を含む Markdown を返し、変更がない場合は入力された Markdown をそのまま返すため、不要な書き込みを避けられます。

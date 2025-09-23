@@ -190,4 +190,83 @@ This is test content.`;
     expect(result.headingTree).toHaveLength(1);
     expect(result.headingTree[0]?.text).toBe('Test Content');
   });
+
+  describe('processWithFrontmatterTransform', () => {
+    it('should return undefined when transform cancels processing', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = '# Heading\n\nBody';
+
+      const result = await processor.processWithFrontmatterTransform(
+        markdown,
+        'id',
+        () => undefined
+      );
+
+      expect(result).toBeUndefined();
+    });
+
+    it('should treat returning original frontmatter reference as unchanged', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = `---
+title: "Same"
+---
+
+# Heading`;
+
+      const result = await processor.processWithFrontmatterTransform(
+        markdown,
+        'id',
+        ({ originalFrontmatter }) => originalFrontmatter,
+        { useContentStringHeaderId: true }
+      );
+
+      expect(result).not.toBeUndefined();
+      expect(result?.changed).toBe(false);
+      expect(result?.html).toContain('<h1 id="id-heading">Heading</h1>');
+      expect(result?.composeMarkdown()).toBe(markdown);
+    });
+
+    it('should apply changes when transform returns modified frontmatter', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = `---
+title: "Original"
+---
+
+# Heading`;
+
+      const result = await processor.processWithFrontmatterTransform(
+        markdown,
+        'id',
+        ({ originalFrontmatter }) => ({
+          ...originalFrontmatter,
+          category: 'news',
+        })
+      );
+
+      expect(result).not.toBeUndefined();
+      expect(result?.changed).toBe(true);
+      expect(result?.frontmatter).toEqual({
+        title: 'Original',
+        category: 'news',
+      });
+      expect(result?.composeMarkdown()).toBe(`---
+title: Original
+category: news
+---
+
+# Heading`);
+    });
+  });
 });
