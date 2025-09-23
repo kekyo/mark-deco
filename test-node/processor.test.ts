@@ -233,6 +233,7 @@ title: "Same"
             uniqueIdPrefix: 'id',
           };
         },
+        undefined,
         { useContentStringHeaderId: true }
       );
 
@@ -241,6 +242,7 @@ title: "Same"
       expect(result?.html).toContain('<h1 id="id-heading">Heading</h1>');
       expect(result?.composeMarkdown()).toBe(markdown);
       expect(receivedPrefix).toBe('id');
+      expect(result?.uniqueIdPrefix).toBe('id');
     });
 
     it('should apply changes when transform returns modified frontmatter', async () => {
@@ -285,6 +287,7 @@ category: news
 
 # Heading`);
       expect(receivedPrefix).toBe('id');
+      expect(result?.uniqueIdPrefix).toBe('id');
     });
 
     it('should allow transform to override uniqueIdPrefix', async () => {
@@ -307,12 +310,40 @@ category: news
             uniqueIdPrefix: 'custom',
           };
         },
+        undefined,
         { useContentStringHeaderId: true }
       );
 
       expect(result).not.toBeUndefined();
       expect(result?.headingTree[0]?.id.startsWith('custom-')).toBe(true);
       expect(receivedPrefix).toBe('id');
+      expect(result?.uniqueIdPrefix).toBe('custom');
+    });
+
+    it('should allow post transform to annotate frontmatter', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = '# Heading';
+
+      const result = await processor.processWithFrontmatterTransform(
+        markdown,
+        'id',
+        ({ originalFrontmatter, uniqueIdPrefix }) => ({
+          frontmatter: originalFrontmatter,
+          uniqueIdPrefix,
+        }),
+        ({ frontmatter, headingTree }) => ({
+          ...frontmatter,
+          summary: `headings:${headingTree.length}`,
+        })
+      );
+
+      expect(result).not.toBeUndefined();
+      expect(result?.frontmatter).toEqual({ summary: 'headings:1' });
+      expect(result?.changed).toBe(true);
     });
   });
 });

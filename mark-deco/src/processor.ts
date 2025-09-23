@@ -25,8 +25,10 @@ import type {
   ProcessResult,
   FrontmatterData,
   HeadingNode,
-  FrontmatterTransform,
-  FrontmatterTransformContext,
+  FrontmatterPreTransform,
+  FrontmatterPreTransformContext,
+  FrontmatterPostTransform,
+  FrontmatterPostTransformContext,
   ProcessResultWithFrontmatterTransform,
 } from './types.js';
 import type { HTMLBeautifyOptions } from 'js-beautify';
@@ -516,6 +518,7 @@ export const createMarkdownProcessor = (
       changed,
       headingTree,
       composeMarkdown,
+      uniqueIdPrefix,
     };
   };
 
@@ -549,20 +552,21 @@ export const createMarkdownProcessor = (
   const processWithFrontmatterTransform = async (
     markdown: string,
     uniqueIdPrefix: string,
-    frontmatterTransform: FrontmatterTransform,
+    frontmatterPreTransform: FrontmatterPreTransform,
+    frontmatterPostTransform?: FrontmatterPostTransform,
     options: ProcessOptions = {}
   ): Promise<ProcessResultWithFrontmatterTransform | undefined> => {
     try {
       const { data: parsedFrontmatter, content } = parseFrontmatter(markdown);
       const originalSnapshot = snapshotFrontmatter(parsedFrontmatter);
 
-      const context: FrontmatterTransformContext = {
+      const preContext: FrontmatterPreTransformContext = {
         originalFrontmatter: parsedFrontmatter,
         markdownContent: content,
         uniqueIdPrefix,
       };
 
-      const transformed = frontmatterTransform(context);
+      const transformed = frontmatterPreTransform(preContext);
       if (transformed === undefined) {
         return undefined;
       }
@@ -570,20 +574,50 @@ export const createMarkdownProcessor = (
       const { frontmatter, uniqueIdPrefix: overrideUniqueIdPrefix } =
         transformed;
       const nextUniqueIdPrefix = overrideUniqueIdPrefix ?? uniqueIdPrefix;
-      const snapshot =
+      const preSnapshot =
         frontmatter === parsedFrontmatter
           ? originalSnapshot
           : snapshotFrontmatter(frontmatter);
-      const changed = snapshot !== originalSnapshot;
+      const preChanged = preSnapshot !== originalSnapshot;
 
-      return await processCore(
+      const baseResult = await processCore(
         markdown,
         nextUniqueIdPrefix,
         options,
         frontmatter,
         content,
-        changed
+        preChanged
       );
+
+      let finalFrontmatter = baseResult.frontmatter;
+
+      if (frontmatterPostTransform) {
+        const postContext: FrontmatterPostTransformContext = {
+          frontmatter: finalFrontmatter,
+          headingTree: baseResult.headingTree,
+        };
+        const postTransformed = frontmatterPostTransform(postContext);
+        finalFrontmatter = postTransformed;
+      }
+
+      const finalSnapshot = snapshotFrontmatter(finalFrontmatter);
+      const finalChanged = finalSnapshot !== originalSnapshot;
+
+      const composeMarkdown = (): string => {
+        if (!finalChanged) {
+          return markdown;
+        }
+        return composeMarkdownFromParts(finalFrontmatter, content);
+      };
+
+      return {
+        html: baseResult.html,
+        frontmatter: finalFrontmatter,
+        changed: finalChanged,
+        headingTree: baseResult.headingTree,
+        composeMarkdown,
+        uniqueIdPrefix: baseResult.uniqueIdPrefix,
+      };
     } catch (error) {
       return handleProcessingError(error);
     }

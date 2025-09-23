@@ -1720,6 +1720,7 @@ title: Post
       expect(result?.changed).toBe(false);
       expect(result?.composeMarkdown()).toBe(markdown);
       expect(receivedPrefix).toBe('id');
+      expect(result?.uniqueIdPrefix).toBe('id');
     });
 
     it('composes updated markdown when transformer modifies frontmatter', async () => {
@@ -1762,6 +1763,7 @@ category: release
 `;
       expect(result?.composeMarkdown()).toBe(expectedMarkdown);
       expect(receivedPrefix).toBe('id');
+      expect(result?.uniqueIdPrefix).toBe('id');
     });
 
     it('applies uniqueIdPrefix override from transform result', async () => {
@@ -1779,6 +1781,7 @@ category: release
             uniqueIdPrefix: 'custom',
           };
         },
+        undefined,
         { useContentStringHeaderId: true }
       );
 
@@ -1786,6 +1789,34 @@ category: release
       expect(result?.headingTree[0]?.id.startsWith('custom-')).toBe(true);
       expect(result?.changed).toBe(false);
       expect(receivedPrefix).toBe('id');
+      expect(result?.uniqueIdPrefix).toBe('custom');
+    });
+
+    it('applies post transform to refine frontmatter using heading tree', async () => {
+      const markdown = `# Title\n\nSome content`;
+
+      const result = await processor.processWithFrontmatterTransform(
+        markdown,
+        'id',
+        ({ originalFrontmatter, uniqueIdPrefix }) => ({
+          frontmatter: {
+            ...originalFrontmatter,
+            processed: true,
+          },
+          uniqueIdPrefix,
+        }),
+        ({ frontmatter, headingTree }) => ({
+          ...frontmatter,
+          headingCount: headingTree.length,
+        })
+      );
+
+      expect(result).not.toBeUndefined();
+      expect(result?.frontmatter).toEqual({ processed: true, headingCount: 1 });
+      expect(result?.changed).toBe(true);
+      const composed = result?.composeMarkdown() ?? '';
+      expect(composed).toContain('processed: true');
+      expect(composed).toContain('headingCount: 1');
     });
   });
 });

@@ -23,7 +23,7 @@ export interface FrontmatterData {
 /**
  * Context supplied to a frontmatter transform callback
  */
-export interface FrontmatterTransformContext {
+export interface FrontmatterPreTransformContext {
   /** Frontmatter extracted from the original markdown (shared reference) */
   readonly originalFrontmatter: FrontmatterData;
   /** Markdown content body without the frontmatter block */
@@ -45,9 +45,26 @@ export interface FrontmatterTransformResult {
 /**
  * Function signature for frontmatter transformation
  */
-export type FrontmatterTransform = (
-  ctx: FrontmatterTransformContext
+export type FrontmatterPreTransform = (
+  ctx: FrontmatterPreTransformContext
 ) => FrontmatterTransformResult | undefined;
+
+/**
+ * Context supplied to a frontmatter post transform callback
+ */
+export interface FrontmatterPostTransformContext {
+  /** Frontmatter produced after preprocessing */
+  readonly frontmatter: FrontmatterData;
+  /** Heading structure generated during HTML conversion */
+  readonly headingTree: HeadingNode[];
+}
+
+/**
+ * Function signature for frontmatter post transformation
+ */
+export type FrontmatterPostTransform = (
+  ctx: FrontmatterPostTransformContext
+) => FrontmatterData;
 
 /**
  * Heading node (representing a hierarchical structure)
@@ -175,6 +192,8 @@ export interface ProcessResultWithFrontmatterTransform extends ProcessResult {
   readonly changed: boolean;
   /** Compose markdown string using the current frontmatter and content */
   readonly composeMarkdown: () => string;
+  /** Unique ID prefix applied during rendering (after any transform override) */
+  readonly uniqueIdPrefix: string;
 }
 
 /**
@@ -197,14 +216,16 @@ export interface MarkdownProcessor {
    * Process markdown content with frontmatter transformation control
    * @param markdown - Raw markdown content with frontmatter
    * @param uniqueIdPrefix - ID prefix for generating unique IDs within this processing scope
-   * @param frontmatterTransform - Callback that can mutate or replace frontmatter and override the unique ID prefix
+   * @param frontmatterPreTransform - Callback that can mutate or replace frontmatter and override the unique ID prefix before rendering
+   * @param frontmatterPostTransform - Callback that can adjust frontmatter after rendering using generated heading information
    * @param options - Processing options excluding transform
    * @returns Promise resolving to processed result or undefined when transformation cancels processing
    */
   readonly processWithFrontmatterTransform: (
     markdown: string,
     uniqueIdPrefix: string,
-    frontmatterTransform: FrontmatterTransform,
+    frontmatterPreTransform: FrontmatterPreTransform,
+    frontmatterPostTransform?: FrontmatterPostTransform,
     options?: ProcessOptions
   ) => Promise<ProcessResultWithFrontmatterTransform | undefined>;
 }
