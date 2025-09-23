@@ -3,7 +3,7 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import { dump as dumpYaml, load as loadYaml } from 'js-yaml';
+import { dump as dumpYaml, load as loadYaml, JSON_SCHEMA } from 'js-yaml';
 import type { FrontmatterData } from './types.js';
 
 export interface ParsedFrontmatter {
@@ -38,7 +38,7 @@ export function parseFrontmatter(content: string): ParsedFrontmatter {
 
   try {
     // Parse YAML content using js-yaml
-    const parsedData = loadYaml(yamlContent);
+    const parsedData = loadYaml(yamlContent, { schema: JSON_SCHEMA });
 
     // Ensure we return an object (handle null/undefined cases)
     const data: FrontmatterData =

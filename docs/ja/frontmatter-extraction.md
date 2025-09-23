@@ -22,7 +22,7 @@ const result = await processor.process(markdown, 'id');
 // Frontmatterデータにアクセス
 console.log(result.frontmatter.title); // "サンプル記事"
 console.log(result.frontmatter.author); // "山田太郎"
-console.log(result.frontmatter.date); // Date object: 2024-01-15T00:00:00.000Z
+console.log(result.frontmatter.date); // "2024-01-15"
 console.log(result.frontmatter.tags); // ["markdown", "プロセッサ"]
 console.log(result.frontmatter.published); // true
 
@@ -38,7 +38,7 @@ Frontmatterデータは以下のような用途で活用できます:
 - SEO情報の抽出
 - カスタムレンダリングロジックの制御
 
-注意: MarkDecoプロセッサ自身は、Frontmatterの情報を使用しません。後述のプラグインは、プラグインの実装によっては情報を使用する可能性があります。
+注意: MarkDecoプロセッサ自身は、Frontmatterの情報を使用しません。後述のプラグインは、プラグインの実装によっては情報を使用する可能性があります。Frontmatter のスカラー値は JSON スキーマで解析され、`null` / `true` / `false` / 数値 / 文字列といった JSON 互換型で受け取れます。
 
 ### 処理中にFrontmatterを更新する
 
