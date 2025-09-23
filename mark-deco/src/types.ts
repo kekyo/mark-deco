@@ -24,7 +24,7 @@ export interface FrontmatterData {
  * Context supplied to a frontmatter transform callback
  */
 export interface FrontmatterTransformContext {
-  /** Frontmatter extracted from the original markdown */
+  /** Frontmatter extracted from the original markdown (shared reference) */
   readonly originalFrontmatter: FrontmatterData;
   /** Markdown content body without the frontmatter block */
   readonly markdownContent: string;
@@ -141,8 +141,6 @@ export interface ProcessOptions {
   useHierarchicalHeadingId?: boolean;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
-  /** Optional transform that can modify frontmatter before rendering */
-  frontmatterTransform?: FrontmatterTransform;
 }
 
 /**
@@ -153,10 +151,16 @@ export interface ProcessResult {
   readonly html: string;
   /** Extracted frontmatter data */
   readonly frontmatter: FrontmatterData;
-  /** Indicates whether frontmatter was modified by the transform */
-  readonly changed: boolean;
   /** Heading node tree (representing a hierarchical structure) */
   readonly headingTree: HeadingNode[];
+}
+
+/**
+ * Result of markdown processing
+ */
+export interface ProcessResultWithFrontmatterTransform extends ProcessResult {
+  /** Indicates whether frontmatter was modified by the transform */
+  readonly changed: boolean;
   /** Compose markdown string using the current frontmatter and content */
   readonly composeMarkdown: () => string;
 }
@@ -177,6 +181,20 @@ export interface MarkdownProcessor {
     uniqueIdPrefix: string,
     options?: ProcessOptions
   ) => Promise<ProcessResult>;
+  /**
+   * Process markdown content with frontmatter transformation control
+   * @param markdown - Raw markdown content with frontmatter
+   * @param uniqueIdPrefix - ID prefix for generating unique IDs within this processing scope
+   * @param frontmatterTransform - Callback that can mutate or replace frontmatter
+   * @param options - Processing options excluding transform
+   * @returns Promise resolving to processed result or undefined when transformation cancels processing
+   */
+  readonly processWithFrontmatterTransform: (
+    markdown: string,
+    uniqueIdPrefix: string,
+    frontmatterTransform: FrontmatterTransform,
+    options?: ProcessOptions
+  ) => Promise<ProcessResultWithFrontmatterTransform | undefined>;
 }
 
 /**

@@ -25,7 +25,9 @@ import type {
   ProcessResult,
   FrontmatterData,
   HeadingNode,
+  FrontmatterTransform,
   FrontmatterTransformContext,
+  ProcessResultWithFrontmatterTransform,
 } from './types.js';
 import type { HTMLBeautifyOptions } from 'js-beautify';
 
@@ -48,29 +50,6 @@ export const defaultHtmlOptions: HTMLBeautifyOptions = {
   content_unformatted: ['pre', 'code', 'textarea'],
   extra_liners: [],
 } as const;
-
-const cloneFrontmatterData = (source: FrontmatterData): FrontmatterData => {
-  const cloneValue = (value: unknown): unknown => {
-    if (value instanceof Date) {
-      return new Date(value.getTime());
-    }
-    if (Array.isArray(value)) {
-      return value.map(cloneValue);
-    }
-    if (value && typeof value === 'object') {
-      const result: Record<string, unknown> = {};
-      for (const [key, inner] of Object.entries(
-        value as Record<string, unknown>
-      )) {
-        result[key] = cloneValue(inner);
-      }
-      return result;
-    }
-    return value;
-  };
-
-  return cloneValue(source ?? {}) as FrontmatterData;
-};
 
 const normalizeFrontmatterValue = (value: unknown): unknown => {
   if (value instanceof Date) {
@@ -434,21 +413,34 @@ export const createMarkdownProcessor = (
     };
   };
 
-  /**
-   * Process markdown content with frontmatter
-   */
-  const process = async (
+  const handleProcessingError = (error: unknown): never => {
+    logger.error(
+      `Failed to process markdown: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    );
+    throw new Error(
+      `Failed to process markdown: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    );
+  };
+
+  const processCore = async (
     markdown: string,
     uniqueIdPrefix: string,
-    {
+    options: ProcessOptions | undefined,
+    frontmatter: FrontmatterData,
+    content: string,
+    changed: boolean
+  ): Promise<ProcessResultWithFrontmatterTransform> => {
+    const {
       signal,
       useContentStringHeaderId = false,
       useHierarchicalHeadingId = true,
       advancedOptions,
-      frontmatterTransform,
-    }: ProcessOptions = {}
-  ): Promise<ProcessResult> => {
-    // Extract extended options with defaults
+    } = options ?? {};
+
     const {
       allowDangerousHtml = true,
       htmlOptions = defaultHtmlOptions,
@@ -456,120 +448,145 @@ export const createMarkdownProcessor = (
       remarkPlugins = [],
       rehypePlugins = [],
     } = advancedOptions || {};
-    try {
-      const originalMarkdown = markdown;
 
-      // Parse frontmatter
-      const { data: parsedFrontmatter, content } = parseFrontmatter(markdown);
-      let frontmatter = parsedFrontmatter;
+    const headingTree: HeadingNode[] = [];
 
-      const originalSnapshot = snapshotFrontmatter(parsedFrontmatter);
-      let changed = false;
+    let idCounter = 0;
+    const getUniqueId = (): string => {
+      const id = `${uniqueIdPrefix}-${++idCounter}`;
+      return id;
+    };
 
-      if (frontmatterTransform) {
-        const context: FrontmatterTransformContext = {
-          originalFrontmatter: cloneFrontmatterData(parsedFrontmatter),
-          markdownContent: content,
-        };
-        const transformed = frontmatterTransform(context);
-        if (transformed !== undefined) {
-          frontmatter = transformed;
-          changed = snapshotFrontmatter(transformed) !== originalSnapshot;
+    let processor0 = unified().use(remarkParse);
+
+    if (remarkPlugins) {
+      for (const plugin of remarkPlugins) {
+        if (Array.isArray(plugin)) {
+          processor0 = processor0.use(plugin[0], plugin[1]);
+        } else {
+          processor0 = processor0.use(plugin as any);
         }
       }
+    }
 
-      // Array to collect heading tree
-      const headingTree: HeadingNode[] = [];
-
-      // Create unique ID generators for this processing session
-      let idCounter = 0;
-
-      const getUniqueId = (): string => {
-        const id = `${uniqueIdPrefix}-${++idCounter}`;
-        return id;
-      };
-
-      // Create unified processor with plugins
-      let processor0 = unified().use(remarkParse);
-
-      // Add custom remark plugins first
-      if (remarkPlugins) {
-        for (const plugin of remarkPlugins) {
-          if (Array.isArray(plugin)) {
-            // Plugin with options: [plugin, options]
-            processor0 = processor0.use(plugin[0], plugin[1]);
-          } else {
-            // Plugin without options
-            processor0 = processor0.use(plugin as any);
-          }
-        }
-      }
-
-      let processor = processor0
-        .use(remarkGfm, gfmOptions) // Add remark-gfm with options, provide empty object if undefined
-        .use(remarkAttr) // Add remark-attr for CSS attribute support (before heading tree and custom plugins)
-        .use(
-          createHeadingTreePlugin(
-            headingTree,
-            useContentStringHeaderId
-              ? (text) =>
-                  generateHeadingIdInternal(uniqueIdPrefix, text, getUniqueId)
-              : getUniqueId,
-            useHierarchicalHeadingId,
-            useContentStringHeaderId,
-            uniqueIdPrefix
-          )
+    let processor = processor0
+      .use(remarkGfm, gfmOptions)
+      .use(remarkAttr)
+      .use(
+        createHeadingTreePlugin(
+          headingTree,
+          useContentStringHeaderId
+            ? (text) =>
+                generateHeadingIdInternal(uniqueIdPrefix, text, getUniqueId)
+            : getUniqueId,
+          useHierarchicalHeadingId,
+          useContentStringHeaderId,
+          uniqueIdPrefix
         )
-        .use(createCustomBlockPlugin(frontmatter, signal, getUniqueId))
-        .use(remarkRehype, { allowDangerousHtml })
-        .use(rehypeResponsiveImages) // Add responsive images plugin
-        .use(rehypeStringify, { allowDangerousHtml });
+      )
+      .use(createCustomBlockPlugin(frontmatter, signal, getUniqueId))
+      .use(remarkRehype, { allowDangerousHtml })
+      .use(rehypeResponsiveImages)
+      .use(rehypeStringify, { allowDangerousHtml });
 
-      // Add custom rehype plugins last
-      if (rehypePlugins) {
-        for (const plugin of rehypePlugins) {
-          if (Array.isArray(plugin)) {
-            // Plugin with options: [plugin, options]
-            processor = processor.use(plugin[0], plugin[1]);
-          } else {
-            // Plugin without options
-            processor = processor.use(plugin as any);
-          }
+    if (rehypePlugins) {
+      for (const plugin of rehypePlugins) {
+        if (Array.isArray(plugin)) {
+          processor = processor.use(plugin[0], plugin[1]);
+        } else {
+          processor = processor.use(plugin as any);
         }
       }
+    }
 
-      // Process markdown to HTML
-      const result = await processor.process(content);
-      const rehypedHtml = String(result);
+    const result = await processor.process(content);
+    const rehypedHtml = String(result);
+    const formattedHtml = beautifyHtml(rehypedHtml, htmlOptions);
 
-      // Format HTML with js-beautify, using provided options or defaults from advancedOptions
-      const formattedHtml = beautifyHtml(rehypedHtml, htmlOptions);
+    const composeMarkdown = (): string => {
+      if (!changed) {
+        return markdown;
+      }
+      return composeMarkdownFromParts(frontmatter, content);
+    };
 
-      const composeMarkdown = (): string => {
-        if (!changed) {
-          return originalMarkdown;
-        }
-        return composeMarkdownFromParts(frontmatter, content);
-      };
+    return {
+      html: formattedHtml,
+      frontmatter,
+      changed,
+      headingTree,
+      composeMarkdown,
+    };
+  };
 
-      return {
-        html: formattedHtml,
-        frontmatter,
-        changed,
-        headingTree,
-        composeMarkdown,
-      };
+  /**
+   * Process markdown content without frontmatter transform
+   */
+  const process = async (
+    markdown: string,
+    uniqueIdPrefix: string,
+    options: ProcessOptions = {}
+  ): Promise<ProcessResult> => {
+    try {
+      const { data: parsedFrontmatter, content } = parseFrontmatter(markdown);
+
+      return await processCore(
+        markdown,
+        uniqueIdPrefix,
+        options,
+        parsedFrontmatter,
+        content,
+        false
+      );
     } catch (error) {
-      logger.error(
-        `Failed to process markdown: ${error instanceof Error ? error.message : 'Unknown error'}`
+      return handleProcessingError(error);
+    }
+  };
+
+  /**
+   * Process markdown content with frontmatter transform
+   */
+  const processWithFrontmatterTransform = async (
+    markdown: string,
+    uniqueIdPrefix: string,
+    frontmatterTransform: FrontmatterTransform,
+    options: ProcessOptions = {}
+  ): Promise<ProcessResultWithFrontmatterTransform | undefined> => {
+    try {
+      const { data: parsedFrontmatter, content } = parseFrontmatter(markdown);
+      const originalSnapshot = snapshotFrontmatter(parsedFrontmatter);
+
+      const context: FrontmatterTransformContext = {
+        originalFrontmatter: parsedFrontmatter,
+        markdownContent: content,
+      };
+
+      const transformed = frontmatterTransform(context);
+      if (transformed === undefined) {
+        return undefined;
+      }
+
+      const frontmatter = transformed;
+      const changed =
+        (transformed === parsedFrontmatter
+          ? snapshotFrontmatter(parsedFrontmatter)
+          : snapshotFrontmatter(transformed)) !== originalSnapshot;
+
+      return await processCore(
+        markdown,
+        uniqueIdPrefix,
+        options,
+        frontmatter,
+        content,
+        changed
       );
-      throw new Error(
-        `Failed to process markdown: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+    } catch (error) {
+      return handleProcessingError(error);
     }
   };
 
   return {
     process,
+    processWithFrontmatterTransform,
   };
 };

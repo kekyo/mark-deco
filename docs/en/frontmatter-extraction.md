@@ -42,12 +42,15 @@ Note: The MarkDeco processor itself doesn't use frontmatter information. Plugins
 
 ### Updating Frontmatter During Processing
 
-If you need to edit metadata before rendering, provide `frontmatterTransform` through `ProcessOptions`. The callback receives the parsed frontmatter and Markdown body (without the frontmatter block). Return a new object to apply changes or `undefined` to leave the metadata untouched.
+When you need to tweak metadata before rendering, use `processor.processWithFrontmatterTransform`. Pass the transform callback as the third argument; it receives the parsed frontmatter (by reference) and the Markdown body without the frontmatter block. Return the same frontmatter object to mark the metadata as unchanged, a new object with any modifications to continue rendering, or `undefined` to cancel processing altogether.
 
 ```typescript
-const result = await processor.process(markdown, 'id', {
-  frontmatterTransform: ({ originalFrontmatter }) => {
+const result = await processor.processWithFrontmatterTransform(
+  markdown,
+  'id',
+  ({ originalFrontmatter }) => {
     if (!originalFrontmatter || originalFrontmatter.status !== 'draft') {
+      // Cancel processing (skip Markdown -> HTML) when not a draft.
       return undefined;
     }
 
@@ -56,13 +59,20 @@ const result = await processor.process(markdown, 'id', {
       status: 'published',
       updatedAt: new Date().toISOString(),
     };
-  },
-});
+  }
+);
+
+if (!result) {
+  // The transform returned undefined, so no HTML was generated.
+  return;
+}
 
 if (result.changed) {
   const updatedMarkdown = result.composeMarkdown();
-  // Persist the updated markdown string when metadata changed
+  // Persist the updated markdown string when metadata changed.
 }
 ```
 
-`ProcessResult.changed` reports whether `frontmatterTransform` altered the metadata. When changes occurred, `composeMarkdown()` returns a Markdown string whose frontmatter reflects the final state; otherwise it returns the original input untouched, allowing you to skip unnecessary writes.
+Need to tweak rendering flags as well? Pass regular `ProcessOptions` as the optional fourth argument.
+
+`ProcessResult.changed` reports whether the transform altered the metadata. When changes occurred, `composeMarkdown()` returns a Markdown string whose frontmatter reflects the final state; otherwise it returns the original input untouched, allowing you to skip unnecessary writes.
