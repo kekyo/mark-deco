@@ -27,7 +27,7 @@ export default defineConfig({
       name: 'mark-deco',
       formats: ['es', 'cjs'],
       fileName: (format, entryName) =>
-        `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
+        `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`,
     },
     rollupOptions: {
       external: [
