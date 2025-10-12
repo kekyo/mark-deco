@@ -10,7 +10,7 @@ Flexible Markdown to HTML conversion library.
 |`mark-deco`|[![npm version](https://img.shields.io/npm/v/mark-deco.svg)](https://www.npmjs.com/package/mark-deco)|
 |`mark-deco-cli`|[![npm version](https://img.shields.io/npm/v/mark-deco-cli.svg)](https://www.npmjs.com/package/mark-deco-cli)|
 
-[(日本語はこちら)](./README_ja.md)
+[(Japanese is here/日本語はこちら)](./README_ja.md)
 
 ## What is this?
 
