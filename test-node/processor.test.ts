@@ -43,6 +43,7 @@ More content here.`;
 
     const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
+      applyTitleFromH1: false,
     });
 
     expect(result.frontmatter).toEqual({
@@ -73,6 +74,7 @@ Just some content.`;
 
     const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
+      applyTitleFromH1: false,
     });
 
     expect(result.frontmatter).toEqual({});
@@ -89,7 +91,9 @@ Just some content.`;
 
     const markdown = '';
 
-    const result = await processor.process(markdown, 'id');
+    const result = await processor.process(markdown, 'id', {
+      applyTitleFromH1: false,
+    });
 
     expect(result.frontmatter).toEqual({});
     expect(result.headingTree).toEqual([]);
@@ -107,7 +111,9 @@ title: "Only Frontmatter"
 tags: ["test"]
 ---`;
 
-    const result = await processor.process(markdown, 'id');
+    const result = await processor.process(markdown, 'id', {
+      applyTitleFromH1: false,
+    });
 
     expect(result.frontmatter).toEqual({
       title: 'Only Frontmatter',
@@ -137,6 +143,7 @@ Content 3`;
 
     const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
+      applyTitleFromH1: false,
     });
 
     expect(result.headingTree).toHaveLength(3);
@@ -173,7 +180,9 @@ number: 42
 
 This is test content.`;
 
-    const result = await processor.process(markdown, 'id');
+    const result = await processor.process(markdown, 'id', {
+      applyTitleFromH1: false,
+    });
 
     expect(result.frontmatter).toEqual({
       title: 'Complex Test',
@@ -191,6 +200,67 @@ This is test content.`;
     expect(result.headingTree[0]?.text).toBe('Test Content');
   });
 
+  describe('applyTitleFromH1 behaviour', () => {
+    it('applies leading H1 to frontmatter and removes heading', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = `# Node Title
+
+Body content.`;
+
+      const result = await processor.process(markdown, 'id');
+
+      expect(result.frontmatter).toEqual({ title: 'Node Title' });
+      expect(result.html).not.toContain('<h1');
+      expect(result.headingTree).toHaveLength(0);
+    });
+
+    it('keeps existing frontmatter title while removing heading', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = `---
+title: Existing Node Title
+---
+
+# Display Title
+
+Rest of content.`;
+
+      const result = await processor.process(markdown, 'id');
+
+      expect(result.frontmatter).toEqual({ title: 'Existing Node Title' });
+      expect(result.html).not.toContain('<h1');
+    });
+
+    it('supports disabling the behaviour via options', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = `# Keep Heading
+
+More text.`;
+
+      const result = await processor.process(markdown, 'id', {
+        applyTitleFromH1: false,
+        useContentStringHeaderId: true,
+      });
+
+      expect(result.frontmatter).toEqual({});
+      expect(result.html).toContain(
+        '<h1 id="id-keep-heading">Keep Heading</h1>'
+      );
+      expect(result.headingTree).toHaveLength(1);
+    });
+  });
+
   describe('processWithFrontmatterTransform', () => {
     it('should return undefined when transform cancels processing', async () => {
       const processor = createMarkdownProcessor({
@@ -203,7 +273,9 @@ This is test content.`;
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        () => undefined
+        () => undefined,
+        undefined,
+        { applyTitleFromH1: false }
       );
 
       expect(result).toBeUndefined();
@@ -234,7 +306,7 @@ title: "Same"
           };
         },
         undefined,
-        { useContentStringHeaderId: true }
+        { useContentStringHeaderId: true, applyTitleFromH1: false }
       );
 
       expect(result).not.toBeUndefined();
@@ -271,7 +343,9 @@ title: "Original"
             },
             uniqueIdPrefix: 'id',
           };
-        }
+        },
+        undefined,
+        { applyTitleFromH1: false }
       );
 
       expect(result).not.toBeUndefined();
@@ -311,7 +385,7 @@ category: news
           };
         },
         undefined,
-        { useContentStringHeaderId: true }
+        { useContentStringHeaderId: true, applyTitleFromH1: false }
       );
 
       expect(result).not.toBeUndefined();
@@ -338,7 +412,8 @@ category: news
         ({ frontmatter, headingTree }) => ({
           ...frontmatter,
           summary: `headings:${headingTree.length}`,
-        })
+        }),
+        { applyTitleFromH1: false }
       );
 
       expect(result).not.toBeUndefined();

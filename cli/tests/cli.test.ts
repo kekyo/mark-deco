@@ -45,17 +45,22 @@ const spawnAsync = (
 };
 
 const CLI_PATH = resolve(__dirname, '../dist/cli.cjs');
+const NO_TITLE_FLAG = '--no-apply-title-from-h1';
 
 describe('mark-deco-cli', () => {
   it('should display help information', async () => {
-    const { stdout } = await spawnAsync('node', [CLI_PATH, '--help']);
+    const { stdout } = await spawnAsync('node', [
+      CLI_PATH,
+      NO_TITLE_FLAG,
+      '--help',
+    ]);
     expect(stdout).toContain('mark-deco-cli');
   });
 
   it('should process markdown from stdin', async () => {
     const { stdout } = await spawnAsync(
       'node',
-      [CLI_PATH],
+      [CLI_PATH, NO_TITLE_FLAG],
       '# Hello World\n\nThis is a test.'
     );
     expect(stdout).toContain('<h1 id="section-1">Hello World</h1>');
@@ -74,7 +79,12 @@ More content here.`;
 
     try {
       await writeFile(testFile, testContent);
-      const { stdout } = await spawnAsync('node', [CLI_PATH, '-i', testFile]);
+      const { stdout } = await spawnAsync('node', [
+        CLI_PATH,
+        NO_TITLE_FLAG,
+        '-i',
+        testFile,
+      ]);
 
       expect(stdout).toContain('<h1 id="section-1">Test File</h1>');
       expect(stdout).toContain('<h2 id="section-1-1">Section 2</h2>');
@@ -100,7 +110,7 @@ Some content here.`;
 
     const { stdout } = await spawnAsync(
       'node',
-      [CLI_PATH],
+      [CLI_PATH, NO_TITLE_FLAG],
       markdownWithFrontmatter
     );
 
@@ -108,10 +118,41 @@ Some content here.`;
     // Note: frontmatter is no longer output to stderr by default
   });
 
+  it('should apply title from leading H1 by default', async () => {
+    const frontmatterFile = resolve(__dirname, 'auto-title-frontmatter.json');
+    const markdown = `# Auto Title
+
+Body text.`;
+
+    try {
+      const { stdout, code } = await spawnAsync(
+        'node',
+        [CLI_PATH, '--frontmatter-output', frontmatterFile],
+        markdown
+      );
+
+      expect(code).toBe(0);
+
+      const frontmatterContent = await readFile(frontmatterFile, 'utf-8');
+      const frontmatter = JSON.parse(frontmatterContent);
+      expect(frontmatter.title).toBe('Auto Title');
+
+      // Default behaviour removes the leading H1 from HTML output
+      expect(stdout).not.toContain('<h1');
+      expect(stdout).toContain('<p>Body text.</p>');
+    } finally {
+      try {
+        await unlink(frontmatterFile);
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
+  });
+
   it('should handle custom unique-id-prefix', async () => {
     const { stdout } = await spawnAsync(
       'node',
-      [CLI_PATH, '--unique-id-prefix', 'custom'],
+      [CLI_PATH, NO_TITLE_FLAG, '--unique-id-prefix', 'custom'],
       '# Test Heading'
     );
     expect(stdout).toContain('<h1 id="custom-1">Test Heading</h1>');
@@ -123,7 +164,7 @@ Some content here.`;
     try {
       await spawnAsync(
         'node',
-        [CLI_PATH, '-o', outputFile],
+        [CLI_PATH, NO_TITLE_FLAG, '-o', outputFile],
         '# Output Test\n\nThis should be written to a file.'
       );
 
@@ -152,7 +193,11 @@ Some content here.`;
   });
 
   it('should handle invalid command line options', async () => {
-    const { code } = await spawnAsync('node', [CLI_PATH, '--invalid-option']);
+    const { code } = await spawnAsync('node', [
+      CLI_PATH,
+      NO_TITLE_FLAG,
+      '--invalid-option',
+    ]);
     expect(code).toBe(1);
   });
 
@@ -170,7 +215,7 @@ Some content here.`;
     try {
       await spawnAsync(
         'node',
-        [CLI_PATH, '--frontmatter-output', frontmatterFile],
+        [CLI_PATH, NO_TITLE_FLAG, '--frontmatter-output', frontmatterFile],
         markdownWithFrontmatter
       );
 
@@ -202,7 +247,7 @@ More content.`;
     try {
       await spawnAsync(
         'node',
-        [CLI_PATH, '--heading-tree-output', headingTreeFile],
+        [CLI_PATH, NO_TITLE_FLAG, '--heading-tree-output', headingTreeFile],
         markdownWithHeadings
       );
 
@@ -225,7 +270,7 @@ More content.`;
   it('should process markdown with no plugins successfully', async () => {
     const { stdout, code } = await spawnAsync(
       'node',
-      [CLI_PATH, '--no-plugins'],
+      [CLI_PATH, NO_TITLE_FLAG, '--no-plugins'],
       '# Hello World\n\nThis is a test.'
     );
     expect(code).toBe(0);
@@ -236,7 +281,7 @@ More content.`;
   it('should process markdown with empty plugin list successfully', async () => {
     const { stdout, code } = await spawnAsync(
       'node',
-      [CLI_PATH, '-p'],
+      [CLI_PATH, NO_TITLE_FLAG, '-p'],
       '# Hello World\n\nThis is a test.'
     );
     expect(code).toBe(0);
@@ -263,7 +308,13 @@ This is a test.`;
 
     const { stdout, code } = await spawnAsync(
       'node',
-      [CLI_PATH, '--frontmatter-output', frontmatterPath, '--no-plugins'],
+      [
+        CLI_PATH,
+        NO_TITLE_FLAG,
+        '--frontmatter-output',
+        frontmatterPath,
+        '--no-plugins',
+      ],
       markdown
     );
 
@@ -300,7 +351,13 @@ This is a test.`;
 
     const { stdout, code } = await spawnAsync(
       'node',
-      [CLI_PATH, '--heading-tree-output', headingTreePath, '--no-plugins'],
+      [
+        CLI_PATH,
+        NO_TITLE_FLAG,
+        '--heading-tree-output',
+        headingTreePath,
+        '--no-plugins',
+      ],
       markdown
     );
 
@@ -341,6 +398,7 @@ title: Combined Test
       'node',
       [
         CLI_PATH,
+        NO_TITLE_FLAG,
         '--frontmatter-output',
         frontmatterPath,
         '--heading-tree-output',

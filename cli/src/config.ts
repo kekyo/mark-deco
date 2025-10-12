@@ -12,6 +12,7 @@ export interface Config {
   uniqueIdPrefix?: string;
   hierarchicalHeadingId?: boolean;
   contentBasedHeadingId?: boolean;
+  applyTitleFromH1?: boolean;
   // Plugin-specific configurations
   oembed?: {
     enabled?: boolean;
@@ -63,6 +64,7 @@ export function getDefaultConfig(): Config {
     uniqueIdPrefix: 'section',
     hierarchicalHeadingId: true,
     contentBasedHeadingId: false,
+    applyTitleFromH1: true,
     oembed: {
       enabled: true,
     },

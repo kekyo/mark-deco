@@ -375,6 +375,7 @@ https://unsupported-provider.mock/some-content
       const result = await processor.process(sampleMarkdown, 'id', {
         useContentStringHeaderId: true,
         useHierarchicalHeadingId: false,
+        applyTitleFromH1: false,
       });
 
       // Verify that frontmatter is parsed correctly

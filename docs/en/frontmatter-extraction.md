@@ -42,6 +42,17 @@ Note: The MarkDeco processor itself doesn't use frontmatter information.
 Plugins may use this information depending on their implementation.
 Frontmatter scalars are parsed with the JSON schema, so you receive JSON-compatible types (`null`, `true`/`false`, numbers, strings).
 
+### Automatic Title Extraction from Leading H1
+
+When the first non-whitespace block in the Markdown body is an H1 heading,
+MarkDeco applies that heading to `frontmatter.title` by default and removes the heading from the content.
+
+If a title already exists in the frontmatter, the heading is still removed but the existing title remains untouched.
+Disable this behaviour by passing `process(markdown, prefix, { applyTitleFromH1: false })`.
+
+For `processWithFrontmatterTransform`, the pre-transform callback runs before this extraction,
+so it will not observe the injected title—this is intentional.
+
 ### Updating Frontmatter During Processing
 
 When you need to tweak metadata before rendering, use `processor.processWithFrontmatterTransform`.
