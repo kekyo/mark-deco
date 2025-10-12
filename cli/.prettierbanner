@@ -2,6 +2,3 @@
 // Copyright (c) Kouji Matsui. (@kekyo@mi.kekyo.net)
 // Under MIT.
 // https://github.com/kekyo/mark-deco
-
-// Build-time injected version constant
-declare const __VERSION__: string;

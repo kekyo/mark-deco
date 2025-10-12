@@ -1,3 +1,8 @@
+// mark-deco - Flexible Markdown to HTML conversion library
+// Copyright (c) Kouji Matsui. (@kekyo@mi.kekyo.net)
+// Under MIT.
+// https://github.com/kekyo/mark-deco
+
 import { Command, Option } from 'commander';
 import { loadConfig } from './config.js';
 import { readInput, writeOutput, writeJsonOutput } from './io.js';
@@ -15,6 +20,7 @@ interface CLIOptions {
   uniqueIdPrefix?: string;
   hierarchicalHeadingId?: boolean;
   contentBasedHeadingId?: boolean;
+  applyTitleFromH1?: boolean;
   frontmatterOutput?: string;
   headingTreeOutput?: string;
 }
@@ -64,6 +70,12 @@ async function main() {
     )
     .addOption(
       new Option(
+        '--no-apply-title-from-h1',
+        'Disable applying the first H1 to frontmatter.title'
+      )
+    )
+    .addOption(
+      new Option(
         '--frontmatter-output <file>',
         'Output frontmatter as JSON to specified file'
       )
@@ -90,12 +102,16 @@ async function main() {
         const processor = setupProcessor(mergedOptions);
 
         // Process markdown
+        const applyTitleFromH1 =
+          options.applyTitleFromH1 ?? config.applyTitleFromH1 ?? true;
+
         const result = await processor.process(
           markdown,
           options.uniqueIdPrefix || 'section',
           {
             useHierarchicalHeadingId: options.hierarchicalHeadingId ?? true,
             useContentStringHeaderId: options.contentBasedHeadingId ?? false,
+            applyTitleFromH1,
           }
         );
 

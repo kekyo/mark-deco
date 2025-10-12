@@ -1,3 +1,8 @@
+// mark-deco - Flexible Markdown to HTML conversion library
+// Copyright (c) Kouji Matsui. (@kekyo@mi.kekyo.net)
+// Under MIT.
+// https://github.com/kekyo/mark-deco
+
 import * as cheerio from 'cheerio';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { extractEnhancedData } from '../src/plugins/card/utils.js';

@@ -42,6 +42,16 @@ Frontmatterデータは以下のような用途で活用できます:
 後述のプラグインは、プラグインの実装によっては情報を使用する可能性があります。
 Frontmatter のスカラー値は JSON スキーマで解析され、`null` / `true` / `false` / 数値 / 文字列といった JSON 互換型で受け取れます。
 
+### 先頭H1からのtitle自動抽出
+
+Markdown本文で最初の（ホワイトスペースを除いた）ブロックがH1見出しの場合、
+MarkDecoはデフォルトでその見出し文字列を `frontmatter.title` に書き込み、元のH1を本文から取り除きます。
+
+既にfrontmatterに `title` が存在する場合はH1のみ除去され、titleは変更されません。
+この機能を無効化するには `processor.process(markdown, prefix, { applyTitleFromH1: false })` を指定してください。
+
+`processWithFrontmatterTransform` の pre 変換は抽出前に実行されるため、この自動タイトルを参照できない点には留意してください。
+
 ### 処理中にFrontmatterを更新する
 
 レンダリング前にメタデータを調整したい場合は、`processor.processWithFrontmatterTransform` を利用します。

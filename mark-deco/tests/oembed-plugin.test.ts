@@ -1,3 +1,8 @@
+// mark-deco - Flexible Markdown to HTML conversion library
+// Copyright (c) Kouji Matsui. (@kekyo@mi.kekyo.net)
+// Under MIT.
+// https://github.com/kekyo/mark-deco
+
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createCachedFetcher } from '../src/fetcher.js';
 import { getNoOpLogger } from '../src/logger.js';
@@ -175,6 +180,7 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
       const result = await processor.process(markdown, 'id', {
         useContentStringHeaderId: true,
         useHierarchicalHeadingId: false,
+        applyTitleFromH1: false,
       });
 
       expect(result.html).toContain('<h1 id="id-test">Test</h1>');

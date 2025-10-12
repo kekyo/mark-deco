@@ -1,7 +1,12 @@
+// mark-deco - Flexible Markdown to HTML conversion library
+// Copyright (c) Kouji Matsui. (@kekyo@mi.kekyo.net)
+// Under MIT.
+// https://github.com/kekyo/mark-deco
+
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createCachedFetcher } from '../src/fetcher.js';
 import { createMarkdownProcessor } from '../src/processor.js';
-import type { MarkdownProcessor } from '../src/types.js';
+import type { MarkdownProcessor, ProcessOptions } from '../src/types.js';
 
 describe('remark-attr integration', () => {
   let processor: MarkdownProcessor;
@@ -16,10 +21,21 @@ describe('remark-attr integration', () => {
     });
   });
 
+  const runProcess = async (
+    markdown: string,
+    prefix = 'test',
+    options: ProcessOptions = {}
+  ) => {
+    return processor.process(markdown, prefix, {
+      applyTitleFromH1: false,
+      ...options,
+    });
+  };
+
   describe('basic attribute application', () => {
     it('should apply class attribute to heading', async () => {
       const markdown = '# Hello World {.my-class}';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="my-class"');
       expect(result.html).toContain('<h1');
@@ -27,7 +43,7 @@ describe('remark-attr integration', () => {
 
     it('should apply id attribute to heading', async () => {
       const markdown = '# Hello World {#custom-id}';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('id="custom-id"');
       expect(result.html).toContain('<h1');
@@ -35,7 +51,7 @@ describe('remark-attr integration', () => {
 
     it('should apply multiple attributes to heading', async () => {
       const markdown = '# Hello World {#custom-id .my-class data-value="test"}';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('id="custom-id"');
       expect(result.html).toContain('class="my-class"');
@@ -44,7 +60,7 @@ describe('remark-attr integration', () => {
 
     it('should apply attributes to paragraph', async () => {
       const markdown = 'This is a paragraph. {.highlight}';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="highlight"');
       expect(result.html).toContain('<p');
@@ -52,7 +68,7 @@ describe('remark-attr integration', () => {
 
     it('should apply attributes to image', async () => {
       const markdown = '![Alt text](image.jpg){.responsive}';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="responsive"');
       expect(result.html).toContain('<img');
@@ -61,7 +77,7 @@ describe('remark-attr integration', () => {
     it('should apply attributes to links', async () => {
       const markdown =
         '[Link text](https://example.com){.external target="_blank"}';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="external"');
       expect(result.html).toContain('target="_blank"');
@@ -73,7 +89,7 @@ describe('remark-attr integration', () => {
     it('should apply attributes to code blocks', async () => {
       const markdown =
         '```javascript {.highlight-code}\nconsole.log("Hello");\n```';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="highlight-code"');
       expect(result.html).toContain('language-javascript');
@@ -83,7 +99,7 @@ describe('remark-attr integration', () => {
     it('should apply id and class to code blocks', async () => {
       const markdown =
         '```python {#code-example .my-code}\nprint("Hello")\n```';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('id="code-example"');
       expect(result.html).toContain('class="my-code"');
@@ -93,7 +109,7 @@ describe('remark-attr integration', () => {
     it('should apply data attributes to code blocks', async () => {
       const markdown =
         '```yaml {data-config="true" data-env="prod"}\nkey: value\n```';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('data-config="true"');
       expect(result.html).toContain('data-env="prod"');
@@ -103,7 +119,7 @@ describe('remark-attr integration', () => {
   describe('inline element attributes', () => {
     it('should apply attributes to inline code', async () => {
       const markdown = 'Here is `some code`{.highlight} in a paragraph.';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="highlight"');
       expect(result.html).toContain('<code');
@@ -113,7 +129,7 @@ describe('remark-attr integration', () => {
     it('should apply multiple attributes to inline code', async () => {
       const markdown =
         'Check this `command`{.warning #cmd data-lang="bash"} out.';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="warning"');
       expect(result.html).toContain('id="cmd"');
@@ -125,7 +141,7 @@ describe('remark-attr integration', () => {
   describe('block element attributes', () => {
     it('should apply attributes to blockquotes', async () => {
       const markdown = '> This is a quote {.quote-style}';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="quote-style"');
       expect(result.html).toContain('<blockquote');
@@ -134,7 +150,7 @@ describe('remark-attr integration', () => {
     it('should apply attributes to blockquotes on separate lines', async () => {
       const markdown =
         '> This is a quote\n> Multi-line quote\n\n{.fancy-quote #testimonial}';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="fancy-quote"');
       expect(result.html).toContain('id="testimonial"');
@@ -143,7 +159,7 @@ describe('remark-attr integration', () => {
 
     it('should apply attributes to lists', async () => {
       const markdown = '- Item 1\n- Item 2\n{.custom-list}';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="custom-list"');
       expect(result.html).toContain('<ul');
@@ -151,7 +167,7 @@ describe('remark-attr integration', () => {
 
     it('should apply attributes to list items', async () => {
       const markdown = '- Item 1 {.item-class}\n- Item 2';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('class="item-class"');
       expect(result.html).toContain('<li');
@@ -178,7 +194,9 @@ describe('remark-attr integration', () => {
 
       const markdown =
         '```test-plugin {.custom-styling #plugin-block}\ntest content\n```';
-      const result = await pluginProcessor.process(markdown, 'test');
+      const result = await pluginProcessor.process(markdown, 'test', {
+        applyTitleFromH1: false,
+      });
 
       // Note: When plugins process code blocks, they replace the original code block
       // so remark-attr attributes are not preserved in the plugin output.
@@ -207,7 +225,7 @@ describe('remark-attr integration', () => {
     it('should handle attributes on standard code blocks that become plugin blocks', async () => {
       const markdown =
         '```javascript {.highlight-js data-theme="dark"}\nconsole.log("test");\n```';
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       // Standard code blocks should have attributes applied
       expect(result.html).toContain('class="highlight-js"');
@@ -235,7 +253,7 @@ function hello() {
 \`\`\`
       `.trim();
 
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       expect(result.html).toContain('id="main"');
       expect(result.html).toContain('class="title-style"');
@@ -257,7 +275,7 @@ Normal paragraph content.
 [Link](https://example.com){.external}
       `.trim();
 
-      const result = await processor.process(markdown, 'test');
+      const result = await runProcess(markdown, 'test');
 
       // Check that attributes are applied
       expect(result.html).toContain('class="styled"');

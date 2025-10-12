@@ -1,3 +1,8 @@
+// mark-deco - Flexible Markdown to HTML conversion library
+// Copyright (c) Kouji Matsui. (@kekyo@mi.kekyo.net)
+// Under MIT.
+// https://github.com/kekyo/mark-deco
+
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { getNoOpLogger } from '../src/logger.js';
 import { createMermaidPlugin } from '../src/plugins/mermaid-plugin.js';

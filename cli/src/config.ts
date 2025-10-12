@@ -1,3 +1,8 @@
+// mark-deco - Flexible Markdown to HTML conversion library
+// Copyright (c) Kouji Matsui. (@kekyo@mi.kekyo.net)
+// Under MIT.
+// https://github.com/kekyo/mark-deco
+
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 
@@ -7,6 +12,7 @@ export interface Config {
   uniqueIdPrefix?: string;
   hierarchicalHeadingId?: boolean;
   contentBasedHeadingId?: boolean;
+  applyTitleFromH1?: boolean;
   // Plugin-specific configurations
   oembed?: {
     enabled?: boolean;
@@ -58,6 +64,7 @@ export function getDefaultConfig(): Config {
     uniqueIdPrefix: 'section',
     hierarchicalHeadingId: true,
     contentBasedHeadingId: false,
+    applyTitleFromH1: true,
     oembed: {
       enabled: true,
     },

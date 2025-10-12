@@ -168,6 +168,8 @@ export interface ProcessOptions {
   useContentStringHeaderId?: boolean;
   /** Whether to use hierarchical numbering for heading IDs (e.g., id-1, id-1-1, id-1-2, id-2) (default: true) */
   useHierarchicalHeadingId?: boolean;
+  /** Whether to apply the first H1 to frontmatter.title and remove it from content (default: true) */
+  applyTitleFromH1?: boolean;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }

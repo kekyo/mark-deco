@@ -152,7 +152,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // マークダウンを処理
-      const result = await processor.process(markdown, idPrefix);
+      const result = await processor.process(markdown, idPrefix, {
+        applyTitleFromH1: false,
+      });
 
       // 結果を表示
       htmlOutput.innerHTML = result.html;

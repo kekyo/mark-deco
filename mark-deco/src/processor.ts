@@ -16,6 +16,8 @@ import { escapeHtml } from './plugins/oembed/utils.js';
 import { remarkAttr } from './plugins/remark-attr.js';
 import { rehypeResponsiveImages } from './plugins/responsive-images.js';
 import { generateHeadingId } from './utils.js';
+import { applyTitleFromH1 } from './apply-title-from-h1.js';
+import { extractHeadingText } from './utils/heading.js';
 import type {
   Plugin,
   PluginContext,
@@ -75,22 +77,6 @@ const normalizeFrontmatterValue = (value: unknown): unknown => {
 
 const snapshotFrontmatter = (data: FrontmatterData): string => {
   return JSON.stringify(normalizeFrontmatterValue(data ?? {}));
-};
-
-/**
- * Extract text content from heading node
- */
-const extractHeadingText = (node: any): string => {
-  if (node.type === 'text') {
-    return node.value || '';
-  }
-  if (node.type === 'inlineCode') {
-    return node.value || '';
-  }
-  if (node.children && Array.isArray(node.children)) {
-    return node.children.map(extractHeadingText).join('');
-  }
-  return '';
 };
 
 /**
@@ -533,13 +519,29 @@ export const createMarkdownProcessor = (
     try {
       const { data: parsedFrontmatter, content } = parseFrontmatter(markdown);
 
+      const shouldApplyTitle = options.applyTitleFromH1 ?? true;
+      let workingContent = content;
+      let contentChanged = false;
+      let frontmatterChanged = false;
+
+      if (shouldApplyTitle) {
+        const h1Result = applyTitleFromH1(workingContent, parsedFrontmatter, {
+          allowTitleWrite: true,
+        });
+        workingContent = h1Result.content;
+        contentChanged = h1Result.headingRemoved;
+        frontmatterChanged = h1Result.titleWritten;
+      }
+
+      const changed = contentChanged || frontmatterChanged;
+
       return await processCore(
         markdown,
         uniqueIdPrefix,
         options,
         parsedFrontmatter,
-        content,
-        false
+        workingContent,
+        changed
       );
     } catch (error) {
       return handleProcessingError(error);
@@ -574,18 +576,28 @@ export const createMarkdownProcessor = (
       const { frontmatter, uniqueIdPrefix: overrideUniqueIdPrefix } =
         transformed;
       const nextUniqueIdPrefix = overrideUniqueIdPrefix ?? uniqueIdPrefix;
-      const preSnapshot =
-        frontmatter === parsedFrontmatter
-          ? originalSnapshot
-          : snapshotFrontmatter(frontmatter);
-      const preChanged = preSnapshot !== originalSnapshot;
+
+      const shouldApplyTitle = options.applyTitleFromH1 ?? true;
+      let workingContent = content;
+      let contentChanged = false;
+
+      if (shouldApplyTitle) {
+        const h1Result = applyTitleFromH1(workingContent, frontmatter, {
+          allowTitleWrite: true,
+        });
+        workingContent = h1Result.content;
+        contentChanged = h1Result.headingRemoved || contentChanged;
+      }
+
+      const preSnapshot = snapshotFrontmatter(frontmatter);
+      const preChanged = preSnapshot !== originalSnapshot || contentChanged;
 
       const baseResult = await processCore(
         markdown,
         nextUniqueIdPrefix,
         options,
         frontmatter,
-        content,
+        workingContent,
         preChanged
       );
 
@@ -601,13 +613,13 @@ export const createMarkdownProcessor = (
       }
 
       const finalSnapshot = snapshotFrontmatter(finalFrontmatter);
-      const finalChanged = finalSnapshot !== originalSnapshot;
+      const finalChanged = finalSnapshot !== originalSnapshot || contentChanged;
 
       const composeMarkdown = (): string => {
         if (!finalChanged) {
           return markdown;
         }
-        return composeMarkdownFromParts(finalFrontmatter, content);
+        return composeMarkdownFromParts(finalFrontmatter, workingContent);
       };
 
       return {
