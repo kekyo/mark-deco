@@ -23,7 +23,8 @@
   },
   "main": "./dist/cli.cjs",
   "files": [
-    "dist"
+    "dist",
+    "LICENSE"
   ],
   "scripts": {
     "dev": "vite build --watch",
