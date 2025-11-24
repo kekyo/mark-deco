@@ -65,7 +65,7 @@ MarkDecoはデフォルトでその見出し文字列を `frontmatter.title` に
 const result = await processor.processWithFrontmatterTransform(
   markdown,
   'id',
-  ({ originalFrontmatter, uniqueIdPrefix }) => {
+  async ({ originalFrontmatter, uniqueIdPrefix }) => {
     if (!originalFrontmatter || originalFrontmatter.status !== 'draft') {
       // 下書きでなければ処理をキャンセル（変換をスキップ）
       return undefined;
@@ -80,7 +80,7 @@ const result = await processor.processWithFrontmatterTransform(
       uniqueIdPrefix,
     };
   },
-  ({ frontmatter, headingTree }) => ({
+  async ({ frontmatter, headingTree }) => ({
     ...frontmatter,
     headingCount: headingTree.length,
   })

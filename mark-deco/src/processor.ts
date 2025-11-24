@@ -568,7 +568,7 @@ export const createMarkdownProcessor = (
         uniqueIdPrefix,
       };
 
-      const transformed = frontmatterPreTransform(preContext);
+      const transformed = await frontmatterPreTransform(preContext);
       if (transformed === undefined) {
         return undefined;
       }
@@ -608,7 +608,7 @@ export const createMarkdownProcessor = (
           frontmatter: finalFrontmatter,
           headingTree: baseResult.headingTree,
         };
-        const postTransformed = frontmatterPostTransform(postContext);
+        const postTransformed = await frontmatterPostTransform(postContext);
         finalFrontmatter = postTransformed;
       }
 

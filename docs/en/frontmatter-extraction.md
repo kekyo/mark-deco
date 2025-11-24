@@ -64,7 +64,7 @@ Return `undefined` from the pre transform to cancel processing altogether, or a 
 const result = await processor.processWithFrontmatterTransform(
   markdown,
   'id',
-  ({ originalFrontmatter, uniqueIdPrefix }) => {
+  async ({ originalFrontmatter, uniqueIdPrefix }) => {
     if (!originalFrontmatter || originalFrontmatter.status !== 'draft') {
       // Cancel processing (skip Markdown -> HTML) when not a draft.
       return undefined;
@@ -79,7 +79,7 @@ const result = await processor.processWithFrontmatterTransform(
       uniqueIdPrefix,
     };
   },
-  ({ frontmatter, headingTree }) => ({
+  async ({ frontmatter, headingTree }) => ({
     ...frontmatter,
     headingCount: headingTree.length,
   })

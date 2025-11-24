@@ -47,7 +47,7 @@ export interface FrontmatterTransformResult {
  */
 export type FrontmatterPreTransform = (
   ctx: FrontmatterPreTransformContext
-) => FrontmatterTransformResult | undefined;
+) => Promise<FrontmatterTransformResult | undefined>;
 
 /**
  * Context supplied to a frontmatter post transform callback
@@ -64,7 +64,7 @@ export interface FrontmatterPostTransformContext {
  */
 export type FrontmatterPostTransform = (
   ctx: FrontmatterPostTransformContext
-) => FrontmatterData;
+) => Promise<FrontmatterData>;
 
 /**
  * Heading node (representing a hierarchical structure)
