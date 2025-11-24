@@ -7,13 +7,17 @@ import type { Heading, Root } from 'mdast';
 import type { Position } from 'unist';
 import type { Plugin } from 'unified';
 import { extractHeadingText } from '../utils/heading.js';
-import type { FrontmatterData } from '../types.js';
+import type { FrontmatterData, H1TitleTransform } from '../types.js';
+
+type ApplyTitleTransform = Exclude<H1TitleTransform, 'none'>;
 
 export interface ApplyTitleFromH1Options {
   /** Mutable reference to the frontmatter object */
   readonly frontmatter: FrontmatterData;
   /** Whether frontmatter already contains a title */
   readonly hasTitle: boolean;
+  /** How to treat the first H1 heading */
+  readonly transform: ApplyTitleTransform;
   /** Whether plugin is allowed to write extracted title into frontmatter */
   readonly allowTitleWrite: boolean;
   /** Callback invoked when a heading was removed */
@@ -29,15 +33,24 @@ export interface ApplyTitleFromH1Result {
   readonly nextNodeStartOffset: number | undefined;
   /** Whether the heading text was written into frontmatter.title */
   readonly titleWritten: boolean;
+  /** Whether the heading was removed from the markdown */
+  readonly headingRemoved: boolean;
 }
 
 /**
- * Remark plugin that removes the first H1 heading and optionally applies it to frontmatter.title
+ * Remark plugin that optionally removes the first H1 heading and applies it to frontmatter.title
  */
 export const remarkApplyTitleFromH1: Plugin<[ApplyTitleFromH1Options], Root> = (
   options
 ) => {
-  const { frontmatter, hasTitle, allowTitleWrite, onHeadingApplied } = options;
+  const {
+    frontmatter,
+    hasTitle,
+    transform,
+    allowTitleWrite,
+    onHeadingApplied,
+  } = options;
+  const shouldRemoveHeading = transform === 'extractAndRemove';
 
   return (tree: Root) => {
     if (!frontmatter || !tree.children || tree.children.length === 0) {
@@ -56,7 +69,9 @@ export const remarkApplyTitleFromH1: Plugin<[ApplyTitleFromH1Options], Root> = (
             : undefined;
         const headingText = extractHeadingText(heading).trim();
 
-        tree.children.splice(index, 1);
+        if (shouldRemoveHeading) {
+          tree.children.splice(index, 1);
+        }
 
         let titleWritten = false;
         if (!hasTitle && allowTitleWrite && headingText.length > 0) {
@@ -70,6 +85,7 @@ export const remarkApplyTitleFromH1: Plugin<[ApplyTitleFromH1Options], Root> = (
             position: heading.position,
             nextNodeStartOffset,
             titleWritten,
+            headingRemoved: shouldRemoveHeading,
           });
         }
 

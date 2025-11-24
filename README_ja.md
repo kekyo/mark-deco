@@ -101,6 +101,17 @@ const result = await processor.process(
 
 `AbortController`や`AbortSignal`の使用方法は、ECMAScriptのドキュメントなどを参照してください。
 
+### タイトルの自動抽出
+
+MarkDecoはデフォルトで先頭のH1見出しを `frontmatter.title` にコピーし、その見出しを本文から削除します。
+`h1TitleTransform` で挙動を切り替えられます:
+
+```typescript
+await processor.process(markdown, 'id', { h1TitleTransform: 'extract' });
+```
+
+`extract` なら見出しを残したままtitleへ反映し、`extractAndRemove` (デフォルト) は見出しを削除、`none` はこの処理自体を行いません。
+
 ### CLIインターフェイス
 
 MarkDecoはライブラリですが、MarkDecoを気軽に試すことが出来るCLIインターフェイスもパッケージで公開されています。これを使えば、TypeScriptでコードを書かなくても変換を試行したり、別のコードから独立したアプリケーションとして呼び出せます。

@@ -45,13 +45,13 @@ const spawnAsync = (
 };
 
 const CLI_PATH = resolve(__dirname, '../dist/cli.cjs');
-const NO_TITLE_FLAG = '--no-apply-title-from-h1';
+const NO_TITLE_ARGS = ['--h1-title-transform', 'none'];
 
 describe('mark-deco-cli', () => {
   it('should display help information', async () => {
     const { stdout } = await spawnAsync('node', [
       CLI_PATH,
-      NO_TITLE_FLAG,
+      ...NO_TITLE_ARGS,
       '--help',
     ]);
     expect(stdout).toContain('mark-deco-cli');
@@ -60,7 +60,7 @@ describe('mark-deco-cli', () => {
   it('should process markdown from stdin', async () => {
     const { stdout } = await spawnAsync(
       'node',
-      [CLI_PATH, NO_TITLE_FLAG],
+      [CLI_PATH, ...NO_TITLE_ARGS],
       '# Hello World\n\nThis is a test.'
     );
     expect(stdout).toContain('<h1 id="section-1">Hello World</h1>');
@@ -81,7 +81,7 @@ More content here.`;
       await writeFile(testFile, testContent);
       const { stdout } = await spawnAsync('node', [
         CLI_PATH,
-        NO_TITLE_FLAG,
+        ...NO_TITLE_ARGS,
         '-i',
         testFile,
       ]);
@@ -110,7 +110,7 @@ Some content here.`;
 
     const { stdout } = await spawnAsync(
       'node',
-      [CLI_PATH, NO_TITLE_FLAG],
+      [CLI_PATH, ...NO_TITLE_ARGS],
       markdownWithFrontmatter
     );
 
@@ -152,7 +152,7 @@ Body text.`;
   it('should handle custom unique-id-prefix', async () => {
     const { stdout } = await spawnAsync(
       'node',
-      [CLI_PATH, NO_TITLE_FLAG, '--unique-id-prefix', 'custom'],
+      [CLI_PATH, ...NO_TITLE_ARGS, '--unique-id-prefix', 'custom'],
       '# Test Heading'
     );
     expect(stdout).toContain('<h1 id="custom-1">Test Heading</h1>');
@@ -164,7 +164,7 @@ Body text.`;
     try {
       await spawnAsync(
         'node',
-        [CLI_PATH, NO_TITLE_FLAG, '-o', outputFile],
+        [CLI_PATH, ...NO_TITLE_ARGS, '-o', outputFile],
         '# Output Test\n\nThis should be written to a file.'
       );
 
@@ -195,7 +195,7 @@ Body text.`;
   it('should handle invalid command line options', async () => {
     const { code } = await spawnAsync('node', [
       CLI_PATH,
-      NO_TITLE_FLAG,
+      ...NO_TITLE_ARGS,
       '--invalid-option',
     ]);
     expect(code).toBe(1);
@@ -215,7 +215,7 @@ Some content here.`;
     try {
       await spawnAsync(
         'node',
-        [CLI_PATH, NO_TITLE_FLAG, '--frontmatter-output', frontmatterFile],
+        [CLI_PATH, ...NO_TITLE_ARGS, '--frontmatter-output', frontmatterFile],
         markdownWithFrontmatter
       );
 
@@ -247,7 +247,7 @@ More content.`;
     try {
       await spawnAsync(
         'node',
-        [CLI_PATH, NO_TITLE_FLAG, '--heading-tree-output', headingTreeFile],
+        [CLI_PATH, ...NO_TITLE_ARGS, '--heading-tree-output', headingTreeFile],
         markdownWithHeadings
       );
 
@@ -270,7 +270,7 @@ More content.`;
   it('should process markdown with no plugins successfully', async () => {
     const { stdout, code } = await spawnAsync(
       'node',
-      [CLI_PATH, NO_TITLE_FLAG, '--no-plugins'],
+      [CLI_PATH, ...NO_TITLE_ARGS, '--no-plugins'],
       '# Hello World\n\nThis is a test.'
     );
     expect(code).toBe(0);
@@ -281,7 +281,7 @@ More content.`;
   it('should process markdown with empty plugin list successfully', async () => {
     const { stdout, code } = await spawnAsync(
       'node',
-      [CLI_PATH, NO_TITLE_FLAG, '-p'],
+      [CLI_PATH, ...NO_TITLE_ARGS, '-p'],
       '# Hello World\n\nThis is a test.'
     );
     expect(code).toBe(0);
@@ -310,7 +310,7 @@ This is a test.`;
       'node',
       [
         CLI_PATH,
-        NO_TITLE_FLAG,
+        ...NO_TITLE_ARGS,
         '--frontmatter-output',
         frontmatterPath,
         '--no-plugins',
@@ -353,7 +353,7 @@ This is a test.`;
       'node',
       [
         CLI_PATH,
-        NO_TITLE_FLAG,
+        ...NO_TITLE_ARGS,
         '--heading-tree-output',
         headingTreePath,
         '--no-plugins',
@@ -398,7 +398,7 @@ title: Combined Test
       'node',
       [
         CLI_PATH,
-        NO_TITLE_FLAG,
+        ...NO_TITLE_ARGS,
         '--frontmatter-output',
         frontmatterPath,
         '--heading-tree-output',

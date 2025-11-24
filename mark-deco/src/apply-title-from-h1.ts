@@ -6,11 +6,13 @@
 import remarkParse from 'remark-parse';
 import { unified } from 'unified';
 import { remarkApplyTitleFromH1 } from './plugins/remark-apply-title-from-h1.js';
-import type { FrontmatterData } from './types.js';
+import type { FrontmatterData, H1TitleTransform } from './types.js';
 
 export interface ApplyTitleOptions {
   /** Whether the caller allows writing heading text into frontmatter.title */
   readonly allowTitleWrite: boolean;
+  /** How to treat the first H1 heading */
+  readonly transform: H1TitleTransform;
 }
 
 export interface ApplyTitleResult {
@@ -20,13 +22,23 @@ export interface ApplyTitleResult {
 }
 
 /**
- * Apply the leading H1 heading to frontmatter.title and remove it from the markdown content
+ * Apply the leading H1 heading to frontmatter.title and optionally remove it from the markdown content
  */
 export const applyTitleFromH1 = (
   markdownContent: string,
   frontmatter: FrontmatterData,
   options: ApplyTitleOptions
 ): ApplyTitleResult => {
+  const { transform, allowTitleWrite } = options;
+
+  if (transform === 'none') {
+    return {
+      content: markdownContent,
+      headingRemoved: false,
+      titleWritten: false,
+    };
+  }
+
   const hasTitle =
     frontmatter !== undefined &&
     frontmatter !== null &&
@@ -44,10 +56,15 @@ export const applyTitleFromH1 = (
     .use(remarkApplyTitleFromH1, {
       frontmatter,
       hasTitle,
-      allowTitleWrite: options.allowTitleWrite,
+      transform,
+      allowTitleWrite,
       onHeadingApplied: (info) => {
-        headingRemoved = true;
+        headingRemoved = info.headingRemoved;
         titleWritten = info.titleWritten;
+        if (!info.headingRemoved) {
+          return;
+        }
+
         const startOffset = info.position?.start?.offset ?? 0;
         let endOffset = info.position?.end?.offset ?? startOffset;
 

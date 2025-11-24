@@ -7,6 +7,7 @@ import { Command, Option } from 'commander';
 import { loadConfig } from './config.js';
 import { readInput, writeOutput, writeJsonOutput } from './io.js';
 import { setupProcessor } from './processor.js';
+import type { H1TitleTransform } from 'mark-deco';
 
 // Version is injected at build time by Vite
 declare const __VERSION__: string;
@@ -20,7 +21,7 @@ interface CLIOptions {
   uniqueIdPrefix?: string;
   hierarchicalHeadingId?: boolean;
   contentBasedHeadingId?: boolean;
-  applyTitleFromH1?: boolean;
+  h1TitleTransform?: H1TitleTransform;
   frontmatterOutput?: string;
   headingTreeOutput?: string;
 }
@@ -70,9 +71,9 @@ async function main() {
     )
     .addOption(
       new Option(
-        '--no-apply-title-from-h1',
-        'Disable applying the first H1 to frontmatter.title'
-      )
+        '--h1-title-transform <mode>',
+        'Control how the first H1 heading is applied to frontmatter.title (extract, extractAndRemove, none)'
+      ).choices(['extract', 'extractAndRemove', 'none'])
     )
     .addOption(
       new Option(
@@ -102,8 +103,10 @@ async function main() {
         const processor = setupProcessor(mergedOptions);
 
         // Process markdown
-        const applyTitleFromH1 =
-          options.applyTitleFromH1 ?? config.applyTitleFromH1 ?? true;
+        const h1TitleTransform: H1TitleTransform =
+          options.h1TitleTransform ??
+          config.h1TitleTransform ??
+          'extractAndRemove';
 
         const result = await processor.process(
           markdown,
@@ -111,7 +114,7 @@ async function main() {
           {
             useHierarchicalHeadingId: options.hierarchicalHeadingId ?? true,
             useContentStringHeaderId: options.contentBasedHeadingId ?? false,
-            applyTitleFromH1,
+            h1TitleTransform,
           }
         );
 

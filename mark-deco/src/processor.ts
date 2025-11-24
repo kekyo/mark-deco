@@ -519,14 +519,15 @@ export const createMarkdownProcessor = (
     try {
       const { data: parsedFrontmatter, content } = parseFrontmatter(markdown);
 
-      const shouldApplyTitle = options.applyTitleFromH1 ?? true;
+      const titleTransform = options.h1TitleTransform ?? 'extractAndRemove';
       let workingContent = content;
       let contentChanged = false;
       let frontmatterChanged = false;
 
-      if (shouldApplyTitle) {
+      if (titleTransform !== 'none') {
         const h1Result = applyTitleFromH1(workingContent, parsedFrontmatter, {
           allowTitleWrite: true,
+          transform: titleTransform,
         });
         workingContent = h1Result.content;
         contentChanged = h1Result.headingRemoved;
@@ -577,13 +578,14 @@ export const createMarkdownProcessor = (
         transformed;
       const nextUniqueIdPrefix = overrideUniqueIdPrefix ?? uniqueIdPrefix;
 
-      const shouldApplyTitle = options.applyTitleFromH1 ?? true;
+      const titleTransform = options.h1TitleTransform ?? 'extractAndRemove';
       let workingContent = content;
       let contentChanged = false;
 
-      if (shouldApplyTitle) {
+      if (titleTransform !== 'none') {
         const h1Result = applyTitleFromH1(workingContent, frontmatter, {
           allowTitleWrite: true,
+          transform: titleTransform,
         });
         workingContent = h1Result.content;
         contentChanged = h1Result.headingRemoved || contentChanged;
