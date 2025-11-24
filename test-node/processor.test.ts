@@ -43,7 +43,7 @@ More content here.`;
 
     const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
-      applyTitleFromH1: false,
+      h1TitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({
@@ -74,7 +74,7 @@ Just some content.`;
 
     const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
-      applyTitleFromH1: false,
+      h1TitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({});
@@ -92,7 +92,7 @@ Just some content.`;
     const markdown = '';
 
     const result = await processor.process(markdown, 'id', {
-      applyTitleFromH1: false,
+      h1TitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({});
@@ -112,7 +112,7 @@ tags: ["test"]
 ---`;
 
     const result = await processor.process(markdown, 'id', {
-      applyTitleFromH1: false,
+      h1TitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({
@@ -143,7 +143,7 @@ Content 3`;
 
     const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
-      applyTitleFromH1: false,
+      h1TitleTransform: 'none',
     });
 
     expect(result.headingTree).toHaveLength(3);
@@ -181,7 +181,7 @@ number: 42
 This is test content.`;
 
     const result = await processor.process(markdown, 'id', {
-      applyTitleFromH1: false,
+      h1TitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({
@@ -200,7 +200,7 @@ This is test content.`;
     expect(result.headingTree[0]?.text).toBe('Test Content');
   });
 
-  describe('applyTitleFromH1 behaviour', () => {
+  describe('h1TitleTransform behaviour', () => {
     it('applies leading H1 to frontmatter and removes heading', async () => {
       const processor = createMarkdownProcessor({
         plugins: [],
@@ -238,6 +238,26 @@ Rest of content.`;
       expect(result.html).not.toContain('<h1');
     });
 
+    it('extract keeps heading while applying title', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = `# Visible Title
+
+Still here.`;
+
+      const result = await processor.process(markdown, 'id', {
+        h1TitleTransform: 'extract',
+      });
+
+      expect(result.frontmatter).toEqual({ title: 'Visible Title' });
+      expect(result.html).toContain('<h1');
+      expect(result.html).toContain('Visible Title');
+      expect(result.headingTree).toHaveLength(1);
+    });
+
     it('supports disabling the behaviour via options', async () => {
       const processor = createMarkdownProcessor({
         plugins: [],
@@ -249,7 +269,7 @@ Rest of content.`;
 More text.`;
 
       const result = await processor.process(markdown, 'id', {
-        applyTitleFromH1: false,
+        h1TitleTransform: 'none',
         useContentStringHeaderId: true,
       });
 
@@ -273,9 +293,9 @@ More text.`;
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        () => undefined,
+        async () => undefined,
         undefined,
-        { applyTitleFromH1: false }
+        { h1TitleTransform: 'none' }
       );
 
       expect(result).toBeUndefined();
@@ -298,7 +318,7 @@ title: "Same"
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        ({ originalFrontmatter, uniqueIdPrefix }) => {
+        async ({ originalFrontmatter, uniqueIdPrefix }) => {
           receivedPrefix = uniqueIdPrefix;
           return {
             frontmatter: originalFrontmatter,
@@ -306,7 +326,7 @@ title: "Same"
           };
         },
         undefined,
-        { useContentStringHeaderId: true, applyTitleFromH1: false }
+        { useContentStringHeaderId: true, h1TitleTransform: 'none' }
       );
 
       expect(result).not.toBeUndefined();
@@ -334,7 +354,7 @@ title: "Original"
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        ({ originalFrontmatter, uniqueIdPrefix }) => {
+        async ({ originalFrontmatter, uniqueIdPrefix }) => {
           receivedPrefix = uniqueIdPrefix;
           return {
             frontmatter: {
@@ -345,7 +365,7 @@ title: "Original"
           };
         },
         undefined,
-        { applyTitleFromH1: false }
+        { h1TitleTransform: 'none' }
       );
 
       expect(result).not.toBeUndefined();
@@ -377,7 +397,7 @@ category: news
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        ({ originalFrontmatter, uniqueIdPrefix }) => {
+        async ({ originalFrontmatter, uniqueIdPrefix }) => {
           receivedPrefix = uniqueIdPrefix;
           return {
             frontmatter: originalFrontmatter,
@@ -385,7 +405,7 @@ category: news
           };
         },
         undefined,
-        { useContentStringHeaderId: true, applyTitleFromH1: false }
+        { useContentStringHeaderId: true, h1TitleTransform: 'none' }
       );
 
       expect(result).not.toBeUndefined();
@@ -405,15 +425,15 @@ category: news
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        ({ originalFrontmatter, uniqueIdPrefix }) => ({
+        async ({ originalFrontmatter, uniqueIdPrefix }) => ({
           frontmatter: originalFrontmatter,
           uniqueIdPrefix,
         }),
-        ({ frontmatter, headingTree }) => ({
+        async ({ frontmatter, headingTree }) => ({
           ...frontmatter,
           summary: `headings:${headingTree.length}`,
         }),
-        { applyTitleFromH1: false }
+        { h1TitleTransform: 'none' }
       );
 
       expect(result).not.toBeUndefined();

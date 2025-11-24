@@ -46,9 +46,14 @@ Frontmatter scalars are parsed with the JSON schema, so you receive JSON-compati
 
 When the first non-whitespace block in the Markdown body is an H1 heading,
 MarkDeco applies that heading to `frontmatter.title` by default and removes the heading from the content.
+Control this behaviour with the `h1TitleTransform` option:
 
-If a title already exists in the frontmatter, the heading is still removed but the existing title remains untouched.
-Disable this behaviour by passing `process(markdown, prefix, { applyTitleFromH1: false })`.
+- `extractAndRemove` (default): write the H1 text into `frontmatter.title` and remove the heading.
+- `extract`: write the H1 text into `frontmatter.title` but keep the heading in the content.
+- `none`: skip title extraction entirely.
+
+If a title already exists in the frontmatter, `extract` or `extractAndRemove` still removes the heading but preserves the existing title.
+Disable this behaviour by passing `process(markdown, prefix, { h1TitleTransform: 'none' })`.
 
 For `processWithFrontmatterTransform`, the pre-transform callback runs before this extraction,
 so it will not observe the injected title—this is intentional.
@@ -64,7 +69,7 @@ Return `undefined` from the pre transform to cancel processing altogether, or a 
 const result = await processor.processWithFrontmatterTransform(
   markdown,
   'id',
-  ({ originalFrontmatter, uniqueIdPrefix }) => {
+  async ({ originalFrontmatter, uniqueIdPrefix }) => {
     if (!originalFrontmatter || originalFrontmatter.status !== 'draft') {
       // Cancel processing (skip Markdown -> HTML) when not a draft.
       return undefined;
@@ -79,7 +84,7 @@ const result = await processor.processWithFrontmatterTransform(
       uniqueIdPrefix,
     };
   },
-  ({ frontmatter, headingTree }) => ({
+  async ({ frontmatter, headingTree }) => ({
     ...frontmatter,
     headingCount: headingTree.length,
   })

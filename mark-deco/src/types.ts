@@ -14,6 +14,11 @@ export type { HTMLBeautifyOptions };
 export type { RemarkGfmOptions };
 
 /**
+ * Control how H1 headings affect frontmatter.title
+ */
+export type H1TitleTransform = 'extract' | 'extractAndRemove' | 'none';
+
+/**
  * Frontmatter data extracted from markdown
  */
 export interface FrontmatterData {
@@ -47,7 +52,7 @@ export interface FrontmatterTransformResult {
  */
 export type FrontmatterPreTransform = (
   ctx: FrontmatterPreTransformContext
-) => FrontmatterTransformResult | undefined;
+) => Promise<FrontmatterTransformResult | undefined>;
 
 /**
  * Context supplied to a frontmatter post transform callback
@@ -64,7 +69,7 @@ export interface FrontmatterPostTransformContext {
  */
 export type FrontmatterPostTransform = (
   ctx: FrontmatterPostTransformContext
-) => FrontmatterData;
+) => Promise<FrontmatterData>;
 
 /**
  * Heading node (representing a hierarchical structure)
@@ -168,8 +173,8 @@ export interface ProcessOptions {
   useContentStringHeaderId?: boolean;
   /** Whether to use hierarchical numbering for heading IDs (e.g., id-1, id-1-1, id-1-2, id-2) (default: true) */
   useHierarchicalHeadingId?: boolean;
-  /** Whether to apply the first H1 to frontmatter.title and remove it from content (default: true) */
-  applyTitleFromH1?: boolean;
+  /** How to treat the first H1 heading for frontmatter.title (default: extractAndRemove) */
+  h1TitleTransform?: H1TitleTransform;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }

@@ -46,9 +46,14 @@ Frontmatter のスカラー値は JSON スキーマで解析され、`null` / `t
 
 Markdown本文で最初の（ホワイトスペースを除いた）ブロックがH1見出しの場合、
 MarkDecoはデフォルトでその見出し文字列を `frontmatter.title` に書き込み、元のH1を本文から取り除きます。
+`h1TitleTransform` オプションで挙動を切り替えられます:
 
-既にfrontmatterに `title` が存在する場合はH1のみ除去され、titleは変更されません。
-この機能を無効化するには `processor.process(markdown, prefix, { applyTitleFromH1: false })` を指定してください。
+- `extractAndRemove` (デフォルト): H1の文字列を `frontmatter.title` に書き込み、本文から見出しを削除する。
+- `extract`: `frontmatter.title` に書き込むが、H1見出しは本文に残す。
+- `none`: title抽出を行わない。
+
+既に frontmatter に `title` が存在する場合、`extract`または`extractAndRemove` はH1だけを削除し、`title`は上書きしません。
+この機能を無効化するには `processor.process(markdown, prefix, { h1TitleTransform: 'none' })` を指定してください。
 
 `processWithFrontmatterTransform` の pre 変換は抽出前に実行されるため、この自動タイトルを参照できない点には留意してください。
 
@@ -65,7 +70,7 @@ MarkDecoはデフォルトでその見出し文字列を `frontmatter.title` に
 const result = await processor.processWithFrontmatterTransform(
   markdown,
   'id',
-  ({ originalFrontmatter, uniqueIdPrefix }) => {
+  async ({ originalFrontmatter, uniqueIdPrefix }) => {
     if (!originalFrontmatter || originalFrontmatter.status !== 'draft') {
       // 下書きでなければ処理をキャンセル（変換をスキップ）
       return undefined;
@@ -80,7 +85,7 @@ const result = await processor.processWithFrontmatterTransform(
       uniqueIdPrefix,
     };
   },
-  ({ frontmatter, headingTree }) => ({
+  async ({ frontmatter, headingTree }) => ({
     ...frontmatter,
     headingCount: headingTree.length,
   })

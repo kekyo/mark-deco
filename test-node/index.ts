@@ -75,7 +75,7 @@ async function processMarkdownFile(
     console.log('⚙️ Processing markdown...');
     const result = await processor.process(markdownContent, 'id', {
       useContentStringHeaderId: true,
-      applyTitleFromH1: false,
+      h1TitleTransform: 'none',
     });
 
     // Ensure output directory exists

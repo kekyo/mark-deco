@@ -12,7 +12,7 @@ export interface Config {
   uniqueIdPrefix?: string;
   hierarchicalHeadingId?: boolean;
   contentBasedHeadingId?: boolean;
-  applyTitleFromH1?: boolean;
+  h1TitleTransform?: 'extract' | 'extractAndRemove' | 'none';
   // Plugin-specific configurations
   oembed?: {
     enabled?: boolean;
@@ -64,7 +64,7 @@ export function getDefaultConfig(): Config {
     uniqueIdPrefix: 'section',
     hierarchicalHeadingId: true,
     contentBasedHeadingId: false,
-    applyTitleFromH1: true,
+    h1TitleTransform: 'extractAndRemove',
     oembed: {
       enabled: true,
     },

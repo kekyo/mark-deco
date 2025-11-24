@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // マークダウンを処理
       const result = await processor.process(markdown, idPrefix, {
-        applyTitleFromH1: false,
+        h1TitleTransform: 'none',
       });
 
       // 結果を表示

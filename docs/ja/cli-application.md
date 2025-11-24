@@ -37,6 +37,7 @@ Options:
       --unique-id-prefix <prefix>  一意IDのプレフィックス (デフォルト: "section")
       --hierarchical-heading-id    階層的見出しIDを使用 (デフォルト: true)
       --content-based-heading-id   コンテンツベース見出しIDを使用 (デフォルト: false)
+      --h1-title-transform <mode>  先頭H1の扱い (extract / extractAndRemove / none, デフォルト: extractAndRemove)
       --frontmatter-output <file>  FrontmatterをJSONで指定ファイルに出力
       --heading-tree-output <file> 見出しツリーをJSONで指定ファイルに出力
   -h, --help                      ヘルプを表示
@@ -75,6 +76,7 @@ JSON形式の設定ファイルでデフォルトオプションを指定でき�
   "uniqueIdPrefix": "section",
   "hierarchicalHeadingId": true,
   "contentBasedHeadingId": false,
+  "h1TitleTransform": "extractAndRemove",
   "oembed": {
     "enabled": true,
     "timeout": 5000

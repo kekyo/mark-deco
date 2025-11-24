@@ -101,6 +101,17 @@ const result = await processor.process(
 
 For usage of `AbortController` and `AbortSignal`, refer to ECMAScript documentation.
 
+### Automatic Title Extraction
+
+By default, MarkDeco copies the first H1 heading into `frontmatter.title` and removes that heading from the content.
+Adjust this with `h1TitleTransform`:
+
+```typescript
+await processor.process(markdown, 'id', { h1TitleTransform: 'extract' });
+```
+
+Use `extract` to keep the heading while copying the title, `extractAndRemove` (default) to remove it, or `none` to skip the behaviour entirely.
+
 ### CLI Interface
 
 Although MarkDeco is a library, a CLI interface is also available in the package that allows you to easily try out MarkDeco. This allows you to try out conversions without having to write code in TypeScript, or call it as an independent application from another code.
