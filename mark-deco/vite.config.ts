@@ -12,7 +12,9 @@ import prettierMax from 'prettier-max';
 export default defineConfig({
   plugins: [
     screwUp(),
-    prettierMax(),
+    prettierMax({
+      typescript: 'tsconfig.tests.json',
+    }),
     dts({
       insertTypesEntry: true,
       copyDtsFiles: true,

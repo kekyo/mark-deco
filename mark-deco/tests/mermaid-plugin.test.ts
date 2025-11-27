@@ -3,7 +3,7 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { getNoOpLogger } from '../src/logger.js';
 import { createMermaidPlugin } from '../src/plugins/mermaid-plugin.js';
 import type { Plugin, PluginContext, FrontmatterData } from '../src/types.js';
@@ -23,10 +23,10 @@ const escapeHtml = (content: string): string => {
 describe('MermaidPlugin', () => {
   let plugin: Plugin;
   let mockContext: PluginContext;
-  let mockGetUniqueId: ReturnType<typeof vi.fn<[], string>>;
+  let mockGetUniqueId: Mock<() => string>;
 
   beforeEach(() => {
-    mockGetUniqueId = vi.fn<[], string>(() => 'test-id-123');
+    mockGetUniqueId = vi.fn(() => 'test-id-123');
 
     mockContext = {
       logger: getNoOpLogger(),

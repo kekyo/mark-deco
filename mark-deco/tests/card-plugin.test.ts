@@ -4,7 +4,7 @@
 // https://github.com/kekyo/mark-deco
 
 import * as cheerio from 'cheerio';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   generateCardHtml,
   isValidCardUrl,
@@ -17,16 +17,10 @@ import {
 import { getNoOpLogger } from '../src/logger.js';
 import { amazonRules } from '../src/plugins/card/amazon-rules.js';
 import { generateFallbackHtml } from '../src/plugins/card/html-generator.js';
-import { createCardPlugin } from '../src/plugins/card/index.js';
 import { extractEnhancedData } from '../src/plugins/card/utils.js';
 import { createMarkdownProcessor } from '../src/processor.js';
 import type { ExtractedMetadata } from '../src/plugins/card/types.js';
-import type {
-  Plugin,
-  PluginContext,
-  Logger,
-  FetcherType,
-} from '../src/types.js';
+import type { Plugin, PluginContext } from '../src/types.js';
 
 /**
  * Create a mock card plugin for testing purposes
@@ -181,7 +175,7 @@ describe('CardPlugin', () => {
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: {
-          rawFetcher: async (url, accept, signal) => {
+          rawFetcher: async (_url, _accept, _signal) => {
             throw new Error('Not implemented');
           },
           userAgent: 'test-userAgent',
@@ -276,7 +270,7 @@ https://dev.to/article/react-hooks
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: {
-          rawFetcher: async (url, accept, signal) => {
+          rawFetcher: async (_url, _accept, _signal) => {
             throw new Error('Not implemented');
           },
           userAgent: 'test-userAgent',
@@ -302,7 +296,7 @@ https://dev.to/article/react-hooks
         signal: new AbortController().signal,
         frontmatter: {},
         fetcher: {
-          rawFetcher: async (url, accept, signal) => {
+          rawFetcher: async (_url, _accept, _signal) => {
             throw new Error('Not implemented');
           },
           userAgent: 'test-userAgent',

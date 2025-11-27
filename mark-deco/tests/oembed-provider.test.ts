@@ -49,56 +49,83 @@ describe('OEmbed Provider Tests', () => {
     ];
 
     // Mock fetch to return test data
-    const mockFetch = vi.fn<
-      Parameters<typeof fetch>,
-      ReturnType<typeof fetch>
-    >();
-    mockFetch.mockImplementation(async (url: string | URL | Request) => {
-      const urlString = url.toString();
+    const mockFetch = vi.fn<typeof fetch>();
+    mockFetch.mockImplementation(
+      async (input: RequestInfo | URL, _init?: RequestInit) => {
+        const urlString = input.toString();
 
-      // MockTube oEmbed API mock
-      if (urlString.includes('test-tube.mock/oembed')) {
-        const params = new URLSearchParams(urlString.split('?')[1]);
-        const videoUrl = params.get('url') || '';
+        // MockTube oEmbed API mock
+        if (urlString.includes('test-tube.mock/oembed')) {
+          const params = new URLSearchParams(urlString.split('?')[1]);
+          const videoUrl = params.get('url') || '';
 
-        if (videoUrl.includes('video1')) {
+          if (videoUrl.includes('video1')) {
+            return new Response(
+              JSON.stringify({
+                type: 'video',
+                version: '1.0',
+                title: 'Test Video 1 - HD Sample',
+                author_name: 'Test Author',
+                author_url: 'https://test-tube.mock/@testauthor',
+                provider_name: 'MockTube',
+                provider_url: 'https://test-tube.mock/',
+                thumbnail_url: 'https://test-tube.mock/thumbs/video1.jpg',
+                thumbnail_width: 480,
+                thumbnail_height: 360,
+                html: '<iframe width="560" height="315" src="https://test-tube.mock/embed/video1" frameborder="0" allowfullscreen title="Test Video 1 - HD Sample"></iframe>',
+                width: 560,
+                height: 315,
+              }),
+              {
+                status: 200,
+                headers: { 'content-type': 'application/json' },
+              }
+            );
+          } else if (videoUrl.includes('video2')) {
+            return new Response(
+              JSON.stringify({
+                type: 'video',
+                version: '1.0',
+                title: 'Test Video 2 - 4:3 Aspect Ratio',
+                author_name: 'Test Creator',
+                author_url: 'https://test-tube.mock/@testcreator',
+                provider_name: 'MockTube',
+                provider_url: 'https://test-tube.mock/',
+                thumbnail_url: 'https://test-tube.mock/thumbs/video2.jpg',
+                thumbnail_width: 480,
+                thumbnail_height: 360,
+                html: '<iframe width="400" height="300" src="https://test-tube.mock/embed/video2" frameborder="0" allowfullscreen title="Test Video 2 - 4:3 Aspect Ratio"></iframe>',
+                width: 400,
+                height: 300,
+              }),
+              {
+                status: 200,
+                headers: { 'content-type': 'application/json' },
+              }
+            );
+          }
+        }
+
+        // MockPhoto oEmbed API mock
+        if (urlString.includes('test-photo.mock/oembed')) {
           return new Response(
             JSON.stringify({
-              type: 'video',
+              type: 'photo',
+              title: 'Test Photo Sample',
+              author_name: 'Test Photographer',
+              author_url: 'https://test-photo.mock/users/testphotographer',
+              width: 1024,
+              height: 768,
+              url: 'https://test-photo.mock/images/sample.jpg',
+              web_page: 'https://test-photo.mock/photos/sample123',
+              thumbnail_url: 'https://test-photo.mock/thumbs/sample.jpg',
+              thumbnail_width: 150,
+              thumbnail_height: 150,
               version: '1.0',
-              title: 'Test Video 1 - HD Sample',
-              author_name: 'Test Author',
-              author_url: 'https://test-tube.mock/@testauthor',
-              provider_name: 'MockTube',
-              provider_url: 'https://test-tube.mock/',
-              thumbnail_url: 'https://test-tube.mock/thumbs/video1.jpg',
-              thumbnail_width: 480,
-              thumbnail_height: 360,
-              html: '<iframe width="560" height="315" src="https://test-tube.mock/embed/video1" frameborder="0" allowfullscreen title="Test Video 1 - HD Sample"></iframe>',
-              width: 560,
-              height: 315,
-            }),
-            {
-              status: 200,
-              headers: { 'content-type': 'application/json' },
-            }
-          );
-        } else if (videoUrl.includes('video2')) {
-          return new Response(
-            JSON.stringify({
-              type: 'video',
-              version: '1.0',
-              title: 'Test Video 2 - 4:3 Aspect Ratio',
-              author_name: 'Test Creator',
-              author_url: 'https://test-tube.mock/@testcreator',
-              provider_name: 'MockTube',
-              provider_url: 'https://test-tube.mock/',
-              thumbnail_url: 'https://test-tube.mock/thumbs/video2.jpg',
-              thumbnail_width: 480,
-              thumbnail_height: 360,
-              html: '<iframe width="400" height="300" src="https://test-tube.mock/embed/video2" frameborder="0" allowfullscreen title="Test Video 2 - 4:3 Aspect Ratio"></iframe>',
-              width: 400,
-              height: 300,
+              cache_age: 3600,
+              provider_name: 'MockPhoto',
+              provider_url: 'https://test-photo.mock/',
+              html: '<a href="https://test-photo.mock/photos/sample123" title="Test Photo Sample"><img src="https://test-photo.mock/images/sample.jpg" width="1024" height="768" alt="Test Photo Sample"></a>',
             }),
             {
               status: 200,
@@ -106,85 +133,57 @@ describe('OEmbed Provider Tests', () => {
             }
           );
         }
-      }
 
-      // MockPhoto oEmbed API mock
-      if (urlString.includes('test-photo.mock/oembed')) {
-        return new Response(
-          JSON.stringify({
-            type: 'photo',
-            title: 'Test Photo Sample',
-            author_name: 'Test Photographer',
-            author_url: 'https://test-photo.mock/users/testphotographer',
-            width: 1024,
-            height: 768,
-            url: 'https://test-photo.mock/images/sample.jpg',
-            web_page: 'https://test-photo.mock/photos/sample123',
-            thumbnail_url: 'https://test-photo.mock/thumbs/sample.jpg',
-            thumbnail_width: 150,
-            thumbnail_height: 150,
-            version: '1.0',
-            cache_age: 3600,
-            provider_name: 'MockPhoto',
-            provider_url: 'https://test-photo.mock/',
-            html: '<a href="https://test-photo.mock/photos/sample123" title="Test Photo Sample"><img src="https://test-photo.mock/images/sample.jpg" width="1024" height="768" alt="Test Photo Sample"></a>',
-          }),
-          {
+        // Mock unsupported provider (no oEmbed endpoint available)
+        if (urlString.includes('unsupported-provider.mock')) {
+          throw new Error(`No oEmbed provider found for URL: ${urlString}`);
+        }
+
+        // Handle redirect resolution for test URLs
+        if (
+          urlString.includes('short-tube.mock/video1') ||
+          urlString.includes('test-tube.mock/watch?v=video1')
+        ) {
+          return new Response('', {
             status: 200,
-            headers: { 'content-type': 'application/json' },
-          }
-        );
-      }
+            headers: { 'content-type': 'text/html' },
+          });
+        }
+        if (urlString.includes('short-tube.mock/video2')) {
+          return new Response('', {
+            status: 200,
+            headers: { 'content-type': 'text/html' },
+          });
+        }
+        if (urlString.includes('test-photo.mock/photos/sample123')) {
+          return new Response('', {
+            status: 200,
+            headers: { 'content-type': 'text/html' },
+          });
+        }
+        // Handle nonexistent URLs for timeout testing
+        if (urlString.includes('short-tube.mock/nonexistent123')) {
+          return new Response('Not Found', {
+            status: 404,
+            statusText: 'Not Found',
+          });
+        }
 
-      // Mock unsupported provider (no oEmbed endpoint available)
-      if (urlString.includes('unsupported-provider.mock')) {
-        throw new Error(`No oEmbed provider found for URL: ${urlString}`);
-      }
+        // For test-tube.mock or test-photo.mock URLs that don't match any video/photo, return 404
+        if (
+          urlString.includes('test-tube.mock') ||
+          urlString.includes('test-photo.mock')
+        ) {
+          return new Response('Not Found', {
+            status: 404,
+            statusText: 'Not Found',
+          });
+        }
 
-      // Handle redirect resolution for test URLs
-      if (
-        urlString.includes('short-tube.mock/video1') ||
-        urlString.includes('test-tube.mock/watch?v=video1')
-      ) {
-        return new Response('', {
-          status: 200,
-          headers: { 'content-type': 'text/html' },
-        });
+        // For other URLs, throw an error to ensure no external requests
+        throw new Error(`Unexpected fetch call to: ${urlString}`);
       }
-      if (urlString.includes('short-tube.mock/video2')) {
-        return new Response('', {
-          status: 200,
-          headers: { 'content-type': 'text/html' },
-        });
-      }
-      if (urlString.includes('test-photo.mock/photos/sample123')) {
-        return new Response('', {
-          status: 200,
-          headers: { 'content-type': 'text/html' },
-        });
-      }
-      // Handle nonexistent URLs for timeout testing
-      if (urlString.includes('short-tube.mock/nonexistent123')) {
-        return new Response('Not Found', {
-          status: 404,
-          statusText: 'Not Found',
-        });
-      }
-
-      // For test-tube.mock or test-photo.mock URLs that don't match any video/photo, return 404
-      if (
-        urlString.includes('test-tube.mock') ||
-        urlString.includes('test-photo.mock')
-      ) {
-        return new Response('Not Found', {
-          status: 404,
-          statusText: 'Not Found',
-        });
-      }
-
-      // For other URLs, throw an error to ensure no external requests
-      throw new Error(`Unexpected fetch call to: ${urlString}`);
-    });
+    );
 
     global.fetch = mockFetch;
 
