@@ -15,7 +15,12 @@ const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
 const version = packageJson.version;
 
 export default defineConfig({
-  plugins: [prettierMax(), screwUp()],
+  plugins: [
+    prettierMax({
+      typescript: 'tsconfig.tests.json',
+    }),
+    screwUp(),
+  ],
   build: {
     target: 'node18',
     lib: {

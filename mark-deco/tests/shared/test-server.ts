@@ -8,7 +8,6 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as net from 'net';
 import * as path from 'path';
-import * as url from 'url';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -140,9 +139,9 @@ export function createTestServer(config: TestServerConfig): TestServer {
       return;
     }
 
-    const parsedUrl = url.parse(req.url || '', true);
+    const parsedUrl = new URL(req.url || '/', 'http://localhost');
     const pathname = parsedUrl.pathname;
-    const query = parsedUrl.query;
+    const query = parsedUrl.searchParams;
 
     if (!pathname) {
       res.writeHead(404);
@@ -152,7 +151,7 @@ export function createTestServer(config: TestServerConfig): TestServer {
 
     // Handle oEmbed API endpoints for testing
     if (pathname === '/oembed') {
-      const urlParam = query.url as string;
+      const urlParam = query.get('url') ?? '';
 
       if (!urlParam) {
         res.writeHead(400);
