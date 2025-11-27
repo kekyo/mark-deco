@@ -27,11 +27,10 @@ import type {
   ProcessResult,
   FrontmatterData,
   HeadingNode,
-  FrontmatterPreTransform,
   FrontmatterPreTransformContext,
-  FrontmatterPostTransform,
   FrontmatterPostTransformContext,
   ProcessResultWithFrontmatterTransform,
+  ProcessWithFrontmatterTransformOptions,
 } from './types.js';
 import type { HTMLBeautifyOptions } from 'js-beautify';
 
@@ -555,9 +554,7 @@ export const createMarkdownProcessor = (
   const processWithFrontmatterTransform = async (
     markdown: string,
     uniqueIdPrefix: string,
-    frontmatterPreTransform: FrontmatterPreTransform,
-    frontmatterPostTransform?: FrontmatterPostTransform,
-    options: ProcessOptions = {}
+    options: ProcessWithFrontmatterTransformOptions
   ): Promise<ProcessResultWithFrontmatterTransform | undefined> => {
     try {
       const { data: parsedFrontmatter, content } = parseFrontmatter(markdown);
@@ -569,16 +566,19 @@ export const createMarkdownProcessor = (
         uniqueIdPrefix,
       };
 
-      const transformed = await frontmatterPreTransform(preContext);
+      const transformed = await options.preTransform(preContext);
       if (transformed === undefined) {
         return undefined;
       }
 
-      const { frontmatter, uniqueIdPrefix: overrideUniqueIdPrefix } =
-        transformed;
+      const {
+        frontmatter,
+        uniqueIdPrefix: overrideUniqueIdPrefix,
+        h1TitleTransform,
+      } = transformed;
       const nextUniqueIdPrefix = overrideUniqueIdPrefix ?? uniqueIdPrefix;
 
-      const titleTransform = options.h1TitleTransform ?? 'extractAndRemove';
+      const titleTransform = h1TitleTransform ?? 'extractAndRemove';
       let workingContent = content;
       let contentChanged = false;
 
@@ -605,12 +605,12 @@ export const createMarkdownProcessor = (
 
       let finalFrontmatter = baseResult.frontmatter;
 
-      if (frontmatterPostTransform) {
+      if (options.postTransform) {
         const postContext: FrontmatterPostTransformContext = {
           frontmatter: finalFrontmatter,
           headingTree: baseResult.headingTree,
         };
-        const postTransformed = await frontmatterPostTransform(postContext);
+        const postTransformed = await options.postTransform(postContext);
         finalFrontmatter = postTransformed;
       }
 

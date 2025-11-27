@@ -27,7 +27,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "dev": "vite build --watch",
+    "dev": "npm run build",
     "build": "vite build",
     "build:esbuild": "esbuild src/cli.ts --bundle --platform=node --target=node18 --outfile=dist/cli-esbuild.js --format=cjs --minify",
     "test": "npm run build && vitest run",

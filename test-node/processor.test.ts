@@ -293,9 +293,9 @@ More text.`;
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        async () => undefined,
-        undefined,
-        { h1TitleTransform: 'none' }
+        {
+          preTransform: async () => undefined,
+        }
       );
 
       expect(result).toBeUndefined();
@@ -318,15 +318,17 @@ title: "Same"
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        async ({ originalFrontmatter, uniqueIdPrefix }) => {
-          receivedPrefix = uniqueIdPrefix;
-          return {
-            frontmatter: originalFrontmatter,
-            uniqueIdPrefix: 'id',
-          };
-        },
-        undefined,
-        { useContentStringHeaderId: true, h1TitleTransform: 'none' }
+        {
+          preTransform: async ({ originalFrontmatter, uniqueIdPrefix }) => {
+            receivedPrefix = uniqueIdPrefix;
+            return {
+              frontmatter: originalFrontmatter,
+              uniqueIdPrefix: 'id',
+              h1TitleTransform: 'none',
+            };
+          },
+          useContentStringHeaderId: true,
+        }
       );
 
       expect(result).not.toBeUndefined();
@@ -354,18 +356,19 @@ title: "Original"
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        async ({ originalFrontmatter, uniqueIdPrefix }) => {
-          receivedPrefix = uniqueIdPrefix;
-          return {
-            frontmatter: {
-              ...originalFrontmatter,
-              category: 'news',
-            },
-            uniqueIdPrefix: 'id',
-          };
-        },
-        undefined,
-        { h1TitleTransform: 'none' }
+        {
+          preTransform: async ({ originalFrontmatter, uniqueIdPrefix }) => {
+            receivedPrefix = uniqueIdPrefix;
+            return {
+              frontmatter: {
+                ...originalFrontmatter,
+                category: 'news',
+              },
+              uniqueIdPrefix: 'id',
+              h1TitleTransform: 'none',
+            };
+          },
+        }
       );
 
       expect(result).not.toBeUndefined();
@@ -397,15 +400,17 @@ category: news
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        async ({ originalFrontmatter, uniqueIdPrefix }) => {
-          receivedPrefix = uniqueIdPrefix;
-          return {
-            frontmatter: originalFrontmatter,
-            uniqueIdPrefix: 'custom',
-          };
-        },
-        undefined,
-        { useContentStringHeaderId: true, h1TitleTransform: 'none' }
+        {
+          preTransform: async ({ originalFrontmatter, uniqueIdPrefix }) => {
+            receivedPrefix = uniqueIdPrefix;
+            return {
+              frontmatter: originalFrontmatter,
+              uniqueIdPrefix: 'custom',
+              h1TitleTransform: 'none',
+            };
+          },
+          useContentStringHeaderId: true,
+        }
       );
 
       expect(result).not.toBeUndefined();
@@ -425,15 +430,17 @@ category: news
       const result = await processor.processWithFrontmatterTransform(
         markdown,
         'id',
-        async ({ originalFrontmatter, uniqueIdPrefix }) => ({
-          frontmatter: originalFrontmatter,
-          uniqueIdPrefix,
-        }),
-        async ({ frontmatter, headingTree }) => ({
-          ...frontmatter,
-          summary: `headings:${headingTree.length}`,
-        }),
-        { h1TitleTransform: 'none' }
+        {
+          preTransform: async ({ originalFrontmatter, uniqueIdPrefix }) => ({
+            frontmatter: originalFrontmatter,
+            uniqueIdPrefix,
+            h1TitleTransform: 'none',
+          }),
+          postTransform: async ({ frontmatter, headingTree }) => ({
+            ...frontmatter,
+            summary: `headings:${headingTree.length}`,
+          }),
+        }
       );
 
       expect(result).not.toBeUndefined();

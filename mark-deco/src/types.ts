@@ -45,6 +45,8 @@ export interface FrontmatterTransformResult {
   readonly frontmatter: FrontmatterData;
   /** Unique ID prefix applied to generated nodes */
   readonly uniqueIdPrefix: string;
+  /** How to treat the first H1 heading for `frontmatter.title` (default: extractAndRemove) */
+  readonly h1TitleTransform?: H1TitleTransform;
 }
 
 /**
@@ -173,8 +175,26 @@ export interface ProcessOptions {
   useContentStringHeaderId?: boolean;
   /** Whether to use hierarchical numbering for heading IDs (e.g., id-1, id-1-1, id-1-2, id-2) (default: true) */
   useHierarchicalHeadingId?: boolean;
-  /** How to treat the first H1 heading for frontmatter.title (default: extractAndRemove) */
+  /** How to treat the first H1 heading for `frontmatter.title` (default: extractAndRemove) */
   h1TitleTransform?: H1TitleTransform;
+  /** For advanced configuration */
+  advancedOptions?: AdvancedOptions;
+}
+
+/**
+ * Options for markdown processing
+ */
+export interface ProcessWithFrontmatterTransformOptions {
+  /** Callback that can mutate or replace frontmatter and override the unique ID prefix before rendering */
+  preTransform: FrontmatterPreTransform;
+  /** Callback that can adjust frontmatter after rendering using generated heading information (default: ignore handling) */
+  postTransform?: FrontmatterPostTransform;
+  /** AbortSignal for cancelling the processing */
+  signal?: AbortSignal;
+  /** Whether to use content string for header ID generation (default: false) */
+  useContentStringHeaderId?: boolean;
+  /** Whether to use hierarchical numbering for heading IDs (e.g., id-1, id-1-1, id-1-2, id-2) (default: true) */
+  useHierarchicalHeadingId?: boolean;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
@@ -223,17 +243,13 @@ export interface MarkdownProcessor {
    * Process markdown content with frontmatter transformation control
    * @param markdown - Raw markdown content with frontmatter
    * @param uniqueIdPrefix - ID prefix for generating unique IDs within this processing scope
-   * @param frontmatterPreTransform - Callback that can mutate or replace frontmatter and override the unique ID prefix before rendering
-   * @param frontmatterPostTransform - Callback that can adjust frontmatter after rendering using generated heading information
    * @param options - Processing options excluding transform
    * @returns Promise resolving to processed result or undefined when transformation cancels processing
    */
   readonly processWithFrontmatterTransform: (
     markdown: string,
     uniqueIdPrefix: string,
-    frontmatterPreTransform: FrontmatterPreTransform,
-    frontmatterPostTransform?: FrontmatterPostTransform,
-    options?: ProcessOptions
+    options: ProcessWithFrontmatterTransformOptions
   ) => Promise<ProcessResultWithFrontmatterTransform | undefined>;
 }
 
