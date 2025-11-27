@@ -152,7 +152,7 @@ describe('createDirectFetcher', () => {
     const accept = 'application/json';
     const abortController = new AbortController();
 
-    mockFetch.mockImplementationOnce((url, options) => {
+    mockFetch.mockImplementationOnce((_, options) => {
       const signal = options?.signal;
       return new Promise((resolve, reject) => {
         // Check if already aborted
@@ -230,7 +230,7 @@ describe('createDirectFetcher', () => {
     const accept = 'application/json';
 
     // Simulate a slow request that properly handles AbortSignal
-    mockFetch.mockImplementationOnce((url, options) => {
+    mockFetch.mockImplementationOnce((_, options) => {
       const signal = options?.signal;
       return new Promise((resolve, reject) => {
         const timer = setTimeout(() => {

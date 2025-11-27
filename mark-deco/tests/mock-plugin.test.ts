@@ -136,7 +136,7 @@ describe('MockPlugin', () => {
   it('should handle basic mock plugin functionality', async () => {
     const mockPlugin: Plugin = {
       name: 'mock-test',
-      processBlock: async (content: string, context: PluginContext) => {
+      processBlock: async (content: string, _context: PluginContext) => {
         return `<div class="mock-plugin">${content}</div>`;
       },
     };

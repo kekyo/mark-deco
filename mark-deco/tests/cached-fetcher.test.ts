@@ -162,7 +162,7 @@ describe('createCachedFetcher', () => {
     const accept = 'application/json';
 
     // Simulate a slow request that doesn't respect AbortSignal
-    mockFetch.mockImplementationOnce((url, options) => {
+    mockFetch.mockImplementationOnce((_, options) => {
       const signal = options?.signal;
       return new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
