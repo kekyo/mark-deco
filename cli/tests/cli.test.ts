@@ -45,7 +45,7 @@ const spawnAsync = (
 };
 
 const CLI_PATH = resolve(__dirname, '../dist/cli.cjs');
-const NO_TITLE_ARGS = ['--h1-title-transform', 'none'];
+const NO_TITLE_ARGS = ['--header-title-transform', 'none'];
 
 describe('mark-deco-cli', () => {
   it('should display help information', async () => {
@@ -118,7 +118,7 @@ Some content here.`;
     // Note: frontmatter is no longer output to stderr by default
   });
 
-  it('should apply title from leading H1 by default', async () => {
+  it('should apply title from the leading base-level heading by default', async () => {
     const frontmatterFile = resolve(__dirname, 'auto-title-frontmatter.json');
     const markdown = `# Auto Title
 
@@ -137,7 +137,7 @@ Body text.`;
       const frontmatter = JSON.parse(frontmatterContent);
       expect(frontmatter.title).toBe('Auto Title');
 
-      // Default behaviour removes the leading H1 from HTML output
+      // Default behaviour removes the leading base-level heading from HTML output
       expect(stdout).not.toContain('<h1');
       expect(stdout).toContain('<p>Body text.</p>');
     } finally {

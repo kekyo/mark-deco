@@ -180,7 +180,7 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
       const result = await processor.process(markdown, 'id', {
         useContentStringHeaderId: true,
         useHierarchicalHeadingId: false,
-        h1TitleTransform: 'none',
+        headerTitleTransform: 'none',
       });
 
       expect(result.html).toContain('<h1 id="id-test">Test</h1>');

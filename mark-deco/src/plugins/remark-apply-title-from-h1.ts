@@ -6,18 +6,24 @@
 import type { Heading, Root } from 'mdast';
 import type { Position } from 'unist';
 import type { Plugin } from 'unified';
-import { extractHeadingText } from '../utils/heading.js';
-import type { FrontmatterData, H1TitleTransform } from '../types.js';
+import {
+  clampHeadingLevel,
+  extractHeadingText,
+  resolveHeadingBaseLevel,
+} from '../utils/heading.js';
+import type { FrontmatterData, HeaderTitleTransform } from '../types.js';
 
-type ApplyTitleTransform = Exclude<H1TitleTransform, 'none'>;
+type ApplyTitleTransform = Exclude<HeaderTitleTransform, 'none'>;
 
 export interface ApplyTitleFromH1Options {
   /** Mutable reference to the frontmatter object */
   readonly frontmatter: FrontmatterData;
   /** Whether frontmatter already contains a title */
   readonly hasTitle: boolean;
-  /** How to treat the first H1 heading */
+  /** How to treat the first base-level heading */
   readonly transform: ApplyTitleTransform;
+  /** Base heading level for markdown headings */
+  readonly headingBaseLevel: number;
   /** Whether plugin is allowed to write extracted title into frontmatter */
   readonly allowTitleWrite: boolean;
   /** Callback invoked when a heading was removed */
@@ -38,7 +44,7 @@ export interface ApplyTitleFromH1Result {
 }
 
 /**
- * Remark plugin that optionally removes the first H1 heading and applies it to frontmatter.title
+ * Remark plugin that optionally removes the first base-level heading and applies it to frontmatter.title
  */
 export const remarkApplyTitleFromH1: Plugin<[ApplyTitleFromH1Options], Root> = (
   options
@@ -48,9 +54,12 @@ export const remarkApplyTitleFromH1: Plugin<[ApplyTitleFromH1Options], Root> = (
     hasTitle,
     transform,
     allowTitleWrite,
+    headingBaseLevel,
     onHeadingApplied,
   } = options;
   const shouldRemoveHeading = transform === 'extractAndRemove';
+  const baseLevel = resolveHeadingBaseLevel(headingBaseLevel);
+  const offset = baseLevel - 1;
 
   return (tree: Root) => {
     if (!frontmatter || !tree.children || tree.children.length === 0) {
@@ -60,8 +69,12 @@ export const remarkApplyTitleFromH1: Plugin<[ApplyTitleFromH1Options], Root> = (
     let index = 0;
     for (; index < tree.children.length; index++) {
       const node = tree.children[index]!;
-      if (node.type === 'heading' && (node as Heading).depth === 1) {
+      if (node.type === 'heading') {
         const heading = node as Heading;
+        const outputLevel = clampHeadingLevel(heading.depth + offset);
+        if (outputLevel !== baseLevel) {
+          break;
+        }
         const nextNode = tree.children[index + 1];
         const nextNodeStartOffset =
           nextNode && nextNode.position
@@ -105,7 +118,7 @@ export const remarkApplyTitleFromH1: Plugin<[ApplyTitleFromH1Options], Root> = (
         continue;
       }
 
-      // First non-heading content encountered -> abort (no leading H1)
+      // First non-heading content encountered -> abort (no leading base-level heading)
       break;
     }
   };

@@ -7,7 +7,7 @@ import { Command, Option } from 'commander';
 import { loadConfig } from './config.js';
 import { readInput, writeOutput, writeJsonOutput } from './io.js';
 import { setupProcessor } from './processor.js';
-import type { H1TitleTransform } from 'mark-deco';
+import type { HeaderTitleTransform } from 'mark-deco';
 
 // Version is injected at build time by Vite
 declare const __VERSION__: string;
@@ -21,7 +21,8 @@ interface CLIOptions {
   uniqueIdPrefix?: string;
   hierarchicalHeadingId?: boolean;
   contentBasedHeadingId?: boolean;
-  h1TitleTransform?: H1TitleTransform;
+  headingBaseLevel?: number;
+  headerTitleTransform?: HeaderTitleTransform;
   frontmatterOutput?: string;
   headingTreeOutput?: string;
 }
@@ -71,8 +72,16 @@ async function main() {
     )
     .addOption(
       new Option(
-        '--h1-title-transform <mode>',
-        'Control how the first H1 heading is applied to frontmatter.title (extract, extractAndRemove, none)'
+        '--heading-base-level <level>',
+        'Base heading level for markdown headings'
+      )
+        .argParser((value) => Number.parseInt(value, 10))
+        .default(1)
+    )
+    .addOption(
+      new Option(
+        '--header-title-transform <mode>',
+        'Control how the first base-level heading is applied to frontmatter.title (extract, extractAndRemove, none)'
       ).choices(['extract', 'extractAndRemove', 'none'])
     )
     .addOption(
@@ -103,10 +112,12 @@ async function main() {
         const processor = setupProcessor(mergedOptions);
 
         // Process markdown
-        const h1TitleTransform: H1TitleTransform =
-          options.h1TitleTransform ??
-          config.h1TitleTransform ??
+        const headerTitleTransform: HeaderTitleTransform =
+          options.headerTitleTransform ??
+          config.headerTitleTransform ??
           'extractAndRemove';
+        const headingBaseLevel =
+          options.headingBaseLevel ?? config.headingBaseLevel ?? 1;
 
         const result = await processor.process(
           markdown,
@@ -114,7 +125,8 @@ async function main() {
           {
             useHierarchicalHeadingId: options.hierarchicalHeadingId ?? true,
             useContentStringHeaderId: options.contentBasedHeadingId ?? false,
-            h1TitleTransform,
+            headingBaseLevel,
+            headerTitleTransform,
           }
         );
 

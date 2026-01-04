@@ -27,7 +27,7 @@ describe('remark-attr integration', () => {
     options: ProcessOptions = {}
   ) => {
     return processor.process(markdown, prefix, {
-      h1TitleTransform: 'none',
+      headerTitleTransform: 'none',
       ...options,
     });
   };
@@ -195,7 +195,7 @@ describe('remark-attr integration', () => {
       const markdown =
         '```test-plugin {.custom-styling #plugin-block}\ntest content\n```';
       const result = await pluginProcessor.process(markdown, 'test', {
-        h1TitleTransform: 'none',
+        headerTitleTransform: 'none',
       });
 
       // Note: When plugins process code blocks, they replace the original code block

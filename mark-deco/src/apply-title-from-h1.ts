@@ -6,13 +6,15 @@
 import remarkParse from 'remark-parse';
 import { unified } from 'unified';
 import { remarkApplyTitleFromH1 } from './plugins/remark-apply-title-from-h1.js';
-import type { FrontmatterData, H1TitleTransform } from './types.js';
+import type { FrontmatterData, HeaderTitleTransform } from './types.js';
 
 export interface ApplyTitleOptions {
   /** Whether the caller allows writing heading text into frontmatter.title */
   readonly allowTitleWrite: boolean;
-  /** How to treat the first H1 heading */
-  readonly transform: H1TitleTransform;
+  /** How to treat the first base-level heading */
+  readonly transform: HeaderTitleTransform;
+  /** Base heading level for markdown headings (default: 1) */
+  readonly headingBaseLevel: number;
 }
 
 export interface ApplyTitleResult {
@@ -22,14 +24,14 @@ export interface ApplyTitleResult {
 }
 
 /**
- * Apply the leading H1 heading to frontmatter.title and optionally remove it from the markdown content
+ * Apply the leading base-level heading to frontmatter.title and optionally remove it from the markdown content
  */
 export const applyTitleFromH1 = (
   markdownContent: string,
   frontmatter: FrontmatterData,
   options: ApplyTitleOptions
 ): ApplyTitleResult => {
-  const { transform, allowTitleWrite } = options;
+  const { transform, allowTitleWrite, headingBaseLevel } = options;
 
   if (transform === 'none') {
     return {
@@ -58,6 +60,7 @@ export const applyTitleFromH1 = (
       hasTitle,
       transform,
       allowTitleWrite,
+      headingBaseLevel,
       onHeadingApplied: (info) => {
         headingRemoved = info.headingRemoved;
         titleWritten = info.titleWritten;

@@ -39,7 +39,7 @@ export type {
   ProcessOptions,
   ProcessResult,
   ProcessResultWithFrontmatterTransform,
-  H1TitleTransform,
+  HeaderTitleTransform,
   FrontmatterData,
   FrontmatterPreTransform,
   FrontmatterPreTransformContext,
