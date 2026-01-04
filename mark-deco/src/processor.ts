@@ -17,7 +17,11 @@ import { remarkAttr } from './plugins/remark-attr.js';
 import { rehypeResponsiveImages } from './plugins/responsive-images.js';
 import { generateHeadingId } from './utils.js';
 import { applyTitleFromH1 } from './apply-title-from-h1.js';
-import { extractHeadingText } from './utils/heading.js';
+import {
+  clampHeadingLevel,
+  extractHeadingText,
+  resolveHeadingBaseLevel,
+} from './utils/heading.js';
 import type {
   Plugin,
   PluginContext,
@@ -89,13 +93,15 @@ const generateHierarchicalId = (prefix: string, numbers: number[]): string => {
  * Build hierarchical heading numbers
  */
 const buildHierarchicalNumbers = (
-  headings: Array<{ level: number; text: string }>
+  headings: Array<{ level: number; text: string }>,
+  headingBaseLevel: number
 ): Array<{ level: number; text: string; numbers: number[] }> => {
   const result: Array<{ level: number; text: string; numbers: number[] }> = [];
   const stack: number[] = []; // Track numbers at each level
+  const baseLevel = resolveHeadingBaseLevel(headingBaseLevel);
 
   for (const heading of headings) {
-    const level = heading.level;
+    const level = Math.max(1, heading.level - baseLevel + 1);
 
     // Adjust stack size to current level
     // If we're going to a higher level (smaller number), remove deeper levels
@@ -288,17 +294,28 @@ export const createMarkdownProcessor = (
     generateId: (headingText: string) => string,
     useHierarchicalId: boolean = false,
     useContentBasedId: boolean = false,
-    uniqueIdPrefix: string = ''
+    uniqueIdPrefix: string = '',
+    headingBaseLevel: number = 1
   ) => {
     return () => {
       return (tree: any) => {
         const headings: Array<{ level: number; text: string; id: string }> = [];
+        const baseLevel = resolveHeadingBaseLevel(headingBaseLevel);
+        const offset = baseLevel - 1;
+        const resolveAdjustedLevel = (depth: number): number => {
+          return clampHeadingLevel(depth + offset);
+        };
 
         // First pass: collect all headings
-        const headingNodes: any[] = [];
+        const headingNodes: Array<{ node: any; level: number }> = [];
         visit(tree, 'heading', (node: any) => {
           if (node.depth >= 1 && node.depth <= 6) {
-            headingNodes.push(node);
+            const adjustedLevel = resolveAdjustedLevel(node.depth);
+            if (!node.data) {
+              node.data = {};
+            }
+            node.data.hName = `h${adjustedLevel}`;
+            headingNodes.push({ node, level: adjustedLevel });
           }
         });
 
@@ -309,18 +326,21 @@ export const createMarkdownProcessor = (
           numbers: number[];
         }> = [];
         if (useHierarchicalId) {
-          const basicHeadings = headingNodes.map((node) => ({
-            level: node.depth,
+          const basicHeadings = headingNodes.map(({ node, level }) => ({
+            level,
             text: extractHeadingText(node),
           }));
-          hierarchicalNumbers = buildHierarchicalNumbers(basicHeadings);
+          hierarchicalNumbers = buildHierarchicalNumbers(
+            basicHeadings,
+            baseLevel
+          );
         }
 
         // Second pass: set IDs and collect heading data
         const parentContentIds: Array<{ level: number; contentId: string }> =
           [];
 
-        headingNodes.forEach((node, index) => {
+        headingNodes.forEach(({ node, level }, index) => {
           const headingText = extractHeadingText(node);
 
           // Check if ID is already set by remark-attr
@@ -340,7 +360,7 @@ export const createMarkdownProcessor = (
             // Remove parent IDs that are deeper than current level
             while (parentContentIds.length > 0) {
               const lastParent = parentContentIds[parentContentIds.length - 1];
-              if (lastParent && lastParent.level >= node.depth) {
+              if (lastParent && lastParent.level >= level) {
                 parentContentIds.pop();
               } else {
                 break;
@@ -358,7 +378,7 @@ export const createMarkdownProcessor = (
 
             // Store this heading's content ID for children
             parentContentIds.push({
-              level: node.depth,
+              level,
               contentId: contentBasedId,
             });
           } else if (useHierarchicalId && index < hierarchicalNumbers.length) {
@@ -387,7 +407,7 @@ export const createMarkdownProcessor = (
           }
 
           headings.push({
-            level: node.depth,
+            level,
             text: headingText,
             id: headingId,
           });
@@ -425,8 +445,10 @@ export const createMarkdownProcessor = (
       signal,
       useContentStringHeaderId = false,
       useHierarchicalHeadingId = true,
+      headingBaseLevel,
       advancedOptions,
     } = options ?? {};
+    const resolvedHeadingBaseLevel = resolveHeadingBaseLevel(headingBaseLevel);
 
     const {
       allowDangerousHtml = true,
@@ -468,7 +490,8 @@ export const createMarkdownProcessor = (
             : getUniqueId,
           useHierarchicalHeadingId,
           useContentStringHeaderId,
-          uniqueIdPrefix
+          uniqueIdPrefix,
+          resolvedHeadingBaseLevel
         )
       )
       .use(createCustomBlockPlugin(frontmatter, signal, getUniqueId))
@@ -518,7 +541,10 @@ export const createMarkdownProcessor = (
     try {
       const { data: parsedFrontmatter, content } = parseFrontmatter(markdown);
 
-      const titleTransform = options.h1TitleTransform ?? 'extractAndRemove';
+      const resolvedHeadingBaseLevel = resolveHeadingBaseLevel(
+        options.headingBaseLevel
+      );
+      const titleTransform = options.headerTitleTransform ?? 'extractAndRemove';
       let workingContent = content;
       let contentChanged = false;
       let frontmatterChanged = false;
@@ -527,6 +553,7 @@ export const createMarkdownProcessor = (
         const h1Result = applyTitleFromH1(workingContent, parsedFrontmatter, {
           allowTitleWrite: true,
           transform: titleTransform,
+          headingBaseLevel: resolvedHeadingBaseLevel,
         });
         workingContent = h1Result.content;
         contentChanged = h1Result.headingRemoved;
@@ -535,10 +562,15 @@ export const createMarkdownProcessor = (
 
       const changed = contentChanged || frontmatterChanged;
 
+      const normalizedOptions: ProcessOptions = {
+        ...options,
+        headingBaseLevel: resolvedHeadingBaseLevel,
+      };
+
       return await processCore(
         markdown,
         uniqueIdPrefix,
-        options,
+        normalizedOptions,
         parsedFrontmatter,
         workingContent,
         changed
@@ -574,11 +606,14 @@ export const createMarkdownProcessor = (
       const {
         frontmatter,
         uniqueIdPrefix: overrideUniqueIdPrefix,
-        h1TitleTransform,
+        headerTitleTransform,
       } = transformed;
       const nextUniqueIdPrefix = overrideUniqueIdPrefix ?? uniqueIdPrefix;
 
-      const titleTransform = h1TitleTransform ?? 'extractAndRemove';
+      const resolvedHeadingBaseLevel = resolveHeadingBaseLevel(
+        options.headingBaseLevel
+      );
+      const titleTransform = headerTitleTransform ?? 'extractAndRemove';
       let workingContent = content;
       let contentChanged = false;
 
@@ -586,6 +621,7 @@ export const createMarkdownProcessor = (
         const h1Result = applyTitleFromH1(workingContent, frontmatter, {
           allowTitleWrite: true,
           transform: titleTransform,
+          headingBaseLevel: resolvedHeadingBaseLevel,
         });
         workingContent = h1Result.content;
         contentChanged = h1Result.headingRemoved || contentChanged;
@@ -594,10 +630,15 @@ export const createMarkdownProcessor = (
       const preSnapshot = snapshotFrontmatter(frontmatter);
       const preChanged = preSnapshot !== originalSnapshot || contentChanged;
 
+      const normalizedOptions: ProcessWithFrontmatterTransformOptions = {
+        ...options,
+        headingBaseLevel: resolvedHeadingBaseLevel,
+      };
+
       const baseResult = await processCore(
         markdown,
         nextUniqueIdPrefix,
-        options,
+        normalizedOptions,
         frontmatter,
         workingContent,
         preChanged

@@ -37,7 +37,9 @@ Options:
       --unique-id-prefix <prefix>  Unique ID prefix (default: "section")
       --hierarchical-heading-id    Use hierarchical heading IDs (default: true)
       --content-based-heading-id   Use content-based heading IDs (default: false)
-      --h1-title-transform <mode>  Apply the first H1 to frontmatter.title (extract, extractAndRemove, none; default: extractAndRemove)
+      --heading-base-level <level> Base heading level for markdown headings (default: 1)
+      --header-title-transform <mode>
+                                   Apply the first base-level heading to frontmatter.title (extract, extractAndRemove, none; default: extractAndRemove)
       --frontmatter-output <file>  Output frontmatter as JSON to specified file
       --heading-tree-output <file> Output heading tree as JSON to specified file
   -h, --help                      Display help
@@ -76,7 +78,8 @@ You can specify default options in JSON format configuration file:
   "uniqueIdPrefix": "section",
   "hierarchicalHeadingId": true,
   "contentBasedHeadingId": false,
-  "h1TitleTransform": "extractAndRemove",
+  "headingBaseLevel": 1,
+  "headerTitleTransform": "extractAndRemove",
   "oembed": {
     "enabled": true,
     "timeout": 5000

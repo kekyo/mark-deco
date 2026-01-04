@@ -103,11 +103,10 @@ For usage of `AbortController` and `AbortSignal`, refer to ECMAScript documentat
 
 ### Automatic Title Extraction
 
-By default, MarkDeco copies the first H1 heading into `frontmatter.title` and removes that heading from the content.
-Adjust this with `h1TitleTransform`:
+By default, MarkDeco copies the first base-level heading into `frontmatter.title` and removes that heading from the content. Adjust this with `headerTitleTransform`:
 
 ```typescript
-await processor.process(markdown, 'id', { h1TitleTransform: 'extract' });
+await processor.process(markdown, 'id', { headerTitleTransform: 'extract' });
 ```
 
 Use `extract` to keep the heading while copying the title, `extractAndRemove` (default) to remove it, or `none` to skip the behaviour entirely.

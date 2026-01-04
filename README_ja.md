@@ -103,11 +103,10 @@ const result = await processor.process(
 
 ### タイトルの自動抽出
 
-MarkDecoはデフォルトで先頭のH1見出しを `frontmatter.title` にコピーし、その見出しを本文から削除します。
-`h1TitleTransform` で挙動を切り替えられます:
+MarkDecoはデフォルトで先頭のベース見出しを `frontmatter.title` にコピーし、その見出しを本文から削除します。`headerTitleTransform` で挙動を切り替えられます:
 
 ```typescript
-await processor.process(markdown, 'id', { h1TitleTransform: 'extract' });
+await processor.process(markdown, 'id', { headerTitleTransform: 'extract' });
 ```
 
 `extract` なら見出しを残したままtitleへ反映し、`extractAndRemove` (デフォルト) は見出しを削除、`none` はこの処理自体を行いません。

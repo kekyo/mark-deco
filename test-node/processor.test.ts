@@ -43,7 +43,7 @@ More content here.`;
 
     const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
-      h1TitleTransform: 'none',
+      headerTitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({
@@ -74,7 +74,7 @@ Just some content.`;
 
     const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
-      h1TitleTransform: 'none',
+      headerTitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({});
@@ -92,7 +92,7 @@ Just some content.`;
     const markdown = '';
 
     const result = await processor.process(markdown, 'id', {
-      h1TitleTransform: 'none',
+      headerTitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({});
@@ -112,7 +112,7 @@ tags: ["test"]
 ---`;
 
     const result = await processor.process(markdown, 'id', {
-      h1TitleTransform: 'none',
+      headerTitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({
@@ -143,7 +143,7 @@ Content 3`;
 
     const result = await processor.process(markdown, 'id', {
       useContentStringHeaderId: true,
-      h1TitleTransform: 'none',
+      headerTitleTransform: 'none',
     });
 
     expect(result.headingTree).toHaveLength(3);
@@ -181,7 +181,7 @@ number: 42
 This is test content.`;
 
     const result = await processor.process(markdown, 'id', {
-      h1TitleTransform: 'none',
+      headerTitleTransform: 'none',
     });
 
     expect(result.frontmatter).toEqual({
@@ -200,8 +200,8 @@ This is test content.`;
     expect(result.headingTree[0]?.text).toBe('Test Content');
   });
 
-  describe('h1TitleTransform behaviour', () => {
-    it('applies leading H1 to frontmatter and removes heading', async () => {
+  describe('headerTitleTransform behaviour', () => {
+    it('applies leading base-level heading to frontmatter and removes heading', async () => {
       const processor = createMarkdownProcessor({
         plugins: [],
         fetcher: createCachedFetcher('test-userAgent', 10000),
@@ -249,7 +249,7 @@ Rest of content.`;
 Still here.`;
 
       const result = await processor.process(markdown, 'id', {
-        h1TitleTransform: 'extract',
+        headerTitleTransform: 'extract',
       });
 
       expect(result.frontmatter).toEqual({ title: 'Visible Title' });
@@ -269,7 +269,7 @@ Still here.`;
 More text.`;
 
       const result = await processor.process(markdown, 'id', {
-        h1TitleTransform: 'none',
+        headerTitleTransform: 'none',
         useContentStringHeaderId: true,
       });
 
@@ -278,6 +278,77 @@ More text.`;
         '<h1 id="id-keep-heading">Keep Heading</h1>'
       );
       expect(result.headingTree).toHaveLength(1);
+    });
+  });
+
+  describe('headingBaseLevel', () => {
+    it('offsets heading levels in output and headingTree', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = `# Title
+
+## Sub
+
+### Detail`;
+
+      const result = await processor.process(markdown, 'id', {
+        headerTitleTransform: 'none',
+        headingBaseLevel: 2,
+      });
+
+      expect(result.html).toContain('<h2 id="id-1">Title</h2>');
+      expect(result.html).toContain('<h3 id="id-1-1">Sub</h3>');
+      expect(result.html).toContain('<h4 id="id-1-1-1">Detail</h4>');
+      expect(result.headingTree[0]?.level).toBe(2);
+      expect(result.headingTree[0]?.children[0]?.level).toBe(3);
+      expect(result.headingTree[0]?.children[0]?.children[0]?.level).toBe(4);
+    });
+
+    it('clamps heading levels at h6', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = `# Top
+
+### Deep
+
+#### Deeper`;
+
+      const result = await processor.process(markdown, 'id', {
+        headerTitleTransform: 'none',
+        headingBaseLevel: 5,
+      });
+
+      expect(result.html).toContain('<h5 id="id-1">Top</h5>');
+      expect(result.html).toContain('<h6 id="id-1-1">Deep</h6>');
+      expect(result.html).toContain('<h6 id="id-1-2">Deeper</h6>');
+      expect(result.headingTree[0]?.level).toBe(5);
+      expect(result.headingTree[0]?.children[0]?.level).toBe(6);
+    });
+
+    it('extracts title from base-level heading', async () => {
+      const processor = createMarkdownProcessor({
+        plugins: [],
+        fetcher: createCachedFetcher('test-userAgent', 10000),
+      });
+
+      const markdown = `# Visible Title
+
+Body text.`;
+
+      const result = await processor.process(markdown, 'id', {
+        headerTitleTransform: 'extract',
+        headingBaseLevel: 2,
+      });
+
+      expect(result.frontmatter).toEqual({ title: 'Visible Title' });
+      expect(result.html).toContain('<h2 id="id-1">Visible Title</h2>');
+      expect(result.headingTree[0]?.level).toBe(2);
     });
   });
 
@@ -324,7 +395,7 @@ title: "Same"
             return {
               frontmatter: originalFrontmatter,
               uniqueIdPrefix: 'id',
-              h1TitleTransform: 'none',
+              headerTitleTransform: 'none',
             };
           },
           useContentStringHeaderId: true,
@@ -365,7 +436,7 @@ title: "Original"
                 category: 'news',
               },
               uniqueIdPrefix: 'id',
-              h1TitleTransform: 'none',
+              headerTitleTransform: 'none',
             };
           },
         }
@@ -406,7 +477,7 @@ category: news
             return {
               frontmatter: originalFrontmatter,
               uniqueIdPrefix: 'custom',
-              h1TitleTransform: 'none',
+              headerTitleTransform: 'none',
             };
           },
           useContentStringHeaderId: true,
@@ -434,7 +505,7 @@ category: news
           preTransform: async ({ originalFrontmatter, uniqueIdPrefix }) => ({
             frontmatter: originalFrontmatter,
             uniqueIdPrefix,
-            h1TitleTransform: 'none',
+            headerTitleTransform: 'none',
           }),
           postTransform: async ({ frontmatter, headingTree }) => ({
             ...frontmatter,

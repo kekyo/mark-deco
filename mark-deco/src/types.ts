@@ -14,9 +14,9 @@ export type { HTMLBeautifyOptions };
 export type { RemarkGfmOptions };
 
 /**
- * Control how H1 headings affect frontmatter.title
+ * Control how the leading base-level heading affects frontmatter.title
  */
-export type H1TitleTransform = 'extract' | 'extractAndRemove' | 'none';
+export type HeaderTitleTransform = 'extract' | 'extractAndRemove' | 'none';
 
 /**
  * Frontmatter data extracted from markdown
@@ -45,8 +45,8 @@ export interface FrontmatterTransformResult {
   readonly frontmatter: FrontmatterData;
   /** Unique ID prefix applied to generated nodes */
   readonly uniqueIdPrefix: string;
-  /** How to treat the first H1 heading for `frontmatter.title` (default: extractAndRemove) */
-  readonly h1TitleTransform?: H1TitleTransform;
+  /** How to treat the first base-level heading for `frontmatter.title` (default: extractAndRemove) */
+  readonly headerTitleTransform?: HeaderTitleTransform;
 }
 
 /**
@@ -171,12 +171,14 @@ export interface AdvancedOptions {
 export interface ProcessOptions {
   /** AbortSignal for cancelling the processing */
   signal?: AbortSignal;
+  /** Base heading level for markdown headings (default: 1) */
+  headingBaseLevel?: number;
   /** Whether to use content string for header ID generation (default: false) */
   useContentStringHeaderId?: boolean;
   /** Whether to use hierarchical numbering for heading IDs (e.g., id-1, id-1-1, id-1-2, id-2) (default: true) */
   useHierarchicalHeadingId?: boolean;
-  /** How to treat the first H1 heading for `frontmatter.title` (default: extractAndRemove) */
-  h1TitleTransform?: H1TitleTransform;
+  /** How to treat the first base-level heading for `frontmatter.title` (default: extractAndRemove) */
+  headerTitleTransform?: HeaderTitleTransform;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
@@ -191,10 +193,14 @@ export interface ProcessWithFrontmatterTransformOptions {
   postTransform?: FrontmatterPostTransform;
   /** AbortSignal for cancelling the processing */
   signal?: AbortSignal;
+  /** Base heading level for markdown headings (default: 1) */
+  headingBaseLevel?: number;
   /** Whether to use content string for header ID generation (default: false) */
   useContentStringHeaderId?: boolean;
   /** Whether to use hierarchical numbering for heading IDs (e.g., id-1, id-1-1, id-1-2, id-2) (default: true) */
   useHierarchicalHeadingId?: boolean;
+  /** How to treat the first base-level heading for `frontmatter.title` (default: extractAndRemove) */
+  headerTitleTransform?: HeaderTitleTransform;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }

@@ -31,3 +31,21 @@ export const extractHeadingText = (
 
   return '';
 };
+
+/**
+ * Clamp heading level into the range 1-6.
+ */
+export const clampHeadingLevel = (level: number): number => {
+  if (!Number.isFinite(level)) {
+    return 1;
+  }
+  const normalized = Math.trunc(level);
+  return Math.min(6, Math.max(1, normalized));
+};
+
+/**
+ * Resolve heading base level with default and clamp.
+ */
+export const resolveHeadingBaseLevel = (baseLevel?: number): number => {
+  return clampHeadingLevel(baseLevel ?? 1);
+};

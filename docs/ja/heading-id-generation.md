@@ -40,6 +40,20 @@ console.log(result.headingTree);
 <p>これは結論部分です。</p>
 ```
 
+### 見出しベースレベル
+
+`headingBaseLevel` で出力する見出しレベルをずらせます:
+
+```typescript
+const result = await processor.process(markdown, 'id', {
+  headingBaseLevel: 2,
+  headerTitleTransform: 'none',
+});
+```
+
+`headingBaseLevel: 2` の場合、`#` は `<h2>`、`##` は `<h3>` になります（`<h6>` でクランプ）。
+`headingTree.level` も調整後のレベルになります。
+
 ### 階層的見出しID
 
 見出しの階層構造を反映したIDを生成する機能があります。`useHierarchicalHeadingId`オプションが`true`の場合、見出しレベルに基づいた階層的な番号が付与されます。

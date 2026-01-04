@@ -42,18 +42,19 @@ Frontmatterデータは以下のような用途で活用できます:
 後述のプラグインは、プラグインの実装によっては情報を使用する可能性があります。
 Frontmatter のスカラー値は JSON スキーマで解析され、`null` / `true` / `false` / 数値 / 文字列といった JSON 互換型で受け取れます。
 
-### 先頭H1からのtitle自動抽出
+### 先頭ベース見出しからのtitle自動抽出
 
-Markdown本文で最初の（ホワイトスペースを除いた）ブロックがH1見出しの場合、
-MarkDecoはデフォルトでその見出し文字列を `frontmatter.title` に書き込み、元のH1を本文から取り除きます。
-`h1TitleTransform` オプションで挙動を切り替えられます:
+Markdown本文で最初の（ホワイトスペースを除いた）ブロックがベース見出しの場合、
+MarkDecoはデフォルトでその見出し文字列を `frontmatter.title` に書き込み、元の見出しを本文から取り除きます。
+ベース見出しは `headingBaseLevel` (デフォルト: 1) で決まります。
+`headerTitleTransform` オプションで挙動を切り替えられます:
 
-- `extractAndRemove` (デフォルト): H1の文字列を `frontmatter.title` に書き込み、本文から見出しを削除する。
-- `extract`: `frontmatter.title` に書き込むが、H1見出しは本文に残す。
+- `extractAndRemove` (デフォルト): 見出し文字列を `frontmatter.title` に書き込み、本文から見出しを削除する。
+- `extract`: `frontmatter.title` に書き込むが、見出しは本文に残す。
 - `none`: title抽出を行わない。
 
-既に frontmatter に `title` が存在する場合、`extract`または`extractAndRemove` はH1だけを削除し、`title`は上書きしません。
-この機能を無効化するには `processor.process(markdown, prefix, { h1TitleTransform: 'none' })` を指定してください。
+既に frontmatter に `title` が存在する場合、`extract`または`extractAndRemove` は見出しだけを削除し、`title`は上書きしません。
+この機能を無効化するには `processor.process(markdown, prefix, { headerTitleTransform: 'none' })` を指定してください。
 
 `processWithFrontmatterTransform` の pre 変換は抽出前に実行されるため、この自動タイトルを参照できない点には留意してください。
 
