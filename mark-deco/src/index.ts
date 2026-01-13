@@ -3,6 +3,9 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
+// Type exports
+export * from './types.js';
+
 // Main exports
 export { createMarkdownProcessor, defaultHtmlOptions } from './processor.js';
 export { createOEmbedPlugin } from './plugins/oembed-plugin.js';
@@ -30,26 +33,6 @@ export type { CacheStorage } from './cache/index.js';
 
 // Logger exports
 export { getNoOpLogger, getConsoleLogger } from './logger.js';
-
-// Type exports
-export type {
-  Plugin,
-  PluginContext,
-  MarkdownProcessor,
-  ProcessOptions,
-  ProcessResult,
-  ProcessResultWithFrontmatterTransform,
-  HeaderTitleTransform,
-  FrontmatterData,
-  FrontmatterPreTransform,
-  FrontmatterPreTransformContext,
-  FrontmatterTransformResult,
-  FrontmatterPostTransform,
-  FrontmatterPostTransformContext,
-  Logger,
-  LogLevel,
-  FetcherType,
-} from './types.js';
 
 // oEmbed specific type exports
 export type { OEmbedProvider } from './plugins/oembed/types.js';
