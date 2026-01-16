@@ -26,6 +26,7 @@ export default defineConfig({
         index: resolve(__dirname, 'src/index.ts'),
         internal: resolve(__dirname, 'src/internal.ts'),
         node: resolve(__dirname, 'src/node.ts'),
+        misc: resolve(__dirname, 'src/misc.ts'),
       },
       name: 'mark-deco',
       formats: ['es', 'cjs'],
