@@ -6,13 +6,13 @@
 import {
   createResponsiveImageWithContainer,
   createResponsiveImageTag,
-} from '../../utils/responsive-image.js';
+} from '../../utils/responsive-image';
 import {
   escapeHtml,
   calculateAspectRatio,
   extractAspectRatioFromHtml,
-} from './utils.js';
-import type { OEmbedResponse, OEmbedPluginOptions } from './types.js';
+} from './utils';
+import type { OEmbedResponse, OEmbedPluginOptions } from './types';
 
 /**
  * Generate fallback HTML for unsupported providers

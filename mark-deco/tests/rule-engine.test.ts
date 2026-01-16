@@ -5,13 +5,13 @@
 
 import * as cheerio from 'cheerio';
 import { describe, it, expect } from 'vitest';
-import { amazonRules } from '../src/plugins/card/amazon-rules.js';
-import { ogpRules } from '../src/plugins/card/ogp-rules.js';
+import { amazonRules } from '../src/plugins/card/amazon-rules';
+import { ogpRules } from '../src/plugins/card/ogp-rules';
 import {
   findMatchingRule,
   applyScrapingRule,
-} from '../src/plugins/card/rule-engine.js';
-import type { ScrapingRule } from '../src/plugins/card/types.js';
+} from '../src/plugins/card/rule-engine';
+import type { ScrapingRule } from '../src/plugins/card/types';
 
 describe('Rule Engine', () => {
   describe('findMatchingRule', () => {

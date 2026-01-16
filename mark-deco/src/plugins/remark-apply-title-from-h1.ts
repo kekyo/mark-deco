@@ -10,8 +10,8 @@ import {
   clampHeadingLevel,
   extractHeadingText,
   resolveHeadingBaseLevel,
-} from '../utils/heading.js';
-import type { FrontmatterData, HeaderTitleTransform } from '../types.js';
+} from '../utils/heading';
+import type { FrontmatterData, HeaderTitleTransform } from '../types';
 
 type ApplyTitleTransform = Exclude<HeaderTitleTransform, 'none'>;
 

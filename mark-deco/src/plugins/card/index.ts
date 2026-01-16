@@ -3,28 +3,34 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import { formatErrorInfo } from '../shared/error-formatter.js';
-import { fetchMetadata } from './fetcher.js';
-import { generateCardHtml, generateFallbackHtml } from './html-generator.js';
-import { isValidUrl } from './utils.js';
-import type { CardPluginOptions } from './types.js';
-import type { Plugin, PluginContext } from '../../types.js';
+import { formatErrorInfo } from '../shared/error-formatter';
+import { fetchMetadata } from './fetcher';
+import { generateCardHtml, generateFallbackHtml } from './html-generator';
+import { isValidUrl } from './utils';
+import type { CardPluginOptions } from './types';
+import type {
+  MarkdownProcessorPlugin,
+  MarkdownProcessorPluginContext,
+} from '../../types';
+import { isBrowser } from '../../utils';
 
 // Export Amazon rules for explicit usage
-export { amazonRules } from './amazon-rules.js';
+export { amazonRules } from './amazon-rules';
 
 /**
  * Create a card plugin instance for generating content cards from URLs
  * @param options - Configuration options for the card plugin
  * @returns Plugin instance for processing card blocks
  */
-export const createCardPlugin = (options: CardPluginOptions = {}): Plugin => {
+export const createCardPlugin = (
+  options: CardPluginOptions = {}
+): MarkdownProcessorPlugin => {
   /**
    * Main plugin interface implementation
    */
   const processBlock = async (
     content: string,
-    context: PluginContext
+    context: MarkdownProcessorPluginContext
   ): Promise<string> => {
     const url = content.trim();
 
@@ -42,7 +48,7 @@ export const createCardPlugin = (options: CardPluginOptions = {}): Plugin => {
       const errorInfo = formatErrorInfo(error);
 
       // Return fallback HTML instead of throwing in browser environment
-      if (typeof window !== 'undefined') {
+      if (isBrowser()) {
         return generateFallbackHtml(url, errorInfo);
       }
 

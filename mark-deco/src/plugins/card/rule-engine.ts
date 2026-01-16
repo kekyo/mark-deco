@@ -12,8 +12,8 @@ import type {
   ProcessorFunction,
   ProcessorContext,
   ExtractedMetadata,
-} from './types.js';
-import type { Logger } from '../../types.js';
+} from './types';
+import type { Logger } from '../../types';
 
 /**
  * Extract locale from HTML meta tags

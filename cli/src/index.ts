@@ -4,13 +4,19 @@
 // https://github.com/kekyo/mark-deco
 
 import { Command, Option } from 'commander';
-import { loadConfig } from './config.js';
-import { readInput, writeOutput, writeJsonOutput } from './io.js';
-import { setupProcessor } from './processor.js';
 import type { HeaderTitleTransform } from 'mark-deco';
 
-// Version is injected at build time by Vite
-declare const __VERSION__: string;
+import {
+  author,
+  description,
+  git_commit_hash,
+  name,
+  repository_url,
+  version,
+} from './generated/packageMetadata';
+import { loadConfig } from './config';
+import { readInput, writeOutput, writeJsonOutput } from './io';
+import { setupProcessor } from './processor';
 
 interface CLIOptions {
   input?: string;
@@ -29,13 +35,11 @@ interface CLIOptions {
 
 const program = new Command();
 
-async function main() {
+const main = async () => {
   program
-    .name('mark-deco-cli')
-    .summary(
-      'MarkDeco - Markdown to HTML conversion processor.\nCopyright (c) Kouji Matsui (@kekyo@mi.kekyo.net)'
-    )
-    .version(__VERSION__);
+    .name(name)
+    .summary(description)
+    .version(`${version}-${git_commit_hash}`);
 
   program
     .addOption(
@@ -169,10 +173,15 @@ async function main() {
     userArgs.includes('--help') ||
     userArgs.includes('-h')
   ) {
-    console.log('Enhanced markdown processor with plugin support');
+    console.log(`${name} [${version}-${git_commit_hash}]`);
+    console.log(description);
+    console.log(`Copyright (c) ${author}`);
+    console.log(repository_url);
+    console.log('License: Under MIT');
+    console.log('');
   }
   program.parse();
-}
+};
 
 // Run the main function
 main().catch((error) => {

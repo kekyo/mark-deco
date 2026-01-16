@@ -6,9 +6,9 @@
 import {
   createResponsiveImageWithContainer,
   createResponsiveImageTag,
-} from '../../utils/responsive-image.js';
-import { escapeHtml, truncateText, cleanText, extractDomain } from './utils.js';
-import type { ExtractedMetadata, CardPluginOptions } from './types.js';
+} from '../../utils/responsive-image';
+import { escapeHtml, truncateText, cleanText, extractDomain } from './utils';
+import type { ExtractedMetadata, CardPluginOptions } from './types';
 
 /**
  * Generate fallback HTML for when OGP data cannot be fetched

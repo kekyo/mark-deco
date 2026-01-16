@@ -4,12 +4,15 @@
 // https://github.com/kekyo/mark-deco
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { getNoOpLogger } from '../src/logger.js';
-import { createMockPlugin } from './test-utils.js';
-import type { Plugin, PluginContext } from '../src/types.js';
+import { getNoOpLogger } from '../src/logger';
+import { createMockPlugin } from './test-utils';
+import type {
+  MarkdownProcessorPlugin,
+  MarkdownProcessorPluginContext,
+} from '../src/types';
 
 describe('MockPlugin', () => {
-  let plugin: Plugin;
+  let plugin: MarkdownProcessorPlugin;
 
   beforeEach(() => {
     plugin = createMockPlugin('test-plugin');
@@ -27,7 +30,7 @@ describe('MockPlugin', () => {
   });
 
   it('should process block content correctly', async () => {
-    const mockContext: PluginContext = {
+    const mockContext: MarkdownProcessorPluginContext = {
       logger: getNoOpLogger(),
       signal: new AbortController().signal,
       frontmatter: {},
@@ -47,7 +50,7 @@ describe('MockPlugin', () => {
   });
 
   it('should handle empty content', async () => {
-    const mockContext: PluginContext = {
+    const mockContext: MarkdownProcessorPluginContext = {
       logger: getNoOpLogger(),
       signal: new AbortController().signal,
       frontmatter: {},
@@ -66,7 +69,7 @@ describe('MockPlugin', () => {
   });
 
   it('should handle special characters in content', async () => {
-    const mockContext: PluginContext = {
+    const mockContext: MarkdownProcessorPluginContext = {
       logger: getNoOpLogger(),
       signal: new AbortController().signal,
       frontmatter: {},
@@ -87,14 +90,14 @@ describe('MockPlugin', () => {
     );
   });
 
-  it('should implement Plugin interface correctly', () => {
-    const plugin: Plugin = createMockPlugin('interface-test');
+  it('should implement MarkdownProcessorPlugin interface correctly', () => {
+    const plugin: MarkdownProcessorPlugin = createMockPlugin('interface-test');
     expect(plugin.name).toBe('interface-test');
     expect(typeof plugin.processBlock).toBe('function');
   });
 
-  describe('Custom Plugin Implementation', () => {
-    const createTestPlugin = (): Plugin => {
+  describe('Custom MarkdownProcessorPlugin Implementation', () => {
+    const createTestPlugin = (): MarkdownProcessorPlugin => {
       const processBlock = async (content: string): Promise<string> => {
         return `<div class="test-output">${content.toUpperCase()}</div>`;
       };
@@ -113,7 +116,7 @@ describe('MockPlugin', () => {
 
     it('should process content with custom logic', async () => {
       const plugin = createTestPlugin();
-      const mockContext: PluginContext = {
+      const mockContext: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},
@@ -134,14 +137,17 @@ describe('MockPlugin', () => {
   });
 
   it('should handle basic mock plugin functionality', async () => {
-    const mockPlugin: Plugin = {
+    const mockPlugin: MarkdownProcessorPlugin = {
       name: 'mock-test',
-      processBlock: async (content: string, _context: PluginContext) => {
+      processBlock: async (
+        content: string,
+        _context: MarkdownProcessorPluginContext
+      ) => {
         return `<div class="mock-plugin">${content}</div>`;
       },
     };
 
-    const mockContext: PluginContext = {
+    const mockContext: MarkdownProcessorPluginContext = {
       logger: getNoOpLogger(),
       signal: new AbortController().signal,
       frontmatter: {},
@@ -159,7 +165,7 @@ describe('MockPlugin', () => {
   });
 
   it('should handle mock plugin with context properties', async () => {
-    const mockContext: PluginContext = {
+    const mockContext: MarkdownProcessorPluginContext = {
       logger: getNoOpLogger(),
       signal: new AbortController().signal,
       frontmatter: {},
@@ -181,7 +187,7 @@ describe('MockPlugin', () => {
   });
 
   it('should handle mock plugin with frontmatter data', async () => {
-    const mockContext: PluginContext = {
+    const mockContext: MarkdownProcessorPluginContext = {
       logger: getNoOpLogger(),
       signal: new AbortController().signal,
       frontmatter: {},
@@ -194,9 +200,12 @@ describe('MockPlugin', () => {
       getUniqueId: () => 'mock-id-3',
     };
 
-    const mockPlugin: Plugin = {
+    const mockPlugin: MarkdownProcessorPlugin = {
       name: 'mock-frontmatter',
-      processBlock: async (content: string, context: PluginContext) => {
+      processBlock: async (
+        content: string,
+        context: MarkdownProcessorPluginContext
+      ) => {
         const frontmatterKeys = Object.keys(context.frontmatter).length;
         return `<div class="mock-plugin" data-frontmatter-keys="${frontmatterKeys}">${content}</div>`;
       },
@@ -212,9 +221,12 @@ describe('MockPlugin', () => {
 
   describe('Advanced mock functionality', () => {
     it('should handle mock plugin with complex context usage', async () => {
-      const mockPlugin: Plugin = {
+      const mockPlugin: MarkdownProcessorPlugin = {
         name: 'complex-mock',
-        processBlock: async (content: string, context: PluginContext) => {
+        processBlock: async (
+          content: string,
+          context: MarkdownProcessorPluginContext
+        ) => {
           const uniqueId = context.getUniqueId();
           const hasSignal = context.signal !== undefined;
           const userAgent = context.fetcher.userAgent;
@@ -223,7 +235,7 @@ describe('MockPlugin', () => {
         },
       };
 
-      const mockContext: PluginContext = {
+      const mockContext: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},

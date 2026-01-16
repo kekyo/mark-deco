@@ -4,7 +4,7 @@
 // https://github.com/kekyo/mark-deco
 
 import { createMutex } from 'async-primitives';
-import type { CacheStorage, CacheEntry } from './index.js';
+import type { CacheStorage, CacheEntry } from './index';
 
 /**
  * Create localStorage-based cache storage instance
@@ -22,11 +22,13 @@ export const createLocalCacheStorage = (
    */
   const isLocalStorageAvailable = (): boolean => {
     try {
-      return (
-        typeof window !== 'undefined' &&
-        typeof window.localStorage !== 'undefined' &&
-        window.localStorage !== null
-      );
+      const storage =
+        typeof localStorage !== 'undefined'
+          ? localStorage
+          : typeof window !== 'undefined'
+            ? window.localStorage
+            : undefined;
+      return storage !== undefined && storage !== null;
     } catch {
       return false;
     }

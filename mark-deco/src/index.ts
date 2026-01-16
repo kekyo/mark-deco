@@ -4,35 +4,30 @@
 // https://github.com/kekyo/mark-deco
 
 // Type exports
-export * from './types.js';
+export * from './types';
 
 // Main exports
-export { createMarkdownProcessor, defaultHtmlOptions } from './processor.js';
-export { createOEmbedPlugin } from './plugins/oembed-plugin.js';
-export { createCardPlugin } from './plugins/card-plugin.js';
-export { createMermaidPlugin } from './plugins/mermaid-plugin.js';
+export { createMarkdownProcessor, defaultHtmlOptions } from './processor';
+export { createOEmbedPlugin } from './plugins/oembed-plugin';
+export { createCardPlugin } from './plugins/card-plugin';
+export { createMermaidPlugin } from './plugins/mermaid-plugin';
 
 // oEmbed specific exports
-export { defaultProviderList } from './plugins/oembed/providers.js';
+export { defaultProviderList } from './plugins/oembed/providers';
 
 // Utility exports
-export { generateHeadingId, fetchData, fetchText, fetchJson } from './utils.js';
+export { generateHeadingId, fetchData, fetchText, fetchJson } from './utils';
 
 // Fetcher exports
-export { createCachedFetcher, createDirectFetcher } from './fetcher.js';
-export type { CachedFetcherOptions } from './fetcher.js';
+export { createCachedFetcher, createDirectFetcher } from './fetcher';
+export type { CachedFetcherOptions } from './fetcher';
 
 // Cache exports
-export {
-  createMemoryCacheStorage,
-  createLocalCacheStorage,
-  createFileSystemCacheStorage,
-  generateCacheKey,
-} from './cache/index.js';
-export type { CacheStorage } from './cache/index.js';
+export { createMemoryCacheStorage, generateCacheKey } from './cache/index';
+export type { CacheStorage } from './cache/index';
 
 // Logger exports
-export { getNoOpLogger, getConsoleLogger } from './logger.js';
+export { getNoOpLogger, getConsoleLogger } from './logger';
 
 // oEmbed specific type exports
-export type { OEmbedProvider } from './plugins/oembed/types.js';
+export type { OEmbedProvider } from './plugins/oembed/types';

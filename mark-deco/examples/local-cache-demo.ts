@@ -9,12 +9,10 @@
  * Showing how to use localStorage-based cache with TTL and Mutex protection
  */
 
-// import { createMarkdownProcessor } from '../src/processor.js';
-// import { createOEmbedPlugin } from '../src/plugins/oembed-plugin.js';
-import {
-  createLocalCacheStorage,
-  type CacheStorage,
-} from '../src/cache/index.js';
+// import { createMarkdownProcessor } from '../src/processor';
+// import { createOEmbedPlugin } from '../src/plugins/oembed-plugin';
+import { type CacheStorage } from '../src/cache/index';
+import { createLocalCacheStorage } from '../src/browser';
 
 // Example 1: Basic localStorage cache usage
 async function basicLocalCacheExample() {

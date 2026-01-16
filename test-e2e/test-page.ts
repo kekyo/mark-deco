@@ -7,7 +7,7 @@ import {
   type FetcherType,
   type MarkdownProcessor,
 } from 'mark-deco';
-import * as testHelpers from '../test-shared/test-helpers.js';
+import * as testHelpers from '../test-shared/test-helpers';
 
 const { createTestCustomProviders } = testHelpers;
 

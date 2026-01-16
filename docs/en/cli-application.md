@@ -16,13 +16,13 @@ npx mark-deco-cli input.md
 
 ```bash
 # From standard input to standard output
-echo "# Hello World" | mark-deco-cli
+echo "# Hello World" | mark-deco
 
 # Process file
-mark-deco-cli -i input.md
+$ mark-deco -i input.md
 
 # Save output to file
-mark-deco-cli -i input.md -o output.html
+$ mark-deco -i input.md -o output.html
 ```
 
 ### Command Line Options
@@ -50,22 +50,22 @@ Options:
 
 ```bash
 # Basic Markdown processing
-echo "# Hello World" | mark-deco-cli
+$ echo "# Hello World" | mark-deco
 
 # File processing with custom ID prefix
-mark-deco-cli -i document.md --unique-id-prefix "doc"
+$ mark-deco -i document.md --unique-id-prefix "doc"
 
 # Disable all plugins
-mark-deco-cli -i simple.md --no-plugins
+$ mark-deco -i simple.md --no-plugins
 
 # Enable only specific plugins
-mark-deco-cli -i content.md -p oembed mermaid
+$ mark-deco -i content.md -p oembed mermaid
 
 # Use configuration file
-mark-deco-cli -i content.md -c config.json
+$ mark-deco -i content.md -c config.json
 
 # Output frontmatter and HTML separately
-mark-deco-cli -i article.md -o article.html --frontmatter-output metadata.json
+$ mark-deco -i article.md -o article.html --frontmatter-output metadata.json
 ```
 
 ### Configuration File

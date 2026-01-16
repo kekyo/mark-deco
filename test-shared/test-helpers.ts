@@ -2,7 +2,7 @@
  * Common test helpers shared between Node.js and E2E tests
  */
 
-import { createMarkdownProcessor, createOEmbedPlugin, createCardPlugin, createMermaidPlugin, createCachedFetcher, type Plugin } from 'mark-deco';
+import { createMarkdownProcessor, createOEmbedPlugin, createCardPlugin, createMermaidPlugin, createCachedFetcher, type MarkdownProcessorPlugin } from 'mark-deco';
 
 /**
  * Create custom oEmbed providers for testing
@@ -43,7 +43,7 @@ export function createTestProcessor(testServerPort: number, options: {
     timeout = 5000
   } = options;
 
-  const plugins: Plugin[] = [];
+  const plugins: MarkdownProcessorPlugin[] = [];
   const fetcher = createCachedFetcher('mark-deco-test/1.0.0', timeout);
 
   if (enableOembed) {

@@ -4,7 +4,7 @@
 // https://github.com/kekyo/mark-deco
 
 import { createMutex } from 'async-primitives';
-import type { CacheStorage, CacheEntry } from './index.js';
+import type { CacheStorage, CacheEntry } from './index';
 
 /**
  * Create in-memory cache storage instance

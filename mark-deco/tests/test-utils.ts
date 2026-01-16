@@ -7,17 +7,20 @@ import {
   generateHtml,
   generateFallbackHtml,
   isValidUrl,
-} from '../src/internal.js';
-import type { OEmbedResponse } from '../src/internal.js';
-import type { Plugin, PluginContext } from '../src/types.js';
+} from '../src/internal';
+import type { OEmbedResponse } from '../src/internal';
+import type {
+  MarkdownProcessorPlugin,
+  MarkdownProcessorPluginContext,
+} from '../src/types';
 
 /**
  * Create a mock plugin for testing purposes
  */
-export const createMockPlugin = (name: string): Plugin => {
+export const createMockPlugin = (name: string): MarkdownProcessorPlugin => {
   const processBlock = async (
     content: string,
-    _context: PluginContext
+    _context: MarkdownProcessorPluginContext
   ): Promise<string> => {
     return `<div class="mock-plugin" data-plugin="${name}">Mock plugin processed: ${content}</div>`;
   };
@@ -33,7 +36,7 @@ export const createMockPlugin = (name: string): Plugin => {
  */
 export const createMockOEmbedPlugin = (
   options: Record<string, unknown> = {}
-): Plugin => {
+): MarkdownProcessorPlugin => {
   const processBlock = async (content: string): Promise<string> => {
     const url = content.trim();
 

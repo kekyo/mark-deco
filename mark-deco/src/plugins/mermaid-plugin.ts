@@ -4,4 +4,4 @@
 // https://github.com/kekyo/mark-deco
 
 // Re-export everything from the new modular structure for backward compatibility
-export * from './mermaid/index.js';
+export * from './mermaid/index';

@@ -4,9 +4,13 @@
 // https://github.com/kekyo/mark-deco
 
 import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
-import { getNoOpLogger } from '../src/logger.js';
-import { createMermaidPlugin } from '../src/plugins/mermaid-plugin.js';
-import type { Plugin, PluginContext, FrontmatterData } from '../src/types.js';
+import { getNoOpLogger } from '../src/logger';
+import { createMermaidPlugin } from '../src/plugins/mermaid-plugin';
+import type {
+  MarkdownProcessorPlugin,
+  MarkdownProcessorPluginContext,
+  FrontmatterData,
+} from '../src/types';
 
 /**
  * HTML escape function to match the plugin implementation
@@ -21,8 +25,8 @@ const escapeHtml = (content: string): string => {
 };
 
 describe('MermaidPlugin', () => {
-  let plugin: Plugin;
-  let mockContext: PluginContext;
+  let plugin: MarkdownProcessorPlugin;
+  let mockContext: MarkdownProcessorPluginContext;
   let mockGetUniqueId: Mock<() => string>;
 
   beforeEach(() => {

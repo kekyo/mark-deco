@@ -4,9 +4,9 @@
 // https://github.com/kekyo/mark-deco
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createCachedFetcher } from '../src/fetcher.js';
-import { createMarkdownProcessor } from '../src/processor.js';
-import type { MarkdownProcessor, ProcessOptions } from '../src/types.js';
+import { createCachedFetcher } from '../src/fetcher';
+import { createMarkdownProcessor } from '../src/processor';
+import type { MarkdownProcessor, ProcessOptions } from '../src/types';
 
 describe('remark-attr integration', () => {
   let processor: MarkdownProcessor;

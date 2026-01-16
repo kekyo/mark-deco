@@ -9,7 +9,7 @@ import { stdin } from 'process';
 /**
  * Read input from file or stdin
  */
-export async function readInput(inputPath?: string): Promise<string> {
+export const readInput = async (inputPath?: string): Promise<string> => {
   if (inputPath) {
     // Read from file
     try {
@@ -49,15 +49,15 @@ export async function readInput(inputPath?: string): Promise<string> {
       });
     });
   }
-}
+};
 
 /**
  * Write output to file or stdout
  */
-export async function writeOutput(
+export const writeOutput = async (
   html: string,
   outputPath?: string
-): Promise<void> {
+): Promise<void> => {
   if (outputPath) {
     // Write to file
     try {
@@ -77,15 +77,15 @@ export async function writeOutput(
       );
     }
   }
-}
+};
 
 /**
  * Write JSON output to file
  */
-export async function writeJsonOutput(
+export const writeJsonOutput = async (
   data: unknown,
   outputPath: string
-): Promise<void> {
+): Promise<void> => {
   try {
     const jsonContent = JSON.stringify(data, null, 2);
     await writeFile(outputPath, jsonContent, 'utf-8');
@@ -94,4 +94,4 @@ export async function writeJsonOutput(
       `Failed to write JSON output file "${outputPath}": ${error instanceof Error ? error.message : String(error)}`
     );
   }
-}
+};

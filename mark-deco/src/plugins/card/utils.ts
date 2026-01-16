@@ -4,10 +4,10 @@
 // https://github.com/kekyo/mark-deco
 
 import * as cheerio from 'cheerio';
-import { ogpRules } from './ogp-rules.js';
-import { findMatchingRule, applyScrapingRule } from './rule-engine.js';
-import type { ExtractedMetadata, ScrapingRule } from './types.js';
-import type { Logger } from '../../types.js';
+import { ogpRules } from './ogp-rules';
+import { findMatchingRule, applyScrapingRule } from './rule-engine';
+import type { ExtractedMetadata, ScrapingRule } from './types';
+import type { Logger } from '../../types';
 
 /**
  * Validate URL format

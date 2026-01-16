@@ -117,7 +117,7 @@ Although MarkDeco is a library, a CLI interface is also available in the package
 
 ```bash
 # Take Markdown from standard input and output HTML 
-echo "# Hello World" | mark-deco-cli 
+$ echo "# Hello World" | mark-deco
 ```
 
 For more information, see [CLI documentation](./docs/en/cli-application.md).

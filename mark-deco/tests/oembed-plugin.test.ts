@@ -4,15 +4,18 @@
 // https://github.com/kekyo/mark-deco
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createCachedFetcher } from '../src/fetcher.js';
-import { getNoOpLogger } from '../src/logger.js';
-import { createMarkdownProcessor } from '../src/processor.js';
-import { createMockOEmbedPlugin } from './test-utils.js';
-import type { Plugin, PluginContext } from '../src/types.js';
+import { createCachedFetcher } from '../src/fetcher';
+import { getNoOpLogger } from '../src/logger';
+import { createMarkdownProcessor } from '../src/processor';
+import { createMockOEmbedPlugin } from './test-utils';
+import type {
+  MarkdownProcessorPlugin,
+  MarkdownProcessorPluginContext,
+} from '../src/types';
 
 describe('OEmbedPlugin', () => {
-  let plugin: Plugin;
-  let mockPlugin: Plugin;
+  let plugin: MarkdownProcessorPlugin;
+  let mockPlugin: MarkdownProcessorPlugin;
   let processor: ReturnType<typeof createMarkdownProcessor>;
 
   beforeEach(() => {
@@ -37,7 +40,7 @@ describe('OEmbedPlugin', () => {
   describe('URL validation', () => {
     it('should throw error for invalid URL when called directly', async () => {
       const testFetcher = createCachedFetcher('test-user-agent', 5000);
-      const context: PluginContext = {
+      const context: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},
@@ -68,7 +71,7 @@ describe('OEmbedPlugin', () => {
 
     it('should return fallback HTML for unsupported provider when called directly in Node.js', async () => {
       const testFetcher = createCachedFetcher('test-user-agent', 5000);
-      const context: PluginContext = {
+      const context: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},
@@ -194,7 +197,7 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
   describe('HTML generation', () => {
     it('should generate fallback HTML with proper escaping', async () => {
       const testFetcher = createCachedFetcher('test-user-agent', 5000);
-      const context: PluginContext = {
+      const context: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},
@@ -216,7 +219,7 @@ https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
     it('should generate proper fallback HTML structure', async () => {
       const testFetcher = createCachedFetcher('test-user-agent', 5000);
-      const context: PluginContext = {
+      const context: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},

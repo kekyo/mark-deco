@@ -7,9 +7,9 @@ import {
   createMemoryCacheStorage,
   generateCacheKey,
   type CacheStorage,
-} from './cache/index.js';
+} from './cache/index';
 import { Logger, type FetcherType } from './types';
-import { fetchData } from './utils.js';
+import { fetchData } from './utils';
 
 /**
  * Options for cached fetcher

@@ -8,7 +8,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',
+    environment: 'jsdom',
     testTimeout: 30000,
     setupFiles: ['./tests/setup.ts'],
     exclude: [
@@ -21,20 +21,6 @@ export default defineConfig({
       '../demo-pages/**',
       '../cli/**',
     ],
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'dist/',
-        'tests/',
-        '../test-shared/**',
-        '../test-node/**',
-        '../test-e2e/**',
-        '../demo-pages/**',
-        '../cli/**',
-      ],
-    },
   },
   esbuild: {
     target: 'node18',

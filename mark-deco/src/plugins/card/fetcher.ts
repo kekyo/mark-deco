@@ -4,10 +4,10 @@
 // https://github.com/kekyo/mark-deco
 
 import * as cheerio from 'cheerio';
-import { fetchText, isCORSError } from '../../utils.js';
-import { extractEnhancedData } from './utils.js';
-import type { CardPluginOptions, ExtractedMetadata } from './types.js';
-import type { PluginContext } from '../../types.js';
+import { fetchText, isBrowser, isCORSError } from '../../utils';
+import { extractEnhancedData } from './utils';
+import type { CardPluginOptions, ExtractedMetadata } from './types';
+import type { MarkdownProcessorPluginContext } from '../../types';
 
 /**
  * Fetch HTML content and extract metadata using rule-based system
@@ -15,7 +15,7 @@ import type { PluginContext } from '../../types.js';
 export const fetchMetadata = async (
   url: string,
   options: CardPluginOptions,
-  context: PluginContext
+  context: MarkdownProcessorPluginContext
 ): Promise<ExtractedMetadata> => {
   const { logger, signal, fetcher } = context;
 
@@ -58,7 +58,7 @@ export const fetchMetadata = async (
     return metadata;
   } catch (error: unknown) {
     if (isCORSError(error)) {
-      if (typeof window !== 'undefined') {
+      if (isBrowser()) {
         logger.debug(
           'fetchMetadata: Browser CORS restrictions prevent fetching metadata for URL:',
           url

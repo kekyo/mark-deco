@@ -16,13 +16,13 @@ npx mark-deco-cli input.md
 
 ```bash
 # 標準入力から標準出力へ
-echo "# Hello World" | mark-deco-cli
+$ echo "# Hello World" | mark-deco
 
 # ファイルを処理
-mark-deco-cli -i input.md
+$ mark-deco -i input.md
 
 # 出力をファイルに保存
-mark-deco-cli -i input.md -o output.html
+$ mark-deco -i input.md -o output.html
 ```
 
 ### コマンドラインオプション
@@ -50,22 +50,22 @@ Options:
 
 ```bash
 # 基本的なMarkdown処理
-echo "# Hello World" | mark-deco-cli
+$ echo "# Hello World" | mark-deco
 
 # カスタムIDプレフィックスでファイル処理
-mark-deco-cli -i document.md --unique-id-prefix "doc"
+$ mark-deco -i document.md --unique-id-prefix "doc"
 
 # 全プラグインを無効化
-mark-deco-cli -i simple.md --no-plugins
+$ mark-deco -i simple.md --no-plugins
 
 # 特定のプラグインのみ有効化
-mark-deco-cli -i content.md -p oembed mermaid
+$ mark-deco -i content.md -p oembed mermaid
 
 # 設定ファイルを使用
-mark-deco-cli -i content.md -c config.json
+$ mark-deco -i content.md -c config.json
 
 # FrontmatterとHTMLを別々に出力
-mark-deco-cli -i article.md -o article.html --frontmatter-output metadata.json
+$ mark-deco -i article.md -o article.html --frontmatter-output metadata.json
 ```
 
 ### 設定ファイル

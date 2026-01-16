@@ -7,8 +7,8 @@ import {
   combineAbortSignals,
   createTimeoutSignal,
   isCORSError,
-} from '../../utils.js';
-import type { Logger } from '../../types.js';
+} from '../../utils';
+import type { Logger } from '../../types';
 // Removed unused import
 
 /**

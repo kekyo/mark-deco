@@ -3,8 +3,11 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import type { MermaidPluginOptions } from './types.js';
-import type { Plugin, PluginContext } from '../../types.js';
+import type { MermaidPluginOptions } from './types';
+import type {
+  MarkdownProcessorPlugin,
+  MarkdownProcessorPluginContext,
+} from '../../types';
 
 /**
  * Create a mermaid plugin instance for rendering mermaid diagrams
@@ -13,7 +16,7 @@ import type { Plugin, PluginContext } from '../../types.js';
  */
 export const createMermaidPlugin = (
   options: MermaidPluginOptions = {}
-): Plugin => {
+): MarkdownProcessorPlugin => {
   const { className = 'mermaid', includeId = true } = options;
 
   /**
@@ -21,7 +24,7 @@ export const createMermaidPlugin = (
    */
   const processBlock = async (
     content: string,
-    context: PluginContext
+    context: MarkdownProcessorPluginContext
   ): Promise<string> => {
     // Trim whitespace from content
     const trimmedContent = content.trim();

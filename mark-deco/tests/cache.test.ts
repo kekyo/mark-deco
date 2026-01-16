@@ -6,7 +6,7 @@
 import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import {
   describe,
   it,
@@ -19,10 +19,10 @@ import {
 import {
   generateCacheKey,
   createMemoryCacheStorage,
-  createLocalCacheStorage,
-  createFileSystemCacheStorage,
   type CacheStorage,
-} from '../src/cache/index.js';
+} from '../src/cache/index';
+import { createLocalCacheStorage } from '../src/browser';
+import { createFileSystemCacheStorage } from '../src/cache/filesystem';
 
 // Mock localStorage for Node.js environment
 const localStorageMock = (() => {

@@ -3,10 +3,10 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import { fetchText, isCORSError } from '../../utils.js';
+import { fetchText, isCORSError } from '../../utils';
 import downloadedProvidersJson from './providers.json' with { type: 'json' };
-import type { OEmbedProvider } from './types.js';
-import type { PluginContext } from '../../types.js';
+import type { OEmbedProvider } from './types';
+import type { MarkdownProcessorPluginContext } from '../../types';
 
 /**
  * Default providers from downloaded providers.json
@@ -65,7 +65,7 @@ const matchesScheme = (url: string, scheme: string): boolean => {
  * @returns Promise resolving to a Map of schemes to endpoint URLs
  */
 export const buildProvidersCache = async (
-  { logger }: PluginContext,
+  { logger }: MarkdownProcessorPluginContext,
   providers: OEmbedProvider[]
 ): Promise<Map<string, string>> => {
   const cache = new Map<string, string>();
@@ -99,7 +99,7 @@ export const buildProvidersCache = async (
 export const getOEmbedUrl = async (
   url: string,
   providersCache: Map<string, string>,
-  { logger, signal, fetcher }: PluginContext
+  { logger, signal, fetcher }: MarkdownProcessorPluginContext
 ): Promise<string> => {
   const urlObj = new URL(url);
   const hostname = urlObj.hostname.toLowerCase();

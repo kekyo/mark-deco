@@ -5,8 +5,8 @@
 
 import * as cheerio from 'cheerio';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { extractEnhancedData } from '../src/plugins/card/utils.js';
-import type { Logger } from '../src/types.js';
+import { extractEnhancedData } from '../src/plugins/card/utils';
+import type { Logger } from '../src/types';
 
 describe('Card Plugin Logging', () => {
   let mockLogger: Logger;

@@ -13,24 +13,27 @@ import {
   resolveUrl,
   truncateText,
   cleanText,
-} from '../src/internal.js';
-import { getNoOpLogger } from '../src/logger.js';
-import { amazonRules } from '../src/plugins/card/amazon-rules.js';
-import { generateFallbackHtml } from '../src/plugins/card/html-generator.js';
-import { extractEnhancedData } from '../src/plugins/card/utils.js';
-import { createMarkdownProcessor } from '../src/processor.js';
-import type { ExtractedMetadata } from '../src/plugins/card/types.js';
-import type { Plugin, PluginContext } from '../src/types.js';
+} from '../src/internal';
+import { getNoOpLogger } from '../src/logger';
+import { amazonRules } from '../src/plugins/card/amazon-rules';
+import { generateFallbackHtml } from '../src/plugins/card/html-generator';
+import { extractEnhancedData } from '../src/plugins/card/utils';
+import { createMarkdownProcessor } from '../src/processor';
+import type { ExtractedMetadata } from '../src/plugins/card/types';
+import type {
+  MarkdownProcessorPlugin,
+  MarkdownProcessorPluginContext,
+} from '../src/types';
 
 /**
  * Create a mock card plugin for testing purposes
  */
 const createMockCardPlugin = (
   options: Record<string, unknown> = {}
-): Plugin => {
+): MarkdownProcessorPlugin => {
   const processBlock = async (
     content: string,
-    _context: PluginContext
+    _context: MarkdownProcessorPluginContext
   ): Promise<string> => {
     const url = content.trim();
 
@@ -109,8 +112,8 @@ const getMockMetadata = (url: string): ExtractedMetadata | null => {
 };
 
 describe('CardPlugin', () => {
-  let plugin: Plugin;
-  let mockPlugin: Plugin;
+  let plugin: MarkdownProcessorPlugin;
+  let mockPlugin: MarkdownProcessorPlugin;
   let processor: ReturnType<typeof createMarkdownProcessor>;
 
   beforeEach(() => {
@@ -131,14 +134,14 @@ describe('CardPlugin', () => {
     expect(plugin.name).toBe('card');
   });
 
-  it('should implement Plugin interface', () => {
+  it('should implement MarkdownProcessorPlugin interface', () => {
     expect(typeof plugin.processBlock).toBe('function');
     expect(plugin.name).toBeDefined();
   });
 
   describe('URL validation', () => {
     it('should throw error for invalid URL when called directly', async () => {
-      const context: PluginContext = {
+      const context: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},
@@ -170,7 +173,7 @@ describe('CardPlugin', () => {
     });
 
     it('should return fallback HTML for unsupported provider when called directly in Node.js', async () => {
-      const context: PluginContext = {
+      const context: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},
@@ -265,7 +268,7 @@ https://dev.to/article/react-hooks
 
   describe('HTML generation', () => {
     it('should generate fallback HTML with proper escaping', async () => {
-      const context: PluginContext = {
+      const context: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},
@@ -291,7 +294,7 @@ https://dev.to/article/react-hooks
     });
 
     it('should generate proper card HTML structure', async () => {
-      const context: PluginContext = {
+      const context: MarkdownProcessorPluginContext = {
         logger: getNoOpLogger(),
         signal: new AbortController().signal,
         frontmatter: {},

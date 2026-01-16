@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
-import * as testHelpers from '../test-shared/test-helpers.js';
-import * as testServerModule from '../test-shared/test-server.js';
-import type { TestServer, ViteServer } from '../test-shared/test-server.js';
+import * as testHelpers from '../test-shared/test-helpers';
+import * as testServerModule from '../test-shared/test-server';
+import type { TestServer, ViteServer } from '../test-shared/test-server';
 
 import { getBrowserInjectionScript } from './browser-utils';
 import type { MarkdownProcessor } from 'mark-deco';
