@@ -37,6 +37,11 @@
       "types": "./dist/node.d.ts",
       "import": "./dist/node.mjs",
       "require": "./dist/node.cjs"
+    },
+    "./misc": {
+      "types": "./dist/misc.d.ts",
+      "import": "./dist/misc.mjs",
+      "require": "./dist/misc.cjs"
     }
   },
   "files": [
