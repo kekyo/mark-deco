@@ -16,15 +16,16 @@ export default defineConfig({
       typescript: 'tsconfig.tests.json',
     }),
     dts({
-      insertTypesEntry: true,
-      copyDtsFiles: true,
+      rollupTypes: true,
     }),
   ],
   build: {
     lib: {
       entry: {
+        browser: resolve(__dirname, 'src/browser.ts'),
         index: resolve(__dirname, 'src/index.ts'),
         internal: resolve(__dirname, 'src/internal.ts'),
+        node: resolve(__dirname, 'src/node.ts'),
       },
       name: 'mark-deco',
       formats: ['es', 'cjs'],
@@ -33,6 +34,13 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
+        'fs/promises',
+        'path',
+        'url',
+        'os',
+        'crypto',
+        'async-primitives',
+        'cheerio',
         'js-yaml',
         'js-beautify',
         'jsdom',
@@ -43,22 +51,9 @@ export default defineConfig({
         'unified',
         'unist-util-visit',
       ],
-      output: {
-        globals: {
-          'js-yaml': 'jsYaml',
-          'js-beautify': 'beautify',
-          jsdom: 'jsdom',
-          'rehype-stringify': 'rehypeStringify',
-          'remark-gfm': 'remarkGfm',
-          'remark-parse': 'remarkParse',
-          'remark-rehype': 'remarkRehype',
-          unified: 'unified',
-          'unist-util-visit': 'visit',
-        },
-      },
     },
+    target: 'es2018',
     sourcemap: true,
-    emptyOutDir: true,
-    target: 'es2022',
+    minify: false,
   },
 });

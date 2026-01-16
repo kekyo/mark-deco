@@ -13,7 +13,7 @@ import {
   getConsoleLogger,
   defaultProviderList,
 } from 'mark-deco';
-import type { Config } from './config.js';
+import type { Config } from './config';
 
 // Import the MarkdownProcessor type - this should be available from mark-deco package
 type MarkdownProcessor = ReturnType<typeof createMarkdownProcessor>;
@@ -21,11 +21,11 @@ type MarkdownProcessor = ReturnType<typeof createMarkdownProcessor>;
 /**
  * Setup markdown processor with plugins based on configuration
  */
-export function setupProcessor(config: Config): MarkdownProcessor {
+export const setupProcessor = (config: Config): MarkdownProcessor => {
   const plugins = [];
   const logger = getConsoleLogger();
   const fetcher = createCachedFetcher(
-    'mark-deco-cli/0.0.1',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.0.0 Safari/537.36',
     5000,
     createMemoryCacheStorage()
   );
@@ -58,4 +58,4 @@ export function setupProcessor(config: Config): MarkdownProcessor {
     logger,
     fetcher,
   });
-}
+};

@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2018",
     "module": "ESNext",
+    "lib": ["ES2018", "DOM"],
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

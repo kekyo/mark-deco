@@ -10,9 +10,9 @@
  * in the card plugin metadata extraction processing.
  */
 
-import { createCardPlugin } from '../src/plugins/card/index.js';
-import { createMarkdownProcessor } from '../src/processor.js';
-import type { Logger } from '../src/types.js';
+import { createCardPlugin } from '../src/plugins/card/index';
+import { createMarkdownProcessor } from '../src/processor';
+import type { Logger } from '../src/types';
 
 // Create custom logger to output detailed logs to console
 const createDetailedLogger = (): Logger => ({

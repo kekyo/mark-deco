@@ -105,7 +105,7 @@ export interface FetcherType {
 /**
  * Context provided to plugins during processing
  */
-export interface PluginContext {
+export interface MarkdownProcessorPluginContext {
   /** Logger instance for output */
   readonly logger: Logger;
   /** AbortSignal for cancelling the operation */
@@ -121,7 +121,7 @@ export interface PluginContext {
 /**
  * Plugin interface for processing custom blocks
  */
-export interface Plugin {
+export interface MarkdownProcessorPlugin {
   /** Unique plugin identifier */
   readonly name: string;
 
@@ -133,7 +133,7 @@ export interface Plugin {
    */
   readonly processBlock: (
     content: string,
-    context: PluginContext
+    context: MarkdownProcessorPluginContext
   ) => Promise<string>;
 }
 
@@ -142,7 +142,7 @@ export interface Plugin {
  */
 export interface MarkdownProcessorOptions {
   /** Plugin instances for processing custom blocks */
-  plugins?: Plugin[];
+  plugins?: MarkdownProcessorPlugin[];
   /** Logger instance for customizable logging (automatically defaults to getNoOpLogger if not specified) */
   logger?: Logger;
   /** Fetch function for HTTP requests (required) */

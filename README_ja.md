@@ -117,7 +117,7 @@ MarkDecoはライブラリですが、MarkDecoを気軽に試すことが出来�
 
 ```bash
 # 標準入力からMarkdownを受け取って、HTMLを出力する
-echo "# Hello World" | mark-deco-cli
+$ echo "# Hello World" | mark-deco
 ```
 
 詳しくは[CLIのドキュメント](./docs/ja/cli-application.md)を参照して下さい。

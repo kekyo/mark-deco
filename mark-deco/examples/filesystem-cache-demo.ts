@@ -9,12 +9,12 @@
  * Showing how to use file system-based cache with TTL and Mutex protection
  */
 
-// import { createMarkdownProcessor } from '../src/processor.js';
-// import { createOEmbedPlugin } from '../src/plugins/oembed-plugin.js';
-// import type { CacheStorage } from '../src/cache/index.js';
+// import { createMarkdownProcessor } from '../src/processor';
+// import { createOEmbedPlugin } from '../src/plugins/oembed-plugin';
+// import type { CacheStorage } from '../src/cache/index';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createFileSystemCacheStorage } from '../src/cache/index.js';
+import { createFileSystemCacheStorage } from '../src/cache/index';
 
 // Get current directory for examples
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

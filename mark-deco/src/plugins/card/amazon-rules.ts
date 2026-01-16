@@ -3,7 +3,7 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import type { ScrapingRule } from './types.js';
+import type { ScrapingRule } from './types';
 
 /**
  * Amazon scraping rules for different locales

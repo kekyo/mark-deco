@@ -3,12 +3,16 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import { formatErrorInfo } from '../shared/error-formatter.js';
-import { fetchOEmbedData } from './fetcher.js';
-import { generateHtml, generateFallbackHtml } from './html-generator.js';
-import { isValidUrl } from './utils.js';
-import type { OEmbedPluginOptions, OEmbedProvider } from './types.js';
-import type { Plugin, PluginContext } from '../../types.js';
+import { formatErrorInfo } from '../shared/error-formatter';
+import { fetchOEmbedData } from './fetcher';
+import { generateHtml, generateFallbackHtml } from './html-generator';
+import { isValidUrl } from './utils';
+import type { OEmbedPluginOptions, OEmbedProvider } from './types';
+import type {
+  MarkdownProcessorPlugin,
+  MarkdownProcessorPluginContext,
+} from '../../types';
+import { isBrowser } from '../../utils';
 
 /**
  * Create an oEmbed plugin instance for embedding rich content from supported providers
@@ -19,7 +23,7 @@ import type { Plugin, PluginContext } from '../../types.js';
 export const createOEmbedPlugin = (
   providerList: OEmbedProvider[],
   options: OEmbedPluginOptions = {}
-): Plugin => {
+): MarkdownProcessorPlugin => {
   const { maxRedirects = 5, timeoutEachRedirect = 10000 } = options;
 
   /**
@@ -27,7 +31,7 @@ export const createOEmbedPlugin = (
    */
   const processBlock = async (
     content: string,
-    context: PluginContext
+    context: MarkdownProcessorPluginContext
   ): Promise<string> => {
     const url = content.trim();
 
@@ -51,7 +55,7 @@ export const createOEmbedPlugin = (
       const errorInfo = formatErrorInfo(error);
 
       // Return fallback HTML instead of throwing in browser environment
-      if (typeof window !== 'undefined') {
+      if (isBrowser()) {
         return generateFallbackHtml(url, errorInfo);
       }
 

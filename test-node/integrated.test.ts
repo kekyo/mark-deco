@@ -10,9 +10,9 @@ import {
   beforeAll,
   afterAll,
 } from 'vitest';
-import * as testHelpers from '../test-shared/test-helpers.js';
-import * as testServerModule from '../test-shared/test-server.js';
-import type { TestServer } from '../test-shared/test-server.js';
+import * as testHelpers from '../test-shared/test-helpers';
+import * as testServerModule from '../test-shared/test-server';
+import type { TestServer } from '../test-shared/test-server';
 
 const {
   createTestProcessor,

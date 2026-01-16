@@ -16,4 +16,7 @@ export default defineConfig({
       exclude: ['node_modules/', 'dist/', 'tests/'],
     },
   },
+  esbuild: {
+    target: 'node18',
+  },
 });

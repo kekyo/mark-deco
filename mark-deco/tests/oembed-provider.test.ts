@@ -4,11 +4,11 @@
 // https://github.com/kekyo/mark-deco
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createMemoryCacheStorage } from '../src/cache/index.js';
-import { createCachedFetcher } from '../src/fetcher.js';
-import { getConsoleLogger } from '../src/logger.js';
-import { createOEmbedPlugin } from '../src/plugins/oembed-plugin.js';
-import { createMarkdownProcessor } from '../src/processor.js';
+import { createMemoryCacheStorage } from '../src/cache/index';
+import { createCachedFetcher } from '../src/fetcher';
+import { getConsoleLogger } from '../src/logger';
+import { createOEmbedPlugin } from '../src/plugins/oembed-plugin';
+import { createMarkdownProcessor } from '../src/processor';
 
 describe('OEmbed Provider Tests', () => {
   let processor: ReturnType<typeof createMarkdownProcessor>;

@@ -3,70 +3,48 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import prettierMax from 'prettier-max';
 import screwUp from 'screw-up';
-
-// Read version from package.json at build time
-const packageJsonPath = resolve(__dirname, 'package.json');
-const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-const version = packageJson.version;
 
 export default defineConfig({
   plugins: [
     prettierMax({
       typescript: 'tsconfig.tests.json',
     }),
-    screwUp(),
+    screwUp({
+      outputMetadataFile: true,
+    }),
   ],
   build: {
-    target: 'node18',
     lib: {
-      entry: 'src/cli.ts',
-      name: 'MarkDecoCLI',
+      entry: 'src/index.ts',
+      name: 'mark-deco-cli',
       formats: ['cjs'],
-      fileName: (format) => `cli.${format === 'cjs' ? 'cjs' : 'js'}`,
+      fileName: (format, entryName) =>
+        `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`,
     },
     rollupOptions: {
       external: [
         'commander',
-        'fs',
+        'mark-deco',
         'fs/promises',
         'path',
         'process',
-        'node:path',
-        'node:url',
-        'node:process',
-        'node:fs',
-        'node:fs/promises',
         'util',
-        'node:util',
         'stream',
-        'node:stream',
         'events',
-        'node:events',
       ],
       output: {
         banner: '#!/usr/bin/env node',
       },
     },
+    target: 'node18',
     minify: false,
     sourcemap: true,
   },
   define: {
     global: 'globalThis',
-    __VERSION__: JSON.stringify(version),
-  },
-  resolve: {
-    alias: {
-      // Prevent Vite from treating Node.js built-ins as browser modules
-      fs: 'fs',
-      path: 'path',
-      process: 'process',
-    },
-    conditions: ['node'],
   },
   esbuild: {
     platform: 'node',

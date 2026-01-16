@@ -4,12 +4,15 @@
 // https://github.com/kekyo/mark-deco
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { createCachedFetcher, createDirectFetcher } from '../src/fetcher.js';
-import { getConsoleLogger } from '../src/logger.js';
-import { createMarkdownProcessor } from '../src/processor.js';
-import { HTMLBeautifyOptions } from '../src/types.js';
-import { createMockPlugin } from './test-utils.js';
-import type { PluginContext, Plugin } from '../src/types.js';
+import { createCachedFetcher, createDirectFetcher } from '../src/fetcher';
+import { getConsoleLogger } from '../src/logger';
+import { createMarkdownProcessor } from '../src/processor';
+import { HTMLBeautifyOptions } from '../src/types';
+import { createMockPlugin } from './test-utils';
+import type {
+  MarkdownProcessorPluginContext,
+  MarkdownProcessorPlugin,
+} from '../src/types';
 
 // Create a default fetcher for tests
 const testUserAgent = 'mark-deco-test/1.0.0';
@@ -357,9 +360,9 @@ More content.`;
     });
 
     it('should handle plugin errors gracefully', async () => {
-      const createErrorPlugin = (): Plugin => {
+      const createErrorPlugin = (): MarkdownProcessorPlugin => {
         const processBlock = async (): Promise<string> => {
-          throw new Error('Plugin processing error');
+          throw new Error('MarkdownProcessorPlugin processing error');
         };
 
         return {
@@ -380,7 +383,7 @@ test content
 
       // Should propagate the plugin error
       await expect(processorWithPlugin.process(markdown, 'id')).rejects.toThrow(
-        'Failed to process markdown: Plugin processing error'
+        'Failed to process markdown: MarkdownProcessorPlugin processing error'
       );
     });
   });
@@ -790,7 +793,7 @@ Body text.`;
     });
   });
 
-  describe('Plugin integration', () => {
+  describe('MarkdownProcessorPlugin integration', () => {
     it('should process custom blocks with plugins', async () => {
       const plugin = createMockPlugin('test');
       const processorWithPlugin = createMarkdownProcessor({
@@ -816,10 +819,10 @@ custom content
     });
 
     it('should pass frontmatter to plugins', async () => {
-      const createFrontmatterTestPlugin = (): Plugin => {
+      const createFrontmatterTestPlugin = (): MarkdownProcessorPlugin => {
         const processBlock = async (
           content: string,
-          context: PluginContext
+          context: MarkdownProcessorPluginContext
         ): Promise<string> => {
           const frontmatter = context.frontmatter;
           const title = frontmatter.title || 'No title';
@@ -870,10 +873,10 @@ test content
     });
 
     it('should pass empty frontmatter to plugins when no frontmatter exists', async () => {
-      const createFrontmatterTestPlugin = (): Plugin => {
+      const createFrontmatterTestPlugin = (): MarkdownProcessorPlugin => {
         const processBlock = async (
           content: string,
-          context: PluginContext
+          context: MarkdownProcessorPluginContext
         ): Promise<string> => {
           const frontmatter = context.frontmatter;
           const title = frontmatter.title || 'No title';
@@ -1032,10 +1035,10 @@ content
       const timeout = 5000;
       const fetcherInterface = createDirectFetcher(userAgent, timeout);
 
-      const createFetchTestPlugin = (): Plugin => {
+      const createFetchTestPlugin = (): MarkdownProcessorPlugin => {
         const processBlock = async (
           content: string,
-          context: PluginContext
+          context: MarkdownProcessorPluginContext
         ): Promise<string> => {
           // Verify that the context has the correct fetcher properties
           expect(context.fetcher.userAgent).toBe(userAgent);
@@ -1104,10 +1107,10 @@ test content
         { cache: false }
       ); // Disable cache for testing
 
-      const createFetchTestPlugin = (): Plugin => {
+      const createFetchTestPlugin = (): MarkdownProcessorPlugin => {
         const processBlock = async (
           content: string,
-          context: PluginContext
+          context: MarkdownProcessorPluginContext
         ): Promise<string> => {
           // Verify that the context has the correct fetcher properties
           expect(context.fetcher.userAgent).toBe(userAgent);
@@ -1156,7 +1159,7 @@ test content
         { cache: false }
       ); // Disable cache for testing
 
-      const plugin: Plugin = {
+      const plugin: MarkdownProcessorPlugin = {
         name: 'undefined-context-test',
         processBlock: async (content, context) => {
           // Should have the specified userAgent from fetcher

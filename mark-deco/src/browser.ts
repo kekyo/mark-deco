@@ -3,5 +3,5 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-// Build-time injected version constant
-declare const __VERSION__: string;
+// Cache exports
+export { createLocalCacheStorage } from './cache/localstorage';

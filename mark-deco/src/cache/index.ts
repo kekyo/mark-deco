@@ -48,6 +48,4 @@ export function generateCacheKey(
 }
 
 // Re-export cache storage implementations
-export { createLocalCacheStorage } from './localstorage.js';
-export { createMemoryCacheStorage } from './memory.js';
-export { createFileSystemCacheStorage } from './filesystem.js';
+export { createMemoryCacheStorage } from './memory';

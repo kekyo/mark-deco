@@ -3,8 +3,13 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
+import { mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises';
+import { join } from 'path';
+import { createHash } from 'crypto';
 import { createMutex } from 'async-primitives';
-import type { CacheStorage, CacheEntry } from './index.js';
+
+import type { CacheStorage, CacheEntry } from './index';
+import { isBrowser } from '../utils';
 
 /**
  * Generate SHA-256 hash for cache key using Node.js crypto module
@@ -14,8 +19,7 @@ import type { CacheStorage, CacheEntry } from './index.js';
  */
 const generateFileHash = async (input: string): Promise<string> => {
   try {
-    const crypto = require('crypto');
-    const hash = crypto.createHash('sha256');
+    const hash = createHash('sha256');
     hash.update(input, 'utf8');
     return hash.digest('hex');
   } catch (error) {
@@ -34,7 +38,7 @@ export const createFileSystemCacheStorage = (
   cacheDir: string
 ): CacheStorage => {
   // Check if we're in a browser environment
-  if (typeof window !== 'undefined') {
+  if (isBrowser()) {
     throw new Error(
       'File system cache is only available in Node.js environment, not in browsers'
     );
@@ -56,8 +60,7 @@ export const createFileSystemCacheStorage = (
    */
   const ensureCacheDir = async (): Promise<void> => {
     try {
-      const { promises: fs } = require('fs');
-      await fs.mkdir(cacheDir, { recursive: true });
+      await mkdir(cacheDir, { recursive: true });
     } catch (error: unknown) {
       // Ignore EEXIST errors since directory already exists
       if ((error as { code?: string }).code !== 'EEXIST') {
@@ -77,13 +80,11 @@ export const createFileSystemCacheStorage = (
       throw new Error(`Failed to ensure cache directory: ${error}`);
     }
 
-    const { promises: fs } = require('fs');
-    const path = require('path');
-    const filePath = path.join(cacheDir, fileName);
+    const filePath = join(cacheDir, fileName);
 
     let entry: CacheEntry;
     try {
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await readFile(filePath, 'utf-8');
       entry = JSON.parse(content);
     } catch {
       // File doesn't exist or invalid JSON
@@ -103,7 +104,7 @@ export const createFileSystemCacheStorage = (
           const stillExpired =
             entry.ttl === 0 || currentTime > entry.timestamp + entry.ttl;
           if (stillExpired) {
-            await fs.unlink(filePath);
+            await unlink(filePath);
           }
           return null;
         } catch {
@@ -140,14 +141,12 @@ export const createFileSystemCacheStorage = (
     try {
       await ensureCacheDir();
 
-      const { promises: fs } = require('fs');
-      const path = require('path');
-      const filePath = path.join(cacheDir, fileName);
+      const filePath = join(cacheDir, fileName);
 
       try {
         // For cache systems, last-write-wins is often acceptable
         // We minimize lock time by only protecting the actual write operation
-        await fs.writeFile(filePath, serialized, 'utf-8');
+        await writeFile(filePath, serialized, 'utf-8');
       } catch (error) {
         throw new Error(`Failed to write cache entry: ${error}`);
       }
@@ -165,12 +164,10 @@ export const createFileSystemCacheStorage = (
     const lockHandle = await mutex.lock();
     try {
       await ensureCacheDir();
-      const { promises: fs } = require('fs');
-      const path = require('path');
-      const filePath = path.join(cacheDir, fileName);
+      const filePath = join(cacheDir, fileName);
 
       try {
-        await fs.unlink(filePath);
+        await unlink(filePath);
       } catch {
         // File doesn't exist, ignore the error
       }
@@ -185,17 +182,15 @@ export const createFileSystemCacheStorage = (
     const lockHandle = await mutex.lock();
     try {
       await ensureCacheDir();
-      const { promises: fs } = require('fs');
-      const path = require('path');
-      const files = await fs.readdir(cacheDir);
+      const files = await readdir(cacheDir);
 
       // Filter files outside the deletion loop for better performance
       const jsonFiles = files.filter((file: string) => file.endsWith('.json'));
 
       for (const file of jsonFiles) {
-        const filePath = path.join(cacheDir, file);
+        const filePath = join(cacheDir, file);
         try {
-          await fs.unlink(filePath);
+          await unlink(filePath);
         } catch {
           // Ignore individual file deletion errors
         }
@@ -210,11 +205,8 @@ export const createFileSystemCacheStorage = (
   const size = async (): Promise<number> => {
     await ensureCacheDir();
 
-    const { promises: fs } = require('fs');
-    const path = require('path');
-
     // Get file list without lock first
-    const files = await fs.readdir(cacheDir);
+    const files = await readdir(cacheDir);
     const jsonFiles = files.filter((file: string) => file.endsWith('.json'));
 
     if (jsonFiles.length === 0) {
@@ -228,9 +220,9 @@ export const createFileSystemCacheStorage = (
       let validCount = 0;
 
       for (const file of jsonFiles) {
-        const filePath = path.join(cacheDir, file);
+        const filePath = join(cacheDir, file);
         try {
-          const fileContent = await fs.readFile(filePath, 'utf8');
+          const fileContent = await readFile(filePath, 'utf8');
           const entry: CacheEntry = JSON.parse(fileContent);
 
           // Check if entry is expired
@@ -238,7 +230,7 @@ export const createFileSystemCacheStorage = (
             const isExpired =
               entry.ttl === 0 || now > entry.timestamp + entry.ttl;
             if (isExpired) {
-              await fs.unlink(filePath);
+              await unlink(filePath);
               continue; // Don't count this file
             }
           }
@@ -246,7 +238,7 @@ export const createFileSystemCacheStorage = (
         } catch {
           // If we can't read or parse the file, delete it
           try {
-            await fs.unlink(filePath);
+            await unlink(filePath);
           } catch {
             // Ignore unlink errors
           }

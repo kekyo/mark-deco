@@ -5,7 +5,11 @@
 
 // Utility functions
 
-import type { FetcherType, Logger } from './types.js';
+import type { FetcherType, Logger } from './types';
+
+export const resolveDefaultExport = <T>(module: T | { default?: T }): T => {
+  return (module as { default?: T }).default ?? (module as T);
+};
 
 /**
  * Check if an error is a CORS error
@@ -167,17 +171,22 @@ export const generateTimestamp = (): string => {
  * @returns HTML-escaped text
  */
 export const escapeHtml = (text: string): string => {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-};
-
-/**
- * Check if running in browser environment
- * @returns True if running in a browser environment
- */
-export const isBrowser = (): boolean => {
-  return typeof window !== 'undefined' && typeof document !== 'undefined';
+  return text.replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case '&':
+        return '&amp;';
+      case '<':
+        return '&lt;';
+      case '>':
+        return '&gt;';
+      case '"':
+        return '&quot;';
+      case "'":
+        return '&#39;';
+      default:
+        return char;
+    }
+  });
 };
 
 /**
@@ -185,10 +194,18 @@ export const isBrowser = (): boolean => {
  * @returns True if running in a Node.js environment
  */
 export const isNode = (): boolean => {
+  return typeof process !== 'undefined' && !!process.versions?.node;
+};
+
+/**
+ * Check if running in browser environment
+ * @returns True if running in a browser environment
+ */
+export const isBrowser = (): boolean => {
   return (
-    typeof process !== 'undefined' &&
-    process.versions &&
-    !!process.versions.node
+    !isNode() &&
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined'
   );
 };
 

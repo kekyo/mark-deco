@@ -15,6 +15,7 @@ demo-pages/dist
 bin/
 
 test-shared/*.js
+test-shared/*.d.ts
 
 # Editor directories and files
 .vscode/*

@@ -44,7 +44,7 @@ const spawnAsync = (
   });
 };
 
-const CLI_PATH = resolve(__dirname, '../dist/cli.cjs');
+const CLI_PATH = resolve(__dirname, '../dist/index.cjs');
 const NO_TITLE_ARGS = ['--header-title-transform', 'none'];
 
 describe('mark-deco-cli', () => {

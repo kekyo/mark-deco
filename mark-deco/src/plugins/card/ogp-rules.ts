@@ -3,7 +3,7 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import type { ScrapingRule } from './types.js';
+import type { ScrapingRule } from './types';
 
 /**
  * OGP (Open Graph Protocol) scraping rules for general fallback

@@ -7,7 +7,7 @@
  * Rehype plugin to make standard markdown images responsive
  */
 import { visit } from 'unist-util-visit';
-import { generateResponsiveImageStyles } from '../utils/responsive-image.js';
+import { generateResponsiveImageStyles } from '../utils/responsive-image';
 import type { Element } from 'hast';
 
 /**

@@ -36,7 +36,7 @@ const fetcher = createCachedFetcher(
 #### ローカルストレージ（ブラウザ環境）
 
 ```typescript
-import { createLocalCacheStorage } from 'mark-deco';
+import { createLocalCacheStorage } from 'mark-deco/browser';
 
 const localStorage = createLocalCacheStorage('myapp:');
 const fetcher = createCachedFetcher('MyApp/1.0', 60000, localStorage);

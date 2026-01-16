@@ -3,11 +3,11 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import { fetchJson, isCORSError } from '../../utils.js';
-import { getOEmbedUrl, buildProvidersCache } from './providers.js';
-import { resolveRedirects } from './redirect-resolver.js';
-import type { OEmbedResponse, OEmbedProvider } from './types.js';
-import type { PluginContext } from '../../types.js';
+import { fetchJson, isBrowser, isCORSError } from '../../utils';
+import { getOEmbedUrl, buildProvidersCache } from './providers';
+import { resolveRedirects } from './redirect-resolver';
+import type { OEmbedResponse, OEmbedProvider } from './types';
+import type { MarkdownProcessorPluginContext } from '../../types';
 
 /**
  * Custom error class to indicate CORS failure
@@ -26,7 +26,7 @@ export const fetchOEmbedData = async (
   url: string,
   maxRedirects: number,
   timeoutEachRedirect: number,
-  context: PluginContext,
+  context: MarkdownProcessorPluginContext,
   providers: OEmbedProvider[]
 ): Promise<OEmbedResponse> => {
   const { logger, signal, fetcher } = context;
@@ -71,7 +71,7 @@ export const fetchOEmbedData = async (
   } catch (error: unknown) {
     // Check if this is a CORS error and wrap it appropriately
     if (isCORSError(error)) {
-      if (typeof window !== 'undefined') {
+      if (isBrowser()) {
         logger.debug(
           'fetchOEmbedData: Browser CORS restrictions block oEmbed API access for URL:',
           url

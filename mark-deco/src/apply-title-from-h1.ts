@@ -5,8 +5,9 @@
 
 import remarkParse from 'remark-parse';
 import { unified } from 'unified';
-import { remarkApplyTitleFromH1 } from './plugins/remark-apply-title-from-h1.js';
-import type { FrontmatterData, HeaderTitleTransform } from './types.js';
+import { remarkApplyTitleFromH1 } from './plugins/remark-apply-title-from-h1';
+import type { FrontmatterData, HeaderTitleTransform } from './types';
+import { resolveDefaultExport } from './utils';
 
 export interface ApplyTitleOptions {
   /** Whether the caller allows writing heading text into frontmatter.title */
@@ -53,8 +54,9 @@ export const applyTitleFromH1 = (
   let removeStartOffset: number | undefined;
   let removeEndOffset: number | undefined;
 
+  const remarkParsePlugin = resolveDefaultExport(remarkParse);
   const runner = unified()
-    .use(remarkParse)
+    .use(remarkParsePlugin)
     .use(remarkApplyTitleFromH1, {
       frontmatter,
       hasTitle,

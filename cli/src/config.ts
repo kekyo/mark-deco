@@ -29,7 +29,7 @@ export interface Config {
 /**
  * Load configuration from file
  */
-export async function loadConfig(configPath?: string): Promise<Config> {
+export const loadConfig = async (configPath?: string): Promise<Config> => {
   if (!configPath) {
     return {};
   }
@@ -41,7 +41,11 @@ export async function loadConfig(configPath?: string): Promise<Config> {
     // Support both JSON and JS config files
     if (configPath.endsWith('.json')) {
       return JSON.parse(configContent);
-    } else if (configPath.endsWith('.js') || configPath.endsWith('.mjs')) {
+    } else if (
+      configPath.endsWith('.js') ||
+      configPath.endsWith('.cjs') ||
+      configPath.endsWith('.mjs')
+    ) {
       // For JS/MJS files, we need to use dynamic import
       const configModule = await import(configFile);
       return configModule.default || configModule;
@@ -54,12 +58,12 @@ export async function loadConfig(configPath?: string): Promise<Config> {
       `Failed to load config file "${configPath}": ${error instanceof Error ? error.message : String(error)}`
     );
   }
-}
+};
 
 /**
  * Get default configuration
  */
-export function getDefaultConfig(): Config {
+export const getDefaultConfig = (): Config => {
   return {
     plugins: ['oembed', 'card', 'mermaid'],
     uniqueIdPrefix: 'section',
@@ -77,4 +81,4 @@ export function getDefaultConfig(): Config {
       enabled: true,
     },
   };
-}
+};

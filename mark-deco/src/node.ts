@@ -3,5 +3,5 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-// Re-export everything from the new modular structure for backward compatibility
-export * from './card/index';
+// Cache exports
+export { createFileSystemCacheStorage } from './cache/filesystem';

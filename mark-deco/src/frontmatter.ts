@@ -4,7 +4,7 @@
 // https://github.com/kekyo/mark-deco
 
 import { dump as dumpYaml, load as loadYaml, JSON_SCHEMA } from 'js-yaml';
-import type { FrontmatterData } from './types.js';
+import type { FrontmatterData } from './types';
 
 export interface ParsedFrontmatter {
   /** Parsed frontmatter data */

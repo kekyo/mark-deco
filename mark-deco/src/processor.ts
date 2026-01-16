@@ -10,21 +10,21 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
-import { composeMarkdownFromParts, parseFrontmatter } from './frontmatter.js';
-import { getNoOpLogger } from './logger.js';
-import { escapeHtml } from './plugins/oembed/utils.js';
-import { remarkAttr } from './plugins/remark-attr.js';
-import { rehypeResponsiveImages } from './plugins/responsive-images.js';
-import { generateHeadingId } from './utils.js';
-import { applyTitleFromH1 } from './apply-title-from-h1.js';
+import { composeMarkdownFromParts, parseFrontmatter } from './frontmatter';
+import { getNoOpLogger } from './logger';
+import { escapeHtml } from './plugins/oembed/utils';
+import { remarkAttr } from './plugins/remark-attr';
+import { rehypeResponsiveImages } from './plugins/responsive-images';
+import { generateHeadingId, resolveDefaultExport } from './utils';
+import { applyTitleFromH1 } from './apply-title-from-h1';
 import {
   clampHeadingLevel,
   extractHeadingText,
   resolveHeadingBaseLevel,
-} from './utils/heading.js';
+} from './utils/heading';
 import type {
-  Plugin,
-  PluginContext,
+  MarkdownProcessorPlugin,
+  MarkdownProcessorPluginContext,
   MarkdownProcessor,
   MarkdownProcessorOptions,
   ProcessOptions,
@@ -35,10 +35,14 @@ import type {
   FrontmatterPostTransformContext,
   ProcessResultWithFrontmatterTransform,
   ProcessWithFrontmatterTransformOptions,
-} from './types.js';
+} from './types';
 import type { HTMLBeautifyOptions } from 'js-beautify';
 
 const { html: beautifyHtml } = beautifyPkg;
+const remarkParsePlugin = resolveDefaultExport(remarkParse);
+const remarkGfmPlugin = resolveDefaultExport(remarkGfm);
+const remarkRehypePlugin = resolveDefaultExport(remarkRehype);
+const rehypeStringifyPlugin = resolveDefaultExport(rehypeStringify);
 
 /**
  * Default HTML beautify options with improved div structure handling
@@ -200,7 +204,7 @@ export const createMarkdownProcessor = (
 ): MarkdownProcessor => {
   const { plugins = [], logger = getNoOpLogger(), fetcher } = options;
 
-  const pluginsMap: Map<string, Plugin> = new Map();
+  const pluginsMap: Map<string, MarkdownProcessorPlugin> = new Map();
 
   // Initialize plugins
   for (const plugin of plugins) {
@@ -218,7 +222,7 @@ export const createMarkdownProcessor = (
   const processBlock = async (
     language: string,
     content: string,
-    context: PluginContext
+    context: MarkdownProcessorPluginContext
   ): Promise<string> => {
     const plugin = pluginsMap.get(language);
 
@@ -238,7 +242,7 @@ export const createMarkdownProcessor = (
     signal: AbortSignal | undefined,
     getUniqueId: () => string
   ) => {
-    const context: PluginContext = {
+    const context: MarkdownProcessorPluginContext = {
       logger,
       signal,
       frontmatter,
@@ -466,7 +470,7 @@ export const createMarkdownProcessor = (
       return id;
     };
 
-    let processor0 = unified().use(remarkParse);
+    let processor0 = unified().use(remarkParsePlugin);
 
     if (remarkPlugins) {
       for (const plugin of remarkPlugins) {
@@ -479,7 +483,7 @@ export const createMarkdownProcessor = (
     }
 
     let processor = processor0
-      .use(remarkGfm, gfmOptions)
+      .use(remarkGfmPlugin, gfmOptions)
       .use(remarkAttr)
       .use(
         createHeadingTreePlugin(
@@ -495,9 +499,9 @@ export const createMarkdownProcessor = (
         )
       )
       .use(createCustomBlockPlugin(frontmatter, signal, getUniqueId))
-      .use(remarkRehype, { allowDangerousHtml })
+      .use(remarkRehypePlugin, { allowDangerousHtml })
       .use(rehypeResponsiveImages)
-      .use(rehypeStringify, { allowDangerousHtml });
+      .use(rehypeStringifyPlugin, { allowDangerousHtml });
 
     if (rehypePlugins) {
       for (const plugin of rehypePlugins) {

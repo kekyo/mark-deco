@@ -7,29 +7,29 @@
 // These exports are intended for internal testing only and may change without notice
 
 // Shared utility exports
-export { formatErrorInfo } from './plugins/shared/error-formatter.js';
+export { formatErrorInfo } from './plugins/shared/error-formatter';
 
 // oEmbed related exports
-export type { OEmbedResponse } from './plugins/oembed/types.js';
+export type { OEmbedResponse } from './plugins/oembed/types';
 export {
   generateHtml,
   generateFallbackHtml,
-} from './plugins/oembed/html-generator.js';
+} from './plugins/oembed/html-generator';
 export {
   isValidUrl,
   escapeHtml,
   calculateAspectRatio,
   extractAspectRatioFromHtml,
-} from './plugins/oembed/utils.js';
+} from './plugins/oembed/utils';
 
-export { fetchOEmbedData, CORSError } from './plugins/oembed/fetcher.js';
+export { fetchOEmbedData, CORSError } from './plugins/oembed/fetcher';
 
 // Card plugin related exports
 
 export {
   generateCardHtml,
   generateFallbackHtml as generateCardFallbackHtml,
-} from './plugins/card/html-generator.js';
+} from './plugins/card/html-generator';
 export {
   isValidUrl as isValidCardUrl,
   escapeHtml as escapeCardHtml,
@@ -38,6 +38,6 @@ export {
   truncateText,
   cleanText,
   extractEnhancedData,
-} from './plugins/card/utils.js';
+} from './plugins/card/utils';
 
-export { fetchMetadata } from './plugins/card/fetcher.js';
+export { fetchMetadata } from './plugins/card/fetcher';
