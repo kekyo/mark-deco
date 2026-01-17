@@ -150,7 +150,7 @@ describe('Card Plugin Logging', () => {
 
     const customRules = [
       {
-        pattern: '^https://github\\.com/',
+        patterns: ['^https://github\\.com/'],
         siteName: 'GitHub',
         fields: {
           title: {
@@ -245,7 +245,7 @@ describe('Card Plugin Logging', () => {
 
     const customRules = [
       {
-        pattern: '^https://shop\\.example\\.com/',
+        patterns: ['^https://shop\\.example\\.com/'],
         siteName: 'Example Shop',
         fields: {
           prices: {

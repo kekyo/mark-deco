@@ -18,10 +18,19 @@ describe('Rule Engine', () => {
     it('should find Amazon JP rule for amazon.co.jp URLs', () => {
       const rule = findMatchingRule(
         amazonRules,
+        'https://www.amazon.co.jp/dp/B0DG8Z9Y1R',
         'https://www.amazon.co.jp/dp/B0DG8Z9Y1R'
       );
       expect(rule).toBeDefined();
-      expect(rule?.pattern).toBe('^https?://(?:www\\.)?amazon\\.co\\.jp/');
+      expect(rule?.postFilters).toEqual([
+        '^https?://(?:www\\.)?amazon\\.co\\.jp/',
+      ]);
+      expect(rule?.patterns).toEqual(
+        expect.arrayContaining([
+          '^https?://(?:www\\.)?amazon\\.co\\.jp/',
+          '^https?://amzn\\.to/',
+        ])
+      );
       expect(rule?.locale).toBe('ja-JP');
       expect(rule?.siteName).toBe('Amazon Japan');
     });
@@ -29,12 +38,44 @@ describe('Rule Engine', () => {
     it('should find Amazon US rule for amazon.com URLs', () => {
       const rule = findMatchingRule(
         amazonRules,
+        'https://www.amazon.com/dp/B08N5WRWNW',
         'https://www.amazon.com/dp/B08N5WRWNW'
       );
       expect(rule).toBeDefined();
-      expect(rule?.pattern).toBe('^https?://(?:www\\.)?amazon\\.com/');
+      expect(rule?.postFilters).toEqual(['^https?://(?:www\\.)?amazon\\.com/']);
+      expect(rule?.patterns).toEqual(
+        expect.arrayContaining([
+          '^https?://(?:www\\.)?amazon\\.com/',
+          '^https?://amzn\\.to/',
+        ])
+      );
       expect(rule?.locale).toBe('en-US');
       expect(rule?.siteName).toBe('Amazon US');
+    });
+
+    it('should match Amazon JP rule for amzn.to with postFilter URL', () => {
+      const rule = findMatchingRule(
+        amazonRules,
+        'https://amzn.to/4pGLXhw',
+        'https://www.amazon.co.jp/dp/B0DG8Z9Y1R'
+      );
+      expect(rule).toBeDefined();
+      expect(rule?.siteName).toBe('Amazon Japan');
+    });
+
+    it('should match Amazon US rule for amzn.to with postFilter URL', () => {
+      const rule = findMatchingRule(
+        amazonRules,
+        'https://amzn.to/4pGLXhw',
+        'https://www.amazon.com/dp/B08N5WRWNW'
+      );
+      expect(rule).toBeDefined();
+      expect(rule?.siteName).toBe('Amazon US');
+    });
+
+    it('should not match Amazon rules when postFilter URL is missing', () => {
+      const rule = findMatchingRule(amazonRules, 'https://amzn.to/4pGLXhw');
+      expect(rule).toBeUndefined();
     });
 
     it('should return undefined for non-matching URLs', () => {
@@ -134,7 +175,7 @@ describe('Rule Engine', () => {
 
     it('should handle locale extraction from HTML when not specified in rule', () => {
       const testRule: ScrapingRule = {
-        pattern: 'test',
+        patterns: ['test'],
         // No locale specified
         siteName: 'Test Site',
         fields: {
@@ -169,7 +210,7 @@ describe('Rule Engine', () => {
 
     it('should prioritize rule locale over HTML locale', () => {
       const testRule: ScrapingRule = {
-        pattern: 'test',
+        patterns: ['test'],
         locale: 'en-US', // Explicitly specified
         siteName: 'Test Site',
         fields: {
@@ -232,7 +273,7 @@ describe('Rule Engine', () => {
 
     it('should handle processor functions', () => {
       const testRule: ScrapingRule = {
-        pattern: 'test',
+        patterns: ['test'],
         siteName: 'Test Site',
         fields: {
           processedField: {
@@ -265,7 +306,7 @@ describe('Rule Engine', () => {
 
     it('should handle multiple selectors', () => {
       const testRule: ScrapingRule = {
-        pattern: 'test',
+        patterns: ['test'],
         siteName: 'Test Site',
         fields: {
           title: {
@@ -299,7 +340,7 @@ describe('Rule Engine', () => {
 
     it('should handle multiple extraction with array results', () => {
       const testRule: ScrapingRule = {
-        pattern: 'test',
+        patterns: ['test'],
         siteName: 'Test Site',
         fields: {
           tags: {
@@ -334,7 +375,7 @@ describe('Rule Engine', () => {
   describe('ProcessorRules', () => {
     it('should handle currency processor', () => {
       const testRule: ScrapingRule = {
-        pattern: 'test',
+        patterns: ['test'],
         siteName: 'Test Site',
         fields: {
           price: {
@@ -368,7 +409,7 @@ describe('Rule Engine', () => {
 
     it('should handle regex processor', () => {
       const testRule: ScrapingRule = {
-        pattern: 'test',
+        patterns: ['test'],
         siteName: 'Test Site',
         fields: {
           cleanText: {
@@ -407,7 +448,7 @@ describe('Rule Engine', () => {
 
     it('should handle first processor', () => {
       const testRule: ScrapingRule = {
-        pattern: 'test',
+        patterns: ['test'],
         siteName: 'Test Site',
         fields: {
           firstItem: {
@@ -442,7 +483,7 @@ describe('Rule Engine', () => {
 
     it('should handle filter processor', () => {
       const testRule: ScrapingRule = {
-        pattern: 'test',
+        patterns: ['test'],
         siteName: 'Test Site',
         fields: {
           filteredItems: {
@@ -487,7 +528,7 @@ describe('OGP Rules Tests', () => {
   it('should find OGP rule for any URL', () => {
     const rule = findMatchingRule(ogpRules, 'https://example.com/page');
     expect(rule).toBeDefined();
-    expect(rule?.pattern).toBe('^https?://');
+    expect(rule?.patterns).toEqual(['^https?://']);
     expect(rule?.siteName).toBe('Generic Site');
   });
 

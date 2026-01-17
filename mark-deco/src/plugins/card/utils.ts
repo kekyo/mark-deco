@@ -106,27 +106,40 @@ export const extractEnhancedData = (
   $: ReturnType<typeof cheerio.load>,
   sourceUrl: string,
   customRules?: ScrapingRule[],
-  logger?: Logger
+  logger?: Logger,
+  postFilterUrl?: string
 ): ExtractedMetadata | null => {
   const rules = buildRuleSet(customRules);
 
   logger?.debug('extractEnhancedData: Starting rule matching process', {
     url: sourceUrl,
+    postFilterUrl,
     totalRules: rules.length,
     customRulesCount: customRules?.length || 0,
     ogpRulesCount: ogpRules.length,
   });
 
-  const matchingRule = findMatchingRule(rules, sourceUrl, logger);
+  const matchingRule = findMatchingRule(
+    rules,
+    sourceUrl,
+    postFilterUrl,
+    logger
+  );
 
   if (matchingRule) {
     logger?.debug('extractEnhancedData: Found matching rule', {
-      pattern: matchingRule.pattern,
+      patterns: matchingRule.patterns,
+      postFilters: matchingRule.postFilters,
       siteName: matchingRule.siteName,
       fieldsToExtract: Object.keys(matchingRule.fields),
     });
 
-    const result = applyScrapingRule(matchingRule, $, sourceUrl, logger);
+    const hasPostFilters =
+      Array.isArray(matchingRule.postFilters) &&
+      matchingRule.postFilters.length > 0;
+    const contextUrl =
+      hasPostFilters && postFilterUrl ? postFilterUrl : sourceUrl;
+    const result = applyScrapingRule(matchingRule, $, contextUrl, logger);
 
     logger?.debug('extractEnhancedData: Rule application completed', {
       extractedFields: Object.keys(result),

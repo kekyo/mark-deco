@@ -33,7 +33,7 @@ const createDetailedLogger = (): Logger => ({
 // Example of custom scraping rules
 const customScrapingRules = [
   {
-    pattern: '^https://github\\.com/[^/]+/[^/]+/?$',
+    patterns: ['^https://github\\.com/[^/]+/[^/]+/?$'],
     siteName: 'GitHub',
     fields: {
       title: {

@@ -655,7 +655,9 @@ describe('Metadata Extraction with Rule Engine', () => {
       const result = extractEnhancedData(
         $,
         'https://www.amazon.co.jp/dp/B0DG8Z9Y1R',
-        amazonRules
+        amazonRules,
+        undefined,
+        'https://www.amazon.co.jp/dp/B0DG8Z9Y1R'
       );
 
       expect(result).toBeDefined();
@@ -689,7 +691,9 @@ describe('Metadata Extraction with Rule Engine', () => {
       const result = extractEnhancedData(
         $,
         'https://www.amazon.com/dp/TESTPRODUCT123',
-        amazonRules
+        amazonRules,
+        undefined,
+        'https://www.amazon.com/dp/TESTPRODUCT123'
       );
 
       expect(result).toBeDefined();

@@ -36,6 +36,19 @@ const extractLocaleFromHTML = (
   return undefined;
 };
 
+const normalizePatternList = (value?: string[]): string[] => {
+  if (!value) return [];
+  return value.map((pattern) => pattern.trim()).filter(Boolean);
+};
+
+const getRulePatterns = (rule: ScrapingRule): string[] => {
+  return normalizePatternList(rule.patterns);
+};
+
+const getRulePostFilters = (rule: ScrapingRule): string[] => {
+  return normalizePatternList(rule.postFilters);
+};
+
 /**
  * Built-in processor rules
  */
@@ -289,8 +302,12 @@ export const applyScrapingRule = (
   url: string,
   logger?: Logger
 ): ExtractedMetadata => {
+  const patterns = getRulePatterns(rule);
+  const postFilters = getRulePostFilters(rule);
+
   logger?.debug('applyScrapingRule: Starting metadata extraction', {
-    pattern: rule.pattern,
+    patterns,
+    postFilters: postFilters.length > 0 ? postFilters : undefined,
     siteName: rule.siteName,
     fieldsCount: Object.keys(rule.fields).length,
   });
@@ -372,13 +389,32 @@ export const applyScrapingRule = (
 /**
  * Find matching scraping rule for URL
  */
-export const findMatchingRule = (
+export function findMatchingRule(
   rules: ScrapingRule[],
   url: string,
   logger?: Logger
-): ScrapingRule | undefined => {
-  logger?.debug('findMatchingRule: Testing rules against URL', {
+): ScrapingRule | undefined;
+export function findMatchingRule(
+  rules: ScrapingRule[],
+  url: string,
+  postFilterUrl: string | undefined,
+  logger?: Logger
+): ScrapingRule | undefined;
+export function findMatchingRule(
+  rules: ScrapingRule[],
+  url: string,
+  postFilterUrlOrLogger?: string | Logger,
+  logger?: Logger
+): ScrapingRule | undefined {
+  const hasPostFilterUrl = typeof postFilterUrlOrLogger === 'string';
+  const postFilterUrl = hasPostFilterUrl ? postFilterUrlOrLogger : undefined;
+  const resolvedLogger = hasPostFilterUrl
+    ? logger
+    : (postFilterUrlOrLogger ?? logger);
+
+  resolvedLogger?.debug('findMatchingRule: Testing rules against URL', {
     url,
+    postFilterUrl,
     rulesCount: rules.length,
   });
 
@@ -386,25 +422,51 @@ export const findMatchingRule = (
     const rule = rules[i];
     if (!rule) continue;
 
-    const regex = new RegExp(rule.pattern);
-    const matches = regex.test(url);
+    const patterns = getRulePatterns(rule);
+    if (patterns.length === 0) {
+      resolvedLogger?.debug(`findMatchingRule: Rule ${i + 1}/${rules.length}`, {
+        patterns,
+        matches: false,
+      });
+      continue;
+    }
 
-    logger?.debug(`findMatchingRule: Rule ${i + 1}/${rules.length}`, {
-      pattern: rule.pattern,
+    const matchesPattern = patterns.some((pattern) =>
+      new RegExp(pattern).test(url)
+    );
+    const postFilters = getRulePostFilters(rule);
+    let matchesPostFilter = true;
+    if (postFilters.length > 0) {
+      if (!postFilterUrl) {
+        matchesPostFilter = false;
+      } else {
+        matchesPostFilter = postFilters.some((pattern) =>
+          new RegExp(pattern).test(postFilterUrl)
+        );
+      }
+    }
+    const matches = matchesPattern && matchesPostFilter;
+
+    resolvedLogger?.debug(`findMatchingRule: Rule ${i + 1}/${rules.length}`, {
+      patterns,
+      postFilters: postFilters.length > 0 ? postFilters : undefined,
       siteName: rule.siteName,
       matches,
+      matchesPattern,
+      matchesPostFilter,
     });
 
     if (matches) {
-      logger?.debug('findMatchingRule: Found matching rule', {
+      resolvedLogger?.debug('findMatchingRule: Found matching rule', {
         ruleIndex: i + 1,
-        pattern: rule.pattern,
+        patterns,
+        postFilters: postFilters.length > 0 ? postFilters : undefined,
         siteName: rule.siteName,
       });
       return rule;
     }
   }
 
-  logger?.debug('findMatchingRule: No matching rule found');
+  resolvedLogger?.debug('findMatchingRule: No matching rule found');
   return undefined;
-};
+}
