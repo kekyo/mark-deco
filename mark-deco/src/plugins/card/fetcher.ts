@@ -4,8 +4,8 @@
 // https://github.com/kekyo/mark-deco
 
 import * as cheerio from 'cheerio';
-import { fetchText, isBrowser, isCORSError } from '../../utils';
-import { extractEnhancedData } from './utils';
+import { isBrowser, isCORSError } from '../../utils';
+import { extractEnhancedData, resolveUrl } from './utils';
 import type { CardPluginOptions, ExtractedMetadata } from './types';
 import type { MarkdownProcessorPluginContext } from '../../types';
 
@@ -22,20 +22,21 @@ export const fetchMetadata = async (
   logger.info('fetchMetadata: Starting metadata extraction for URL:', url);
 
   try {
-    // Fetch HTML content directly using the fetchText utility
-    const htmlContent = await fetchText(
-      fetcher,
-      url,
-      'text/html',
-      signal,
-      logger
-    );
+    const response = await fetcher.rawFetcher(url, 'text/html', signal, logger);
+    const htmlContent = await response.text();
 
     logger.info('fetchMetadata: Successfully fetched HTML content');
 
     // Parse metadata from HTML using rule-based system
     const $ = cheerio.load(htmlContent);
-    const metadata = extractEnhancedData($, url, options.scrapingRules, logger);
+    const postFilterUrl = resolvePostFilterUrl($, url, response.url);
+    const metadata = extractEnhancedData(
+      $,
+      url,
+      options.scrapingRules,
+      logger,
+      postFilterUrl
+    );
 
     if (metadata === null || Object.keys(metadata).length === 0) {
       // Return minimal metadata if no rules matched
@@ -81,4 +82,24 @@ export const fetchMetadata = async (
     // Re-throw the original error
     throw error;
   }
+};
+
+const resolvePostFilterUrl = (
+  $: ReturnType<typeof cheerio.load>,
+  originalUrl: string,
+  responseUrl?: string
+): string | undefined => {
+  const trimmedResponseUrl = responseUrl?.trim();
+  if (trimmedResponseUrl) {
+    return trimmedResponseUrl;
+  }
+
+  const ogUrl = $('meta[property="og:url"]').attr('content')?.trim();
+  const canonicalUrl = $('link[rel="canonical"]').attr('href')?.trim();
+  const twitterUrl = $('meta[name="twitter:url"]').attr('content')?.trim();
+  const candidate = ogUrl || canonicalUrl || twitterUrl;
+  if (!candidate) {
+    return undefined;
+  }
+  return resolveUrl(candidate, originalUrl);
 };

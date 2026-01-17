@@ -30,7 +30,7 @@ import type { ScrapingRule } from './types';
 export const ogpRules: ScrapingRule[] = [
   {
     // Match any URL as fallback
-    pattern: '^https?://',
+    patterns: ['^https?://'],
     locale: 'auto',
     siteName: 'Generic Site',
     fields: {

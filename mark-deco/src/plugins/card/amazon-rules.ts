@@ -3,14 +3,154 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import type { ScrapingRule } from './types';
+import type { FieldRule, ProcessorContext, ScrapingRule } from './types';
 
 /**
  * Amazon scraping rules for different locales
  */
+const resolveUrl = (url: string, baseUrl: string): string => {
+  try {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    if (url.startsWith('//')) {
+      const baseUrlObj = new URL(baseUrl);
+      return `${baseUrlObj.protocol}${url}`;
+    }
+    return new URL(url, baseUrl).toString();
+  } catch {
+    return url;
+  }
+};
+
+const decodeHtmlEntities = (value: string): string =>
+  value
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&#039;/g, "'")
+    .replace(/&amp;/g, '&');
+
+const extractDynamicImageUrl = (value: string): string | undefined => {
+  if (!value.trim().startsWith('{')) {
+    return undefined;
+  }
+  try {
+    const parsed = JSON.parse(value) as Record<string, unknown>;
+    const entries = Object.entries(parsed);
+    if (entries.length === 0) {
+      return undefined;
+    }
+    const firstEntry = entries[0];
+    if (!firstEntry) {
+      return undefined;
+    }
+    let bestUrl = firstEntry[0];
+    let bestArea = 0;
+    for (const [url, size] of entries) {
+      if (Array.isArray(size) && size.length >= 2) {
+        const width = Number(size[0]);
+        const height = Number(size[1]);
+        const area =
+          Number.isFinite(width) && Number.isFinite(height)
+            ? width * height
+            : 0;
+        if (area > bestArea) {
+          bestArea = area;
+          bestUrl = url;
+        }
+      }
+    }
+    return bestUrl;
+  } catch {
+    return undefined;
+  }
+};
+
+const extractAmazonImageUrl = (
+  values: string[],
+  context: ProcessorContext
+): string | undefined => {
+  for (const rawValue of values) {
+    const trimmed = decodeHtmlEntities(rawValue).trim();
+    if (!trimmed) {
+      continue;
+    }
+    const dynamicUrl = extractDynamicImageUrl(trimmed);
+    if (dynamicUrl) {
+      return resolveUrl(dynamicUrl, context.url);
+    }
+    return resolveUrl(trimmed, context.url);
+  }
+  return undefined;
+};
+
+const amazonImageRules: FieldRule[] = [
+  {
+    selector: '#landingImage',
+    method: 'attr',
+    attr: 'data-a-dynamic-image',
+    processor: extractAmazonImageUrl,
+  },
+  {
+    selector: '#landingImage',
+    method: 'attr',
+    attr: 'data-old-hires',
+    processor: extractAmazonImageUrl,
+  },
+  {
+    selector: '#landingImage',
+    method: 'attr',
+    attr: 'src',
+    processor: extractAmazonImageUrl,
+  },
+  {
+    selector: '#imgTagWrapperId img',
+    method: 'attr',
+    attr: 'data-a-dynamic-image',
+    processor: extractAmazonImageUrl,
+  },
+  {
+    selector: '#imgTagWrapperId img',
+    method: 'attr',
+    attr: 'data-old-hires',
+    processor: extractAmazonImageUrl,
+  },
+  {
+    selector: '#imgTagWrapperId img',
+    method: 'attr',
+    attr: 'src',
+    processor: extractAmazonImageUrl,
+  },
+  {
+    selector: 'img[data-old-hires]',
+    method: 'attr',
+    attr: 'data-old-hires',
+    processor: extractAmazonImageUrl,
+  },
+  {
+    selector: 'meta[property="og:image"]',
+    method: 'attr',
+    attr: 'content',
+    processor: extractAmazonImageUrl,
+  },
+  {
+    selector: 'meta[name="twitter:image"]',
+    method: 'attr',
+    attr: 'content',
+    processor: extractAmazonImageUrl,
+  },
+];
+
+const amazonPatterns = [
+  '^https?://(?:www\\.)?amazon\\.co\\.jp/',
+  '^https?://(?:www\\.)?amazon\\.com/',
+  '^https?://amzn\\.to/',
+];
+
 export const amazonRules: ScrapingRule[] = [
   {
-    pattern: '^https?://(?:www\\.)?amazon\\.co\\.jp/',
+    patterns: amazonPatterns,
+    postFilters: ['^https?://(?:www\\.)?amazon\\.co\\.jp/'],
     locale: 'ja-JP',
     siteName: 'Amazon Japan',
     fields: {
@@ -22,6 +162,10 @@ export const amazonRules: ScrapingRule[] = [
             method: 'text',
           },
         ],
+      },
+
+      image: {
+        rules: amazonImageRules,
       },
 
       price: {
@@ -120,7 +264,8 @@ export const amazonRules: ScrapingRule[] = [
   },
 
   {
-    pattern: '^https?://(?:www\\.)?amazon\\.com/',
+    patterns: amazonPatterns,
+    postFilters: ['^https?://(?:www\\.)?amazon\\.com/'],
     locale: 'en-US',
     siteName: 'Amazon US',
     fields: {
@@ -132,6 +277,10 @@ export const amazonRules: ScrapingRule[] = [
             method: 'text',
           },
         ],
+      },
+
+      image: {
+        rules: amazonImageRules,
       },
 
       price: {

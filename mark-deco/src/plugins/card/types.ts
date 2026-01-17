@@ -95,8 +95,10 @@ export interface FieldConfig {
  * Site-specific scraping rule
  */
 export interface ScrapingRule {
-  /** Regex pattern to match URLs */
-  pattern: string;
+  /** Regex patterns to match URLs */
+  patterns: string[];
+  /** Regex patterns to match the post-redirect URL */
+  postFilters?: string[];
   /** Locale/region identifier (optional, if not specified, extracted from META tags) */
   locale?: string;
   /** Site name (automatically added to metadata as 'siteName') */
