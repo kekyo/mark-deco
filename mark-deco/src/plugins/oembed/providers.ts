@@ -4,19 +4,8 @@
 // https://github.com/kekyo/mark-deco
 
 import { fetchText, isCORSError } from '../../utils';
-import downloadedProvidersJson from './providers.json' with { type: 'json' };
-import type { OEmbedProvider } from './types';
 import type { MarkdownProcessorPluginContext } from '../../types';
-
-/**
- * Default providers from downloaded providers.json
- * Downloaded from https://oembed.com/providers.json
- *
- * Export this if you want to use the built-in provider list,
- * or provide your own custom providers to buildProvidersCache.
- */
-export const defaultProviderList: OEmbedProvider[] =
-  downloadedProvidersJson as OEmbedProvider[];
+import { OEmbedProvider } from './types';
 
 /**
  * Decode HTML entities in a string

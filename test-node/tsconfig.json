@@ -23,10 +23,7 @@
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": true,
-    "baseUrl": ".",
-    "paths": {
-      "mark-deco": ["../mark-deco/src/index.ts"]
-    }
+    "baseUrl": "."
   },
   "include": ["*.ts", "../test-shared/**/*"],
   "exclude": ["node_modules", "dist", "test-results"]

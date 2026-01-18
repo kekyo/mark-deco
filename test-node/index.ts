@@ -9,8 +9,8 @@ import {
   createCardPlugin,
   createMermaidPlugin,
   createCachedFetcher,
-  defaultProviderList,
 } from 'mark-deco';
+import { defaultProviderList } from 'mark-deco/misc';
 
 interface ProcessorOptions {
   enableOembed: boolean;

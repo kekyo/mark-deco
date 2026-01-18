@@ -8,10 +8,10 @@ import {
   getConsoleLogger,
   createCachedFetcher,
   createMemoryCacheStorage,
-  defaultProviderList,
 } from 'mark-deco';
 import type { MarkdownProcessor } from 'mark-deco';
 import { createLocalCacheStorage } from 'mark-deco/browser';
+import { defaultProviderList } from 'mark-deco/misc';
 
 // Custom Buffer type for browser environment
 interface BufferLike {

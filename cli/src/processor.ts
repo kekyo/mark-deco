@@ -11,8 +11,8 @@ import {
   createCachedFetcher,
   createMemoryCacheStorage,
   getConsoleLogger,
-  defaultProviderList,
 } from 'mark-deco';
+import { defaultProviderList } from 'mark-deco/misc';
 import type { Config } from './config';
 
 // Import the MarkdownProcessor type - this should be available from mark-deco package

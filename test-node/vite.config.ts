@@ -16,20 +16,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ['commander', 'mark-deco', 'fs/promises', 'path'],
-      output: {
-        globals: {
-          commander: 'commander',
-          'mark-deco': 'markDeco',
-        },
-      },
     },
     target: 'node18',
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, '.'),
-      // Directly reference library source files during development
-      'mark-deco': resolve(__dirname, '../mark-deco/src/index.ts'),
-    },
   },
 });

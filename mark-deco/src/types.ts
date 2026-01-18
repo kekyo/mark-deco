@@ -7,6 +7,25 @@ import type { HTMLBeautifyOptions } from 'js-beautify';
 import type { Options as RemarkGfmOptions } from 'remark-gfm';
 import type { PluggableList } from 'unified';
 
+///////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Log levels for the logger interface
+ */
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+/**
+ * Logger interface for customizable logging
+ */
+export interface Logger {
+  readonly debug: (message: string, ...args: unknown[]) => void;
+  readonly info: (message: string, ...args: unknown[]) => void;
+  readonly warn: (message: string, ...args: unknown[]) => void;
+  readonly error: (message: string, ...args: unknown[]) => void;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
 // Re-export HTMLBeautifyOptions for external use
 export type { HTMLBeautifyOptions };
 
@@ -87,6 +106,8 @@ export interface HeadingNode {
   readonly children: HeadingNode[];
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Fetcher interface that encapsulates both fetching function and metadata
  */
@@ -101,6 +122,8 @@ export interface FetcherType {
   /** User-Agent string used for fetcher HTTP requests */
   readonly userAgent: string;
 }
+
+///////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Context provided to plugins during processing
@@ -136,6 +159,8 @@ export interface MarkdownProcessorPlugin {
     context: MarkdownProcessorPluginContext
   ) => Promise<string>;
 }
+
+///////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Options for creating a markdown processor
@@ -289,19 +314,4 @@ export interface MarkdownProcessor {
     uniqueIdPrefix: string,
     options: ProcessWithFrontmatterTransformOptions
   ) => Promise<ProcessResultWithFrontmatterTransform | undefined>;
-}
-
-/**
- * Log levels for the logger interface
- */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-
-/**
- * Logger interface for customizable logging
- */
-export interface Logger {
-  readonly debug: (message: string, ...args: unknown[]) => void;
-  readonly info: (message: string, ...args: unknown[]) => void;
-  readonly warn: (message: string, ...args: unknown[]) => void;
-  readonly error: (message: string, ...args: unknown[]) => void;
 }
