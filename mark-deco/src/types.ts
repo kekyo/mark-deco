@@ -166,6 +166,30 @@ export interface AdvancedOptions {
 }
 
 /**
+ * Theme config for code highlighting
+ */
+export interface CodeHighlightThemeConfig {
+  /** Theme name to use in light mode */
+  readonly light?: string;
+  /** Theme name to use in dark mode */
+  readonly dark?: string;
+}
+
+/**
+ * Options for built-in code highlighting
+ */
+export interface CodeHighlightOptions {
+  /** Whitelist of languages to load (empty or undefined loads none explicitly) */
+  readonly languages?: readonly string[];
+  /** Theme name or theme pair for light/dark */
+  readonly theme?: string | CodeHighlightThemeConfig;
+  /** Whether to show line numbers for code blocks */
+  readonly lineNumbers?: boolean;
+  /** Default language for code blocks without an explicit language */
+  readonly defaultLanguage?: string;
+}
+
+/**
  * Options for markdown processing
  */
 export interface ProcessOptions {
@@ -181,6 +205,8 @@ export interface ProcessOptions {
   headerTitleTransform?: HeaderTitleTransform;
   /** Default CSS class name(s) to apply to the parent paragraph of images (space-separated) */
   defaultImageOuterClassName?: string;
+  /** Options for built-in code highlighting (enable when provided) */
+  codeHighlight?: CodeHighlightOptions;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
@@ -205,6 +231,8 @@ export interface ProcessWithFrontmatterTransformOptions {
   headerTitleTransform?: HeaderTitleTransform;
   /** Default CSS class name(s) to apply to the parent paragraph of images (space-separated) */
   defaultImageOuterClassName?: string;
+  /** Options for built-in code highlighting (enable when provided) */
+  codeHighlight?: CodeHighlightOptions;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }

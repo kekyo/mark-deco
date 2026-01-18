@@ -13,6 +13,10 @@ import { visit } from 'unist-util-visit';
 import { composeMarkdownFromParts, parseFrontmatter } from './frontmatter';
 import { getNoOpLogger } from './logger';
 import { escapeHtml } from './plugins/oembed/utils';
+import {
+  createCodeHighlightRehypePlugin,
+  remarkProtectCodeMeta,
+} from './plugins/code-highlight';
 import { remarkAttr } from './plugins/remark-attr';
 import { rehypeResponsiveImages } from './plugins/responsive-images';
 import { generateHeadingId, resolveDefaultExport } from './utils';
@@ -451,9 +455,11 @@ export const createMarkdownProcessor = (
       useHierarchicalHeadingId = true,
       headingBaseLevel,
       defaultImageOuterClassName,
+      codeHighlight,
       advancedOptions,
     } = options ?? {};
     const resolvedHeadingBaseLevel = resolveHeadingBaseLevel(headingBaseLevel);
+    const hasCodeHighlight = codeHighlight !== undefined;
 
     const {
       allowDangerousHtml = true,
@@ -483,6 +489,10 @@ export const createMarkdownProcessor = (
       }
     }
 
+    if (hasCodeHighlight) {
+      processor0 = processor0.use(remarkProtectCodeMeta);
+    }
+
     const responsiveImageOptions =
       defaultImageOuterClassName === undefined
         ? undefined
@@ -508,6 +518,11 @@ export const createMarkdownProcessor = (
       .use(remarkRehypePlugin, { allowDangerousHtml })
       .use(rehypeResponsiveImages, responsiveImageOptions)
       .use(rehypeStringifyPlugin, { allowDangerousHtml });
+
+    if (hasCodeHighlight) {
+      const [plugin, options] = createCodeHighlightRehypePlugin(codeHighlight);
+      processor = processor.use(plugin, options);
+    }
 
     if (rehypePlugins) {
       for (const plugin of rehypePlugins) {

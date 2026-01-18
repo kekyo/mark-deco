@@ -142,7 +142,7 @@ MarkDeco has many useful features. For further details, please see below.
 - [Frontmatter Information Extraction](./docs/en/frontmatter-extraction.md) - Parse YAML frontmatter from Markdown files to extract metadata like title, author, tags, and publication date
 - [Heading ID Generation and Heading Information Extraction](./docs/en/heading-id-generation.md) - Automatically generate unique IDs for headings with hierarchical or content-based naming strategies
 - [Fetcher and Cache System](./docs/en/fetcher-and-cache-system.md) - External HTTP request management with configurable caching strategies for oEmbed APIs and page scraping
-- [Built-in Plugins](./docs/en/built-in-plugins.md) - oEmbed, card, and Mermaid plugins for embedding media content, social posts, and interactive diagrams
+- [Built-in Processing](./docs/en/built-in-processing.md) - oEmbed/card/Mermaid plugins and built-in code highlighting
 - [Creating Custom Plugins](./docs/en/creating-custom-plugins.md) - Develop custom plugins to extend Markdown processing with code block interceptors and unified ecosystem integration
 - [CLI Application](./docs/en/cli-application.md) - Command-line interface for batch processing Markdown files with configuration support and plugin control
 
