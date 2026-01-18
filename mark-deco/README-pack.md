@@ -91,16 +91,6 @@ const result = await processor.process(markdown, 'id', {
 
 For usage of `AbortController` and `AbortSignal`, refer to ECMAScript documentation.
 
-### Default Image Class
-
-Assign a default CSS class to all Markdown images with `defaultImageClassName`. The value is merged with any class specified via `remark-attr`.
-
-```typescript
-await processor.process(markdown, 'id', {
-  defaultImageClassName: 'content-image shadow',
-});
-```
-
 ### CLI Interface
 
 Although MarkDeco is a library, a CLI interface is also available in the package that allows you to easily try out MarkDeco. This allows you to try out conversions without having to write code in TypeScript, or call it as an independent application from another code.

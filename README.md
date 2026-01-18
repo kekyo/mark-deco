@@ -111,14 +111,14 @@ await processor.process(markdown, 'id', { headerTitleTransform: 'extract' });
 
 Use `extract` to keep the heading while copying the title, `extractAndRemove` (default) to remove it, or `none` to skip the behaviour entirely.
 
-### Default Image Class
+### Default Image Outer Class
 
-You can assign a default CSS class to all Markdown images with `defaultImageClassName`.
+You can assign a default CSS class to the parent paragraph (`<p>`) of Markdown images with `defaultImageOuterClassName`.
 
 ```typescript
-// Add the .content-image and .shadow classes to the <img> tags
+// Add the .content-image and .shadow classes to the parent <p> tags
 await processor.process(markdown, 'id', {
-  defaultImageClassName: 'content-image shadow',
+  defaultImageOuterClassName: 'content-image shadow',
 });
 ```
 

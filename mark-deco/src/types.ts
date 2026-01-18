@@ -179,8 +179,8 @@ export interface ProcessOptions {
   useHierarchicalHeadingId?: boolean;
   /** How to treat the first base-level heading for `frontmatter.title` (default: extractAndRemove) */
   headerTitleTransform?: HeaderTitleTransform;
-  /** Default CSS class name(s) to apply to all img elements (space-separated) */
-  defaultImageClassName?: string;
+  /** Default CSS class name(s) to apply to the parent paragraph of images (space-separated) */
+  defaultImageOuterClassName?: string;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
@@ -203,8 +203,8 @@ export interface ProcessWithFrontmatterTransformOptions {
   useHierarchicalHeadingId?: boolean;
   /** How to treat the first base-level heading for `frontmatter.title` (default: extractAndRemove) */
   headerTitleTransform?: HeaderTitleTransform;
-  /** Default CSS class name(s) to apply to all img elements (space-separated) */
-  defaultImageClassName?: string;
+  /** Default CSS class name(s) to apply to the parent paragraph of images (space-separated) */
+  defaultImageOuterClassName?: string;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
