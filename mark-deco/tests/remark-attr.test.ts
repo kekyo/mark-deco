@@ -70,7 +70,7 @@ describe('remark-attr integration', () => {
       const markdown = '![Alt text](image.jpg){.responsive}';
       const result = await runProcess(markdown, 'test');
 
-      expect(result.html).toContain('class="responsive"');
+      expect(result.html).toContain('<p class="responsive">');
       expect(result.html).toContain('<img');
     });
 

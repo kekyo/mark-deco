@@ -450,7 +450,7 @@ export const createMarkdownProcessor = (
       useContentStringHeaderId = false,
       useHierarchicalHeadingId = true,
       headingBaseLevel,
-      defaultImageClassName,
+      defaultImageOuterClassName,
       advancedOptions,
     } = options ?? {};
     const resolvedHeadingBaseLevel = resolveHeadingBaseLevel(headingBaseLevel);
@@ -484,9 +484,9 @@ export const createMarkdownProcessor = (
     }
 
     const responsiveImageOptions =
-      defaultImageClassName === undefined
+      defaultImageOuterClassName === undefined
         ? undefined
-        : { defaultClassName: defaultImageClassName };
+        : { defaultOuterClassName: defaultImageOuterClassName };
 
     let processor = processor0
       .use(remarkGfmPlugin, gfmOptions)

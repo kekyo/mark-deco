@@ -11,8 +11,8 @@ import { generateResponsiveImageStyles } from '../utils/responsive-image';
 import type { Element } from 'hast';
 
 export interface ResponsiveImageOptions {
-  /** Default CSS class name(s) to apply to all img elements (space-separated). */
-  defaultClassName?: string;
+  /** Default CSS class name(s) to apply to the parent paragraph of images (space-separated). */
+  defaultOuterClassName?: string;
 }
 
 const normalizeClassList = (value: unknown): string[] => {
@@ -42,6 +42,60 @@ const mergeClassLists = (existing: string[], extra: string[]): string[] => {
   return merged;
 };
 
+const getNodeClassList = (node: Element): string[] => {
+  if (!node.properties) {
+    return [];
+  }
+
+  return normalizeClassList(
+    (node.properties.className ?? node.properties.class) as unknown
+  );
+};
+
+const setNodeClassList = (node: Element, classList: string[]) => {
+  if (!node.properties) {
+    node.properties = {};
+  }
+
+  if (classList.length === 0) {
+    if ('className' in node.properties) {
+      delete (node.properties as Record<string, unknown>).className;
+    }
+    if ('class' in node.properties) {
+      delete (node.properties as Record<string, unknown>).class;
+    }
+    return;
+  }
+
+  node.properties.className = classList;
+  if ('class' in node.properties) {
+    delete (node.properties as Record<string, unknown>).class;
+  }
+};
+
+const collectImageNodes = (node: Element): Element[] => {
+  const images: Element[] = [];
+  const stack = [...(node.children ?? [])];
+
+  while (stack.length > 0) {
+    const child = stack.pop();
+    if (!child || child.type !== 'element') {
+      continue;
+    }
+
+    if (child.tagName === 'img') {
+      images.push(child);
+      continue;
+    }
+
+    if (child.children && child.children.length > 0) {
+      stack.push(...child.children);
+    }
+  }
+
+  return images;
+};
+
 /**
  * Rehype plugin that adds responsive styles to all img tags
  * This plugin processes the HTML AST and adds inline styles to img elements
@@ -50,10 +104,37 @@ const mergeClassLists = (existing: string[], extra: string[]): string[] => {
 export const rehypeResponsiveImages = (
   options: ResponsiveImageOptions = {}
 ) => {
-  const defaultClassList = normalizeClassList(options.defaultClassName);
+  const defaultOuterClassList = normalizeClassList(
+    options.defaultOuterClassName
+  );
 
   return (tree: any) => {
     visit(tree, 'element', (node: Element) => {
+      if (node.tagName === 'p') {
+        const imageNodes = collectImageNodes(node);
+        if (imageNodes.length > 0) {
+          let imageClassList: string[] = [];
+          for (const imageNode of imageNodes) {
+            imageClassList = mergeClassLists(
+              imageClassList,
+              getNodeClassList(imageNode)
+            );
+          }
+
+          const mergedClassList = mergeClassLists(
+            getNodeClassList(node),
+            mergeClassLists(imageClassList, defaultOuterClassList)
+          );
+          if (mergedClassList.length > 0) {
+            setNodeClassList(node, mergedClassList);
+          }
+
+          for (const imageNode of imageNodes) {
+            setNodeClassList(imageNode, []);
+          }
+        }
+      }
+
       if (node.tagName === 'img') {
         const responsiveStyles = generateResponsiveImageStyles();
 
@@ -72,22 +153,6 @@ export const rehypeResponsiveImages = (
 
         // Set the combined styles
         node.properties.style = combinedStyles;
-
-        if (defaultClassList.length > 0) {
-          const existingClassList = normalizeClassList(
-            (node.properties.className ?? node.properties.class) as unknown
-          );
-          const mergedClassList = mergeClassLists(
-            existingClassList,
-            defaultClassList
-          );
-          if (mergedClassList.length > 0) {
-            node.properties.className = mergedClassList;
-            if ('class' in node.properties) {
-              delete (node.properties as Record<string, unknown>).class;
-            }
-          }
-        }
       }
     });
   };

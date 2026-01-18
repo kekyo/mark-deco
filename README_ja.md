@@ -111,14 +111,14 @@ await processor.process(markdown, 'id', { headerTitleTransform: 'extract' });
 
 `extract` なら見出しを残したままtitleへ反映し、`extractAndRemove` (デフォルト) は見出しを削除、`none` はこの処理自体を行いません。
 
-### 画像のデフォルトクラス
+### 画像の外側のデフォルトクラス
 
-`defaultImageClassName` で、Markdownの画像 (`![...](...)`) から生成される `<img>` に既定のクラスを付与できます。
+`defaultImageOuterClassName` で、Markdownの画像 (`![...](...)`) を含む親の `<p>` に既定のクラスを付与できます。
 
 ```typescript
-// .content-imageと.shadowクラスを<img>タグに追加する
+// .content-imageと.shadowクラスを親の<p>タグに追加する
 await processor.process(markdown, 'id', {
-  defaultImageClassName: 'content-image shadow',
+  defaultImageOuterClassName: 'content-image shadow',
 });
 ```
 
