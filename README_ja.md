@@ -142,7 +142,7 @@ MarkDecoには、便利な機能が沢山あります。さらなる詳細は、
 - [Frontmatter情報の取得](./docs/ja/frontmatter-extraction.md) - Markdownファイルの先頭にあるYAML frontmatterから、タイトル、著者、タグ、公開日などのメタデータを抽出
 - [見出しID生成と見出し情報の取得](./docs/ja/heading-id-generation.md) - 見出しに対して階層的またはコンテンツベースの命名戦略でユニークなIDを自動生成
 - [フェッチャーとキャッシュシステム](./docs/ja/fetcher-and-cache-system.md) - oEmbed APIやページスクレイピング用の外部HTTP要求管理と設定可能なキャッシュ戦略
-- [内蔵プラグイン](./docs/ja/built-in-plugins.md) - メディアコンテンツ、ソーシャル投稿、インタラクティブダイアグラムを埋め込むoEmbed、カード、Mermaidプラグイン
+- [組み込み処理](./docs/ja/built-in-processing.md) - oEmbed/card/Mermaidプラグインと組み込みコードハイライト
 - [カスタムプラグインの作成](./docs/ja/creating-custom-plugins.md) - コードブロックインターセプターとunifiedエコシステム統合によるMarkdown処理の拡張用カスタムプラグイン開発
 - [CLIアプリケーション](./docs/ja/cli-application.md) - 設定サポートとプラグイン制御を持つMarkdownファイルのバッチ処理用コマンドラインインターフェース
 

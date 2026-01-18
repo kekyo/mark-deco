@@ -1,9 +1,10 @@
-## Built-in Plugins
+## Built-in Processing
 
-MarkDeco has a plugin system. You can add the effects of these plugins during the Markdown to HTML conversion process. Here are the built-in plugins:
+MarkDeco ships built-in processing features, including a plugin system and code highlighting. Here are the built-in plugins:
 
-| Plugin Name | Details                                                                         |
+| Processing | Details                                                                         |
 | :---------- | :------------------------------------------------------------------------------ |
+| Code highlight | Enable embedded code highlight renderrer |
 | `oembed`    | Accesses oEmbed API from specified URLs and renders HTML with obtained metadata |
 | `card`      | Scrapes specified URL pages and renders HTML with obtained metadata             |
 | `mermaid`   | Enables graph drawing with code written in `mermaid.js` graph syntax            |
@@ -46,6 +47,35 @@ console.log(result.html);
 
 Plugin extensions are done through Markdown code block syntax.
 Usually, code block syntax is used for syntax highlighting of program code, but when a plugin is recognized, the content of code blocks with the plugin name is processed by the plugin.
+
+### Built-in Code Highlighting
+
+MarkDeco ships with a built-in code highlighting pipeline (Shiki + `rehype-pretty-code`).
+It is disabled by default and only runs when `codeHighlight` is provided in `ProcessOptions`:
+
+```typescript
+// Render code blocks with mark-deco
+const result = await processor.process(markdown, 'id', {
+  codeHighlight: {
+    // Accept languages (see below)
+    languages: ['typescript', 'javascript'],
+    // Theme definitions
+    theme: { light: 'github-light', dark: 'github-dark-dimmed' },
+    // Enable line numbers
+    lineNumbers: true,
+    // Default language
+    defaultLanguage: 'plaintext',
+  },
+});
+```
+
+`languages` is optional. If unspecified or empty, Shiki will load the languages used as needed.
+If `languages` is specified, only the languages in that list (plus `plaintext`) will be loaded; unspecified languages will be treated as plain text (without highlighting).
+
+When `codeHighlight` is enabled, code block meta (`{...}`) is reserved for highlight options and is not consumed by `remark-attr` for code block attributes. Avoid mixing `codeHighlight` with other code highlighters added through `advancedOptions.rehypePlugins`.
+
+Additionally, basic HTML rendering for code highlighting occurs even without applying `codeHighlight`.
+For example, using [Prism.js](https://prismjs.com/) allows you to easily achieve code highlighting with browser-based rendering.
 
 ### oEmbed Plugin
 

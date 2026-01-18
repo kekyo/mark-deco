@@ -160,6 +160,25 @@ console.log('Hello, World!');
       expect(result.html).toContain("console.log('Hello, World!');");
     });
 
+    it('should apply built-in code highlighting when enabled', async () => {
+      const markdown = `\`\`\`javascript {1}
+console.log('Hello, World!');
+\`\`\``;
+
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+        headerTitleTransform: 'none',
+        codeHighlight: {
+          languages: ['javascript'],
+          lineNumbers: true,
+        },
+      });
+
+      expect(result.html).toContain('data-rehype-pretty-code-figure');
+      expect(result.html).toContain('data-line-numbers');
+    });
+
     it('should apply default image class and preserve existing classes', async () => {
       const markdown = '![Alt](https://example.com/image.png){.existing} after';
       const result = await processor.process(markdown, 'id', {

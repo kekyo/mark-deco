@@ -61,10 +61,12 @@
     "js-beautify": ">=1.15.4",
     "js-yaml": ">=4.1.1",
     "jsdom": ">=26.1.0",
+    "rehype-pretty-code": ">=0.14.0",
     "rehype-stringify": ">=10.0.0",
     "remark-gfm": ">=4.0.0",
     "remark-parse": ">=11.0.0",
     "remark-rehype": ">=11.0.0",
+    "shiki": ">=3.21.0",
     "unified": ">=11.0.0",
     "unist-util-visit": ">=5.0.0"
   },
