@@ -111,6 +111,17 @@ await processor.process(markdown, 'id', { headerTitleTransform: 'extract' });
 
 `extract` なら見出しを残したままtitleへ反映し、`extractAndRemove` (デフォルト) は見出しを削除、`none` はこの処理自体を行いません。
 
+### 画像のデフォルトクラス
+
+`defaultImageClassName` で、Markdownの画像 (`![...](...)`) から生成される `<img>` に既定のクラスを付与できます。
+
+```typescript
+// .content-imageと.shadowクラスを<img>タグに追加する
+await processor.process(markdown, 'id', {
+  defaultImageClassName: 'content-image shadow',
+});
+```
+
 ### CLIインターフェイス
 
 MarkDecoはライブラリですが、MarkDecoを気軽に試すことが出来るCLIインターフェイスもパッケージで公開されています。これを使えば、TypeScriptでコードを書かなくても変換を試行したり、別のコードから独立したアプリケーションとして呼び出せます。

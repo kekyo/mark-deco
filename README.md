@@ -111,6 +111,17 @@ await processor.process(markdown, 'id', { headerTitleTransform: 'extract' });
 
 Use `extract` to keep the heading while copying the title, `extractAndRemove` (default) to remove it, or `none` to skip the behaviour entirely.
 
+### Default Image Class
+
+You can assign a default CSS class to all Markdown images with `defaultImageClassName`.
+
+```typescript
+// Add the .content-image and .shadow classes to the <img> tags
+await processor.process(markdown, 'id', {
+  defaultImageClassName: 'content-image shadow',
+});
+```
+
 ### CLI Interface
 
 Although MarkDeco is a library, a CLI interface is also available in the package that allows you to easily try out MarkDeco. This allows you to try out conversions without having to write code in TypeScript, or call it as an independent application from another code.

@@ -450,6 +450,7 @@ export const createMarkdownProcessor = (
       useContentStringHeaderId = false,
       useHierarchicalHeadingId = true,
       headingBaseLevel,
+      defaultImageClassName,
       advancedOptions,
     } = options ?? {};
     const resolvedHeadingBaseLevel = resolveHeadingBaseLevel(headingBaseLevel);
@@ -482,6 +483,11 @@ export const createMarkdownProcessor = (
       }
     }
 
+    const responsiveImageOptions =
+      defaultImageClassName === undefined
+        ? undefined
+        : { defaultClassName: defaultImageClassName };
+
     let processor = processor0
       .use(remarkGfmPlugin, gfmOptions)
       .use(remarkAttr)
@@ -500,7 +506,7 @@ export const createMarkdownProcessor = (
       )
       .use(createCustomBlockPlugin(frontmatter, signal, getUniqueId))
       .use(remarkRehypePlugin, { allowDangerousHtml })
-      .use(rehypeResponsiveImages)
+      .use(rehypeResponsiveImages, responsiveImageOptions)
       .use(rehypeStringifyPlugin, { allowDangerousHtml });
 
     if (rehypePlugins) {

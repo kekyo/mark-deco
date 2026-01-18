@@ -160,6 +160,16 @@ console.log('Hello, World!');
       expect(result.html).toContain("console.log('Hello, World!');");
     });
 
+    it('should apply default image class and preserve existing classes', async () => {
+      const markdown = '![Alt](https://example.com/image.png){.existing} after';
+      const result = await processor.process(markdown, 'id', {
+        headerTitleTransform: 'none',
+        defaultImageClassName: 'img-default',
+      });
+
+      expect(result.html).toContain('class="existing img-default"');
+    });
+
     it('should collect headings in hierarchical tree structure', async () => {
       const markdown = `
 # First Title
