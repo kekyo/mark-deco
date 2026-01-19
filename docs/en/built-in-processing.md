@@ -64,13 +64,51 @@ const result = await processor.process(markdown, 'id', {
     // Enable line numbers
     lineNumbers: true,
     // Default language
-    defaultLanguage: 'plaintext',
+    defaultLanguage: 'text',
   },
 });
 ```
 
+- List of themes: [Themes - Shiki](https://shiki.style/themes)
+- List of languages: [Languages - Shiki](https://shiki.style/languages)
+
 `languages` is optional. If unspecified or empty, Shiki will load the languages used as needed.
-If `languages` is specified, only the languages in that list (plus `plaintext`) will be loaded; unspecified languages will be treated as plain text (without highlighting).
+If `languages` is specified, only the languages in that list (plus `text`) will be loaded; unspecified languages will be treated as plain text (without highlighting).
+
+You can also pass Shiki language/theme registrations to extend highlighting:
+
+```typescript
+import type { LanguageRegistration, ThemeRegistrationRaw } from 'shiki';
+
+const customLanguage: LanguageRegistration = {
+  name: 'markdeco-test',
+  scopeName: 'source.markdeco-test',
+  patterns: [{ name: 'keyword.markdeco', match: '\\\\bMARK\\\\b' }],
+};
+
+const customTheme: ThemeRegistrationRaw = {
+  name: 'markdeco-test-theme',
+  type: 'dark',
+  fg: '#111111',
+  bg: '#000000',
+  settings: [
+    { settings: { foreground: '#111111', background: '#000000' } },
+    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+  ],
+  tokenColors: [
+    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+  ],
+};
+
+const result = await processor.process(markdown, 'id', {
+  codeHighlight: {
+    languages: ['typescript', customLanguage],
+    theme: customTheme,
+  },
+});
+```
+
+When you pass language registrations, their `name` (and `aliases`) are added to the whitelist. If a registration shares a name with a bundled language, the registration is used.
 
 When `codeHighlight` is enabled, code block meta (`{...}`) is reserved for highlight options and is not consumed by `remark-attr` for code block attributes. Avoid mixing `codeHighlight` with other code highlighters added through `advancedOptions.rehypePlugins`.
 

@@ -63,13 +63,51 @@ const result = await processor.process(markdown, 'id', {
     // 行番号を有効化するかどうか
     lineNumbers: true,
     // デフォルトの言語
-    defaultLanguage: 'plaintext',
+    defaultLanguage: 'text',
   },
 });
 ```
 
+- 有効なテーマ一覧: [Themes - Shiki](https://shiki.style/themes)
+- 有効な言語一覧: [Languages - Shiki](https://shiki.style/languages)
+
 `languages` は省略可能です。未指定または空の場合は、使用された言語を Shiki が必要に応じてロードします。
-`languages` を指定すると、そのリスト（+ `plaintext`）以外はロードされず、未指定の言語はプレーンテキストとして扱われます（ハイライトなし）。
+`languages` を指定すると、そのリスト（+ `text`）以外はロードされず、未指定の言語はプレーンテキストとして扱われます（ハイライトなし）。
+
+Shikiの言語/テーマ定義を直接渡して拡張することもできます:
+
+```typescript
+import type { LanguageRegistration, ThemeRegistrationRaw } from 'shiki';
+
+const customLanguage: LanguageRegistration = {
+  name: 'markdeco-test',
+  scopeName: 'source.markdeco-test',
+  patterns: [{ name: 'keyword.markdeco', match: '\\\\bMARK\\\\b' }],
+};
+
+const customTheme: ThemeRegistrationRaw = {
+  name: 'markdeco-test-theme',
+  type: 'dark',
+  fg: '#111111',
+  bg: '#000000',
+  settings: [
+    { settings: { foreground: '#111111', background: '#000000' } },
+    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+  ],
+  tokenColors: [
+    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+  ],
+};
+
+const result = await processor.process(markdown, 'id', {
+  codeHighlight: {
+    languages: ['typescript', customLanguage],
+    theme: customTheme,
+  },
+});
+```
+
+言語定義を渡した場合は、`name`（`aliases`を含む）がホワイトリストに追加されます。同名の組み込み言語がある場合は、指定した定義が優先されます。
 
 `codeHighlight` を有効にするとコードブロックのメタ情報 (`{...}`) はハイライト用に予約され、`remark-attr` によるコードブロック属性は適用されません。
 `advancedOptions.rehypePlugins` で別のコードハイライトを追加する場合は重複適用を避けてください。

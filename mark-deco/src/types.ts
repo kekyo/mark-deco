@@ -5,6 +5,7 @@
 
 import type { HTMLBeautifyOptions } from 'js-beautify';
 import type { Options as RemarkGfmOptions } from 'remark-gfm';
+import type { LanguageRegistration, ThemeRegistrationRaw } from 'shiki';
 import type { PluggableList } from 'unified';
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -191,23 +192,33 @@ export interface AdvancedOptions {
 }
 
 /**
+ * Language config for code highlighting
+ */
+export type CodeHighlightLanguage = string | LanguageRegistration;
+
+/**
+ * Theme config for code highlighting
+ */
+export type CodeHighlightTheme = string | ThemeRegistrationRaw;
+
+/**
  * Theme config for code highlighting
  */
 export interface CodeHighlightThemeConfig {
-  /** Theme name to use in light mode */
-  light?: string;
-  /** Theme name to use in dark mode */
-  dark?: string;
+  /** Theme to use in light mode */
+  light?: CodeHighlightTheme;
+  /** Theme to use in dark mode */
+  dark?: CodeHighlightTheme;
 }
 
 /**
  * Options for built-in code highlighting
  */
 export interface CodeHighlightOptions {
-  /** Whitelist of languages to load (empty or undefined loads none explicitly) */
-  languages?: string[];
-  /** Theme name or theme pair for light/dark */
-  theme?: string | CodeHighlightThemeConfig;
+  /** Whitelist of languages to load (names or Shiki registrations; empty or undefined loads none explicitly) */
+  languages?: CodeHighlightLanguage[];
+  /** Theme name, theme registration, or theme pair for light/dark */
+  theme?: CodeHighlightTheme | CodeHighlightThemeConfig;
   /** Whether to show line numbers for code blocks */
   lineNumbers?: boolean;
   /** Default language for code blocks without an explicit language */

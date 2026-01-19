@@ -12,15 +12,43 @@ import {
   getSingletonHighlighter,
   type LanguageInput,
 } from 'shiki';
-import type { CodeHighlightOptions } from '../types';
+import type {
+  CodeHighlightLanguage,
+  CodeHighlightOptions,
+  CodeHighlightTheme,
+  CodeHighlightThemeConfig,
+} from '../types';
 
 const defaultCodeHighlightTheme = {
   light: 'github-light',
   dark: 'github-dark-dimmed',
 } as const;
 
-const coerceTheme = (theme: string): RehypePrettyCodeTheme =>
-  theme as RehypePrettyCodeTheme;
+const coerceTheme = (theme: CodeHighlightTheme): RehypePrettyCodeTheme => {
+  if (typeof theme === 'string') {
+    return theme as RehypePrettyCodeTheme;
+  }
+  if ('tokenColors' in theme && theme.tokenColors) {
+    return theme as RehypePrettyCodeTheme;
+  }
+  if ('settings' in theme) {
+    return {
+      ...theme,
+      tokenColors: theme.settings,
+    } as RehypePrettyCodeTheme;
+  }
+  return theme as RehypePrettyCodeTheme;
+};
+
+const isThemeConfig = (
+  theme: CodeHighlightOptions['theme']
+): theme is CodeHighlightThemeConfig => {
+  return (
+    typeof theme === 'object' &&
+    theme !== null &&
+    ('light' in theme || 'dark' in theme)
+  );
+};
 
 const codeMetaBraceToken = {
   left: '__mtr_code_meta_lbrace__',
@@ -86,6 +114,9 @@ const resolveCodeHighlightTheme = (
   if (typeof theme === 'string') {
     return coerceTheme(theme);
   }
+  if (!isThemeConfig(theme)) {
+    return coerceTheme(theme);
+  }
   return {
     light: coerceTheme(theme.light ?? defaultCodeHighlightTheme.light),
     dark: coerceTheme(theme.dark ?? defaultCodeHighlightTheme.dark),
@@ -108,41 +139,112 @@ const createMetaFilter = (lineNumbers: boolean): MetaFilter => {
   };
 };
 
+const normalizeLanguageName = (value: string): string | undefined => {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
+
+const buildAllowedLanguages = (
+  languages: readonly CodeHighlightLanguage[]
+):
+  | { allowSet: Set<string>; allowList: Array<LanguageInput | string> }
+  | undefined => {
+  let hasLanguage = false;
+  const allowSet = new Set<string>(['text']);
+  const allowList: Array<LanguageInput | string> = ['text'];
+  const allowListNames = new Set<string>(['text']);
+  const registrationNames = new Set<string>();
+
+  for (const language of languages) {
+    if (typeof language === 'string') {
+      const name = normalizeLanguageName(language);
+      if (!name) {
+        continue;
+      }
+      hasLanguage = true;
+      allowSet.add(name);
+      continue;
+    }
+    const name = normalizeLanguageName(language.name);
+    if (!name) {
+      continue;
+    }
+    hasLanguage = true;
+    registrationNames.add(name);
+    allowSet.add(name);
+    if (Array.isArray(language.aliases)) {
+      for (const alias of language.aliases) {
+        const normalized = normalizeLanguageName(alias);
+        if (normalized) {
+          allowSet.add(normalized);
+        }
+      }
+    }
+    if (!allowListNames.has(name)) {
+      allowList.push(language);
+      allowListNames.add(name);
+    }
+  }
+
+  for (const language of languages) {
+    if (typeof language !== 'string') {
+      continue;
+    }
+    const name = normalizeLanguageName(language);
+    if (!name) {
+      continue;
+    }
+    if (registrationNames.has(name)) {
+      continue;
+    }
+    if (!allowListNames.has(name)) {
+      allowList.push(name);
+      allowListNames.add(name);
+    }
+  }
+
+  if (!hasLanguage) {
+    return undefined;
+  }
+
+  return { allowSet, allowList };
+};
+
 const createShikiHighlighter = (
-  languages: readonly string[] | undefined
+  languages: readonly CodeHighlightLanguage[] | undefined
 ): RehypePrettyCodeOptions['getHighlighter'] | undefined => {
   if (!languages || languages.length === 0) {
     return undefined;
   }
-  const normalized = languages
-    .map((language) => language.trim())
-    .filter((language) => language.length > 0);
-  if (normalized.length === 0) {
+  const resolved = buildAllowedLanguages(languages);
+  if (!resolved) {
     return undefined;
   }
-  const allowSet = new Set<string>(['plaintext', ...normalized]);
-  const allowList = Array.from(allowSet);
+  const { allowSet, allowList } = resolved;
 
   return async (options: BundledHighlighterOptions<any, any>) => {
     const highlighter = await getSingletonHighlighter({
       ...options,
       langs: allowList,
     });
-    const loadLanguage = highlighter.loadLanguage.bind(highlighter);
+    const loadLanguage = highlighter.loadLanguage.bind(highlighter) as (
+      ...langs: Array<LanguageInput | string>
+    ) => Promise<void>;
     highlighter.loadLanguage = async (...langs) => {
       const filtered = langs.filter((lang) => {
-        const name =
+        const rawName =
           typeof lang === 'string'
             ? lang
             : lang && typeof lang === 'object' && 'name' in lang
               ? String(lang.name)
               : '';
+        const name = normalizeLanguageName(rawName);
         return !name || allowSet.has(name);
       });
       if (filtered.length === 0) {
         return;
       }
-      return loadLanguage(...(filtered as LanguageInput[]));
+      return loadLanguage(...(filtered as Array<LanguageInput | string>));
     };
     return highlighter;
   };
@@ -154,7 +256,7 @@ const createCodeHighlightOptions = (
   const options: RehypePrettyCodeOptions = {
     theme: resolveCodeHighlightTheme(codeHighlight?.theme),
     defaultLang: {
-      block: codeHighlight?.defaultLanguage ?? 'plaintext',
+      block: codeHighlight?.defaultLanguage ?? 'text',
     },
     keepBackground: true,
     filterMetaString: createMetaFilter(codeHighlight?.lineNumbers === true),
