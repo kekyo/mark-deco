@@ -56,8 +56,6 @@ MarkDecoは [Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](htt
 // コードブロックをmark-decoでレンダリングする
 const result = await processor.process(markdown, 'id', {
   codeHighlight: {
-    // 使用可能にする言語（下記参照）
-    languages: ['typescript', 'javascript'],
     // テーマ定義
     theme: { light: 'github-light', dark: 'github-dark-dimmed' },
     // 行番号を有効化するかどうか
@@ -68,11 +66,11 @@ const result = await processor.process(markdown, 'id', {
 });
 ```
 
-- 有効なテーマ一覧: [Themes - Shiki](https://shiki.style/themes)
-- 有効な言語一覧: [Languages - Shiki](https://shiki.style/languages)
+- 組み込み言語・テーマ一覧: [textmate-grammars-themes](https://textmate-grammars-themes.netlify.app/) (https://shiki.style/themes)
 
-`languages` は省略可能です。未指定または空の場合は、使用された言語を Shiki が必要に応じてロードします。
-`languages` を指定すると、そのリスト（+ `text`）以外はロードされず、未指定の言語はプレーンテキストとして扱われます（ハイライトなし）。
+ShikiはMarkdownで指定された言語を自動的にロードします。独自の言語定義や
+エイリアスを追加したい場合は、`languageDefinitions` と `languageAliases` を
+指定してください。カスタム定義は同名の組み込み言語よりも優先されます。
 
 Shikiの言語/テーマ定義を直接渡して拡張することもできます:
 
@@ -101,7 +99,8 @@ const customTheme: ThemeRegistrationRaw = {
 
 const result = await processor.process(markdown, 'id', {
   codeHighlight: {
-    languages: ['typescript', customLanguage],
+    languageDefinitions: [customLanguage],
+    languageAliases: { 'markdeco-alias': 'markdeco-test' },
     theme: customTheme,
   },
 });

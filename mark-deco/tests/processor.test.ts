@@ -171,7 +171,6 @@ console.log('Hello, World!');
         useHierarchicalHeadingId: false,
         headerTitleTransform: 'none',
         codeHighlight: {
-          languages: ['javascript'],
           lineNumbers: true,
         },
       });
@@ -220,7 +219,7 @@ console.log('Hello, World!');
           },
         ],
       };
-      const markdown = `\`\`\`markdeco-test
+      const markdown = `\`\`\`markdeco-alias
 MARK
 \`\`\``;
 
@@ -229,13 +228,16 @@ MARK
         useHierarchicalHeadingId: false,
         headerTitleTransform: 'none',
         codeHighlight: {
-          languages: [customLanguage],
+          languageDefinitions: [customLanguage],
+          languageAliases: {
+            'markdeco-alias': 'markdeco-test',
+          },
           theme: customTheme,
         },
       });
 
       expect(result.html).toContain('data-rehype-pretty-code-figure');
-      expect(result.html).toContain('data-language="markdeco-test"');
+      expect(result.html).toContain('data-language="markdeco-alias"');
       expect(result.html).toContain('data-theme="markdeco-test-theme"');
       expect(result.html.toLowerCase()).toContain('#ff0000');
     });

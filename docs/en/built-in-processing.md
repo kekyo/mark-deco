@@ -57,8 +57,6 @@ It is disabled by default and only runs when `codeHighlight` is provided in `Pro
 // Render code blocks with mark-deco
 const result = await processor.process(markdown, 'id', {
   codeHighlight: {
-    // Accept languages (see below)
-    languages: ['typescript', 'javascript'],
     // Theme definitions
     theme: { light: 'github-light', dark: 'github-dark-dimmed' },
     // Enable line numbers
@@ -69,11 +67,11 @@ const result = await processor.process(markdown, 'id', {
 });
 ```
 
-- List of themes: [Themes - Shiki](https://shiki.style/themes)
-- List of languages: [Languages - Shiki](https://shiki.style/languages)
+- List of language/themes: [textmate-grammars-themes](https://textmate-grammars-themes.netlify.app/) (https://shiki.style/themes)
 
-`languages` is optional. If unspecified or empty, Shiki will load the languages used as needed.
-If `languages` is specified, only the languages in that list (plus `text`) will be loaded; unspecified languages will be treated as plain text (without highlighting).
+Shiki loads the languages used in Markdown automatically. Use `languageDefinitions` and
+`languageAliases` to register custom language definitions or aliases. Custom definitions
+take precedence over bundled languages with the same name.
 
 You can also pass Shiki language/theme registrations to extend highlighting:
 
@@ -102,7 +100,8 @@ const customTheme: ThemeRegistrationRaw = {
 
 const result = await processor.process(markdown, 'id', {
   codeHighlight: {
-    languages: ['typescript', customLanguage],
+    languageDefinitions: [customLanguage],
+    languageAliases: { 'markdeco-alias': 'markdeco-test' },
     theme: customTheme,
   },
 });

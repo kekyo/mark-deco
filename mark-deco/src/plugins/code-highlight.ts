@@ -11,9 +11,9 @@ import {
   type BundledHighlighterOptions,
   getSingletonHighlighter,
   type LanguageInput,
+  type LanguageRegistration,
 } from 'shiki';
 import type {
-  CodeHighlightLanguage,
   CodeHighlightOptions,
   CodeHighlightTheme,
   CodeHighlightThemeConfig,
@@ -144,108 +144,209 @@ const normalizeLanguageName = (value: string): string | undefined => {
   return trimmed.length > 0 ? trimmed : undefined;
 };
 
-const buildAllowedLanguages = (
-  languages: readonly CodeHighlightLanguage[]
-):
-  | { allowSet: Set<string>; allowList: Array<LanguageInput | string> }
-  | undefined => {
-  let hasLanguage = false;
-  const allowSet = new Set<string>(['text']);
-  const allowList: Array<LanguageInput | string> = ['text'];
-  const allowListNames = new Set<string>(['text']);
-  const registrationNames = new Set<string>();
-
-  for (const language of languages) {
-    if (typeof language === 'string') {
-      const name = normalizeLanguageName(language);
-      if (!name) {
-        continue;
-      }
-      hasLanguage = true;
-      allowSet.add(name);
-      continue;
-    }
-    const name = normalizeLanguageName(language.name);
+const normalizeLanguageDefinitions = (
+  definitions: readonly LanguageRegistration[] | undefined
+): LanguageRegistration[] => {
+  if (!definitions || definitions.length === 0) {
+    return [];
+  }
+  const normalized = new Map<string, LanguageRegistration>();
+  for (const definition of definitions) {
+    const name = normalizeLanguageName(definition.name);
     if (!name) {
       continue;
     }
-    hasLanguage = true;
-    registrationNames.add(name);
-    allowSet.add(name);
-    if (Array.isArray(language.aliases)) {
-      for (const alias of language.aliases) {
-        const normalized = normalizeLanguageName(alias);
-        if (normalized) {
-          allowSet.add(normalized);
-        }
-      }
+    if (normalized.has(name)) {
+      normalized.delete(name);
     }
-    if (!allowListNames.has(name)) {
-      allowList.push(language);
-      allowListNames.add(name);
-    }
+    normalized.set(name, definition);
   }
+  return Array.from(normalized.values());
+};
 
-  for (const language of languages) {
-    if (typeof language !== 'string') {
-      continue;
-    }
-    const name = normalizeLanguageName(language);
-    if (!name) {
-      continue;
-    }
-    if (registrationNames.has(name)) {
-      continue;
-    }
-    if (!allowListNames.has(name)) {
-      allowList.push(name);
-      allowListNames.add(name);
-    }
-  }
-
-  if (!hasLanguage) {
+const normalizeLanguageAliases = (
+  aliases: Record<string, string> | undefined
+): Record<string, string> | undefined => {
+  if (!aliases) {
     return undefined;
   }
+  const normalized: Record<string, string> = {};
+  for (const [key, value] of Object.entries(aliases)) {
+    const from = normalizeLanguageName(key);
+    const to = normalizeLanguageName(value);
+    if (!from || !to) {
+      continue;
+    }
+    normalized[from] = to;
+  }
+  return Object.keys(normalized).length > 0 ? normalized : undefined;
+};
 
-  return { allowSet, allowList };
+const buildCustomLanguageMap = (
+  definitions: readonly LanguageRegistration[]
+): Map<string, LanguageRegistration> => {
+  const customLanguages = new Map<string, LanguageRegistration>();
+  for (const definition of definitions) {
+    const name = normalizeLanguageName(definition.name);
+    if (!name) {
+      continue;
+    }
+    if (customLanguages.has(name)) {
+      customLanguages.delete(name);
+    }
+    customLanguages.set(name, definition);
+    if (Array.isArray(definition.aliases)) {
+      for (const alias of definition.aliases) {
+        const normalized = normalizeLanguageName(alias);
+        if (!normalized) {
+          continue;
+        }
+        if (customLanguages.has(normalized)) {
+          customLanguages.delete(normalized);
+        }
+        customLanguages.set(normalized, definition);
+      }
+    }
+  }
+  return customLanguages;
+};
+
+const resolveLanguageAlias = (
+  name: string,
+  aliases: Record<string, string> | undefined
+): string => {
+  if (!aliases) {
+    return name;
+  }
+  let current = name;
+  const seen = new Set<string>();
+  while (aliases[current]) {
+    if (seen.has(current)) {
+      break;
+    }
+    seen.add(current);
+    const next = aliases[current];
+    if (!next || next === current) {
+      break;
+    }
+    current = next;
+  }
+  return current;
+};
+
+const resolveLanguageName = (
+  name: string,
+  customLanguageMap: Map<string, LanguageRegistration> | undefined,
+  aliases: Record<string, string> | undefined
+): string => {
+  const normalized = normalizeLanguageName(name);
+  if (!normalized) {
+    return name;
+  }
+  const directCustom = customLanguageMap?.get(normalized);
+  if (directCustom) {
+    return directCustom.name;
+  }
+  const resolvedAlias = resolveLanguageAlias(normalized, aliases);
+  const aliasedCustom = customLanguageMap?.get(resolvedAlias);
+  if (aliasedCustom) {
+    return aliasedCustom.name;
+  }
+  return resolvedAlias;
+};
+
+const resolveLanguageInput = (
+  name: string,
+  customLanguageMap: Map<string, LanguageRegistration> | undefined,
+  aliases: Record<string, string> | undefined
+): LanguageInput | string => {
+  const normalized = normalizeLanguageName(name);
+  if (!normalized) {
+    return name;
+  }
+  const directCustom = customLanguageMap?.get(normalized);
+  if (directCustom) {
+    return directCustom;
+  }
+  const resolvedAlias = resolveLanguageAlias(normalized, aliases);
+  const aliasedCustom = customLanguageMap?.get(resolvedAlias);
+  if (aliasedCustom) {
+    return aliasedCustom;
+  }
+  return resolvedAlias;
 };
 
 const createShikiHighlighter = (
-  languages: readonly CodeHighlightLanguage[] | undefined
+  languageDefinitions: readonly LanguageRegistration[] | undefined,
+  languageAliases: Record<string, string> | undefined
 ): RehypePrettyCodeOptions['getHighlighter'] | undefined => {
-  if (!languages || languages.length === 0) {
+  const normalizedDefinitions =
+    normalizeLanguageDefinitions(languageDefinitions);
+  const normalizedAliases = normalizeLanguageAliases(languageAliases);
+  if (normalizedDefinitions.length === 0 && !normalizedAliases) {
     return undefined;
   }
-  const resolved = buildAllowedLanguages(languages);
-  if (!resolved) {
-    return undefined;
-  }
-  const { allowSet, allowList } = resolved;
+  const customLanguageMap =
+    normalizedDefinitions.length > 0
+      ? buildCustomLanguageMap(normalizedDefinitions)
+      : undefined;
 
   return async (options: BundledHighlighterOptions<any, any>) => {
+    const { langAlias, langs, ...rest } = options;
+    const mergedLangs =
+      normalizedDefinitions.length > 0
+        ? [...langs, ...normalizedDefinitions]
+        : langs;
+    const mergedLangAlias = normalizedAliases
+      ? { ...langAlias, ...normalizedAliases }
+      : langAlias;
     const highlighter = await getSingletonHighlighter({
-      ...options,
-      langs: allowList,
+      ...rest,
+      langs: mergedLangs,
+      ...(mergedLangAlias ? { langAlias: mergedLangAlias } : {}),
     });
-    const loadLanguage = highlighter.loadLanguage.bind(highlighter) as (
-      ...langs: Array<LanguageInput | string>
-    ) => Promise<void>;
-    highlighter.loadLanguage = async (...langs) => {
-      const filtered = langs.filter((lang) => {
-        const rawName =
-          typeof lang === 'string'
-            ? lang
-            : lang && typeof lang === 'object' && 'name' in lang
-              ? String(lang.name)
-              : '';
-        const name = normalizeLanguageName(rawName);
-        return !name || allowSet.has(name);
-      });
-      if (filtered.length === 0) {
-        return;
-      }
-      return loadLanguage(...(filtered as Array<LanguageInput | string>));
-    };
+    if (
+      (customLanguageMap && customLanguageMap.size > 0) ||
+      normalizedAliases
+    ) {
+      const loadLanguage = highlighter.loadLanguage.bind(highlighter) as (
+        ...langs: Array<LanguageInput | string>
+      ) => Promise<void>;
+      highlighter.loadLanguage = async (...langs) => {
+        const resolved: Array<LanguageInput | string> = [];
+        for (const lang of langs) {
+          if (typeof lang !== 'string') {
+            resolved.push(lang);
+            continue;
+          }
+          resolved.push(
+            resolveLanguageInput(lang, customLanguageMap, normalizedAliases)
+          );
+        }
+        return loadLanguage(...resolved);
+      };
+      const codeToHtml = highlighter.codeToHtml.bind(
+        highlighter
+      ) as typeof highlighter.codeToHtml;
+      highlighter.codeToHtml = (code, options) => {
+        if (!options || typeof options !== 'object') {
+          return codeToHtml(code, options as any);
+        }
+        const lang = (options as { lang?: string }).lang;
+        if (typeof lang !== 'string') {
+          return codeToHtml(code, options as any);
+        }
+        const resolvedLang = resolveLanguageName(
+          lang,
+          customLanguageMap,
+          normalizedAliases
+        );
+        if (resolvedLang === lang) {
+          return codeToHtml(code, options as any);
+        }
+        return codeToHtml(code, { ...options, lang: resolvedLang });
+      };
+    }
     return highlighter;
   };
 };
@@ -261,7 +362,10 @@ const createCodeHighlightOptions = (
     keepBackground: true,
     filterMetaString: createMetaFilter(codeHighlight?.lineNumbers === true),
   };
-  const highlighter = createShikiHighlighter(codeHighlight?.languages);
+  const highlighter = createShikiHighlighter(
+    codeHighlight?.languageDefinitions,
+    codeHighlight?.languageAliases
+  );
   if (highlighter) {
     options.getHighlighter = highlighter;
   }

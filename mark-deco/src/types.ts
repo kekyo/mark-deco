@@ -192,11 +192,6 @@ export interface AdvancedOptions {
 }
 
 /**
- * Language config for code highlighting
- */
-export type CodeHighlightLanguage = string | LanguageRegistration;
-
-/**
  * Theme config for code highlighting
  */
 export type CodeHighlightTheme = string | ThemeRegistrationRaw;
@@ -215,8 +210,10 @@ export interface CodeHighlightThemeConfig {
  * Options for built-in code highlighting
  */
 export interface CodeHighlightOptions {
-  /** Whitelist of languages to load (names or Shiki registrations; empty or undefined loads none explicitly) */
-  languages?: CodeHighlightLanguage[];
+  /** Custom language definitions to register with Shiki */
+  languageDefinitions?: LanguageRegistration[];
+  /** Additional language alias mappings */
+  languageAliases?: Record<string, string>;
   /** Theme name, theme registration, or theme pair for light/dark */
   theme?: CodeHighlightTheme | CodeHighlightThemeConfig;
   /** Whether to show line numbers for code blocks */
