@@ -3,7 +3,7 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import remarkParse from 'remark-parse';
+import * as remarkParseModule from 'remark-parse';
 import { unified } from 'unified';
 import { remarkApplyTitleFromH1 } from './plugins/remark-apply-title-from-h1';
 import type { FrontmatterData, HeaderTitleTransform } from './types';
@@ -54,7 +54,7 @@ export const applyTitleFromH1 = (
   let removeStartOffset: number | undefined;
   let removeEndOffset: number | undefined;
 
-  const remarkParsePlugin = resolveDefaultExport(remarkParse);
+  const remarkParsePlugin = resolveDefaultExport(remarkParseModule);
   const runner = unified()
     .use(remarkParsePlugin)
     .use(remarkApplyTitleFromH1, {
