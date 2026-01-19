@@ -39,6 +39,8 @@ export default defineConfig({
         'path',
         'url',
         'os',
+        'util',
+        'zlib',
         'crypto',
         'async-primitives',
         'cheerio',
