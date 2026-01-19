@@ -82,7 +82,7 @@ export interface FrontmatterPostTransformContext {
   /** Frontmatter produced after preprocessing */
   readonly frontmatter: FrontmatterData;
   /** Heading structure generated during HTML conversion */
-  readonly headingTree: HeadingNode[];
+  readonly headingTree: readonly HeadingNode[];
 }
 
 /**
@@ -195,9 +195,9 @@ export interface AdvancedOptions {
  */
 export interface CodeHighlightThemeConfig {
   /** Theme name to use in light mode */
-  readonly light?: string;
+  light?: string;
   /** Theme name to use in dark mode */
-  readonly dark?: string;
+  dark?: string;
 }
 
 /**
@@ -205,13 +205,25 @@ export interface CodeHighlightThemeConfig {
  */
 export interface CodeHighlightOptions {
   /** Whitelist of languages to load (empty or undefined loads none explicitly) */
-  readonly languages?: readonly string[];
+  languages?: string[];
   /** Theme name or theme pair for light/dark */
-  readonly theme?: string | CodeHighlightThemeConfig;
+  theme?: string | CodeHighlightThemeConfig;
   /** Whether to show line numbers for code blocks */
-  readonly lineNumbers?: boolean;
+  lineNumbers?: boolean;
   /** Default language for code blocks without an explicit language */
-  readonly defaultLanguage?: string;
+  defaultLanguage?: string;
+}
+
+/**
+ * Context information for resolveUrl hook
+ */
+export interface ResolveUrlContext {
+  /** Source of the URL */
+  readonly kind: 'link' | 'image' | 'definition' | 'html';
+  /** HTML tag name (only for raw HTML) */
+  readonly tagName?: string;
+  /** HTML attribute name (only for raw HTML) */
+  readonly attrName?: string;
 }
 
 /**
@@ -232,6 +244,8 @@ export interface ProcessOptions {
   defaultImageOuterClassName?: string;
   /** Options for built-in code highlighting (enable when provided) */
   codeHighlight?: CodeHighlightOptions;
+  /** Optional URL resolver hook for links, images, and raw HTML attributes */
+  resolveUrl?: (url: string, context: ResolveUrlContext) => string;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
@@ -258,6 +272,8 @@ export interface ProcessWithFrontmatterTransformOptions {
   defaultImageOuterClassName?: string;
   /** Options for built-in code highlighting (enable when provided) */
   codeHighlight?: CodeHighlightOptions;
+  /** Optional URL resolver hook for links, images, and raw HTML attributes */
+  resolveUrl?: (url: string, context: ResolveUrlContext) => string;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
@@ -271,7 +287,7 @@ export interface ProcessResult {
   /** Extracted frontmatter data */
   readonly frontmatter: FrontmatterData;
   /** Heading node tree (representing a hierarchical structure) */
-  readonly headingTree: HeadingNode[];
+  readonly headingTree: readonly HeadingNode[];
 }
 
 /**

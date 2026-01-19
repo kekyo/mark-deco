@@ -19,6 +19,7 @@ import {
 } from './plugins/code-highlight';
 import { remarkAttr } from './plugins/remark-attr';
 import { rehypeResponsiveImages } from './plugins/responsive-images';
+import { rewriteHtmlUrls } from './utils/html-tokenizer';
 import { generateHeadingId, resolveDefaultExport } from './utils';
 import { applyTitleFromH1 } from './apply-title-from-h1';
 import {
@@ -47,6 +48,7 @@ const remarkParsePlugin = resolveDefaultExport(remarkParse);
 const remarkGfmPlugin = resolveDefaultExport(remarkGfm);
 const remarkRehypePlugin = resolveDefaultExport(remarkRehype);
 const rehypeStringifyPlugin = resolveDefaultExport(rehypeStringify);
+type ResolveUrl = NonNullable<ProcessOptions['resolveUrl']>;
 
 /**
  * Default HTML beautify options with improved div structure handling
@@ -295,6 +297,36 @@ export const createMarkdownProcessor = (
   };
 
   /**
+   * Create a remark plugin for resolving URLs
+   */
+  const createResolveUrlPlugin = (resolveUrl: ResolveUrl) => {
+    return () => {
+      return (tree: any) => {
+        visit(tree, (node: any) => {
+          if (!node) {
+            return;
+          }
+          if (node.type === 'link' && typeof node.url === 'string') {
+            node.url = resolveUrl(node.url, { kind: 'link' });
+            return;
+          }
+          if (node.type === 'image' && typeof node.url === 'string') {
+            node.url = resolveUrl(node.url, { kind: 'image' });
+            return;
+          }
+          if (node.type === 'definition' && typeof node.url === 'string') {
+            node.url = resolveUrl(node.url, { kind: 'definition' });
+            return;
+          }
+          if (node.type === 'html' && typeof node.value === 'string') {
+            node.value = rewriteHtmlUrls(node.value, resolveUrl);
+          }
+        });
+      };
+    };
+  };
+
+  /**
    * Create a remark plugin for building heading tree and setting IDs
    */
   const createHeadingTreePlugin = (
@@ -456,6 +488,7 @@ export const createMarkdownProcessor = (
       headingBaseLevel,
       defaultImageOuterClassName,
       codeHighlight,
+      resolveUrl,
       advancedOptions,
     } = options ?? {};
     const resolvedHeadingBaseLevel = resolveHeadingBaseLevel(headingBaseLevel);
@@ -498,7 +531,7 @@ export const createMarkdownProcessor = (
         ? undefined
         : { defaultOuterClassName: defaultImageOuterClassName };
 
-    let processor = processor0
+    let processor: any = processor0
       .use(remarkGfmPlugin, gfmOptions)
       .use(remarkAttr)
       .use(
@@ -514,7 +547,13 @@ export const createMarkdownProcessor = (
           resolvedHeadingBaseLevel
         )
       )
-      .use(createCustomBlockPlugin(frontmatter, signal, getUniqueId))
+      .use(createCustomBlockPlugin(frontmatter, signal, getUniqueId));
+
+    if (resolveUrl) {
+      processor = processor.use(createResolveUrlPlugin(resolveUrl));
+    }
+
+    processor = processor
       .use(remarkRehypePlugin, { allowDangerousHtml })
       .use(rehypeResponsiveImages, responsiveImageOptions)
       .use(rehypeStringifyPlugin, { allowDangerousHtml });

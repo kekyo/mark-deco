@@ -4,7 +4,7 @@
 // https://github.com/kekyo/mark-deco
 
 import { Command, Option } from 'commander';
-import type { HeaderTitleTransform } from 'mark-deco';
+import type { HeaderTitleTransform, ResolveUrlContext } from 'mark-deco';
 
 import {
   author,
@@ -31,9 +31,37 @@ interface CLIOptions {
   headerTitleTransform?: HeaderTitleTransform;
   frontmatterOutput?: string;
   headingTreeOutput?: string;
+  relativeUrl?: string;
 }
 
 const program = new Command();
+
+const isRelativeUrl = (url: string): boolean => {
+  if (!url || url.startsWith('#') || url.startsWith('?')) {
+    return false;
+  }
+  if (url.startsWith('/') || url.startsWith('\\')) {
+    return false;
+  }
+  return !/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(url);
+};
+
+const createRelativeUrlResolver = (relativeUrl: string) => {
+  const base = relativeUrl.replace(/\/+$/, '');
+
+  return (url: string, _context: ResolveUrlContext): string => {
+    if (!isRelativeUrl(url)) {
+      return url;
+    }
+
+    const normalized = url.startsWith('./') ? url.slice(2) : url;
+    if (!base) {
+      return `/${normalized}`;
+    }
+
+    return `${base}/${normalized}`;
+  };
+};
 
 const main = async () => {
   program
@@ -90,6 +118,12 @@ const main = async () => {
     )
     .addOption(
       new Option(
+        '--relative-url <url>',
+        'Prefix relative URLs in output (links, images, raw HTML)'
+      )
+    )
+    .addOption(
+      new Option(
         '--frontmatter-output <file>',
         'Output frontmatter as JSON to specified file'
       )
@@ -122,16 +156,23 @@ const main = async () => {
           'extractAndRemove';
         const headingBaseLevel =
           options.headingBaseLevel ?? config.headingBaseLevel ?? 1;
+        const relativeUrl = options.relativeUrl ?? config.relativeUrl;
+        const resolveUrl = relativeUrl
+          ? createRelativeUrlResolver(relativeUrl)
+          : undefined;
+
+        const processOptions = {
+          useHierarchicalHeadingId: options.hierarchicalHeadingId ?? true,
+          useContentStringHeaderId: options.contentBasedHeadingId ?? false,
+          headingBaseLevel,
+          headerTitleTransform,
+          ...(resolveUrl ? { resolveUrl } : {}),
+        };
 
         const result = await processor.process(
           markdown,
           options.uniqueIdPrefix || 'section',
-          {
-            useHierarchicalHeadingId: options.hierarchicalHeadingId ?? true,
-            useContentStringHeaderId: options.contentBasedHeadingId ?? false,
-            headingBaseLevel,
-            headerTitleTransform,
-          }
+          processOptions
         );
 
         // Write output

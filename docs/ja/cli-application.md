@@ -40,6 +40,7 @@ Options:
       --heading-base-level <level> 見出しベースレベル (デフォルト: 1)
       --header-title-transform <mode>
                                    先頭ベース見出しの扱い (extract / extractAndRemove / none, デフォルト: extractAndRemove)
+      --relative-url <url>         相対URLを指定した接頭辞で書き換え
       --frontmatter-output <file>  FrontmatterをJSONで指定ファイルに出力
       --heading-tree-output <file> 見出しツリーをJSONで指定ファイルに出力
   -h, --help                      ヘルプを表示
@@ -66,6 +67,9 @@ $ mark-deco -i content.md -c config.json
 
 # FrontmatterとHTMLを別々に出力
 $ mark-deco -i article.md -o article.html --frontmatter-output metadata.json
+
+# 相対URLに接頭辞を付ける
+$ mark-deco -i article.md --relative-url "../images"
 ```
 
 ### 設定ファイル
@@ -80,6 +84,7 @@ JSON形式の設定ファイルでデフォルトオプションを指定でき�
   "contentBasedHeadingId": false,
   "headingBaseLevel": 1,
   "headerTitleTransform": "extractAndRemove",
+  "relativeUrl": "../images",
   "oembed": {
     "enabled": true,
     "timeout": 5000

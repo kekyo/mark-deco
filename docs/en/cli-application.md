@@ -40,6 +40,7 @@ Options:
       --heading-base-level <level> Base heading level for markdown headings (default: 1)
       --header-title-transform <mode>
                                    Apply the first base-level heading to frontmatter.title (extract, extractAndRemove, none; default: extractAndRemove)
+      --relative-url <url>         Prefix relative URLs in output (links, images, raw HTML)
       --frontmatter-output <file>  Output frontmatter as JSON to specified file
       --heading-tree-output <file> Output heading tree as JSON to specified file
   -h, --help                      Display help
@@ -66,6 +67,9 @@ $ mark-deco -i content.md -c config.json
 
 # Output frontmatter and HTML separately
 $ mark-deco -i article.md -o article.html --frontmatter-output metadata.json
+
+# Prefix relative URLs in output
+$ mark-deco -i article.md --relative-url "../images"
 ```
 
 ### Configuration File
@@ -80,6 +84,7 @@ You can specify default options in JSON format configuration file:
   "contentBasedHeadingId": false,
   "headingBaseLevel": 1,
   "headerTitleTransform": "extractAndRemove",
+  "relativeUrl": "../images",
   "oembed": {
     "enabled": true,
     "timeout": 5000

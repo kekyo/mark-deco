@@ -50,7 +50,7 @@ Usually, code block syntax is used for syntax highlighting of program code, but 
 
 ### Built-in Code Highlighting
 
-MarkDeco ships with a built-in code highlighting pipeline (Shiki + `rehype-pretty-code`).
+MarkDeco ships with a built-in code highlighting pipeline ([Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code)).
 It is disabled by default and only runs when `codeHighlight` is provided in `ProcessOptions`:
 
 ```typescript
@@ -74,7 +74,7 @@ If `languages` is specified, only the languages in that list (plus `plaintext`) 
 
 When `codeHighlight` is enabled, code block meta (`{...}`) is reserved for highlight options and is not consumed by `remark-attr` for code block attributes. Avoid mixing `codeHighlight` with other code highlighters added through `advancedOptions.rehypePlugins`.
 
-Additionally, basic HTML rendering for code highlighting occurs even without applying `codeHighlight`.
+Note: Basic HTML rendering for code highlighting occurs even without applying `codeHighlight`.
 For example, using [Prism.js](https://prismjs.com/) allows you to easily achieve code highlighting with browser-based rendering.
 
 ### oEmbed Plugin

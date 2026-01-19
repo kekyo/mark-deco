@@ -50,7 +50,7 @@ console.log(result.html);
 
 ### 組み込みコードハイライト
 
-MarkDecoは Shiki + `rehype-pretty-code` によるコードハイライトを内蔵しています。`ProcessOptions` に `codeHighlight` を指定したときだけ有効になります:
+MarkDecoは [Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code) によるコードハイライトを内蔵しています。`ProcessOptions` に `codeHighlight` を指定したときだけ有効になります:
 
 ```typescript
 // コードブロックをmark-decoでレンダリングする
@@ -74,7 +74,7 @@ const result = await processor.process(markdown, 'id', {
 `codeHighlight` を有効にするとコードブロックのメタ情報 (`{...}`) はハイライト用に予約され、`remark-attr` によるコードブロック属性は適用されません。
 `advancedOptions.rehypePlugins` で別のコードハイライトを追加する場合は重複適用を避けてください。
 
-また、 `codeHighlight` を適用しなくても、コードハイライトのための基本的なHTMLレンダリングは行われます。
+Note: `codeHighlight` を適用しなくても、コードハイライトのための基本的なHTMLレンダリングは行われます。
 例えば、 [Prism.js](https://prismjs.com/) を使用すれば、ブラウザ内レンダリングで容易にコードハイライトを実現できます。
 
 ### oEmbedプラグイン

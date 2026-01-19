@@ -122,6 +122,25 @@ await processor.process(markdown, 'id', {
 });
 ```
 
+### URL解決フック
+
+`resolveUrl` はMarkdownから生成されるURLを、HTML出力直前に書き換えるためのフックです。
+Markdownのリンク・画像・参照定義、および raw HTML の `href`, `src`, `srcset`, `poster`, `data`, `action`, `formaction`, `cite`, `xlink:href` などが対象になります。
+常に呼び出されるため、変更しない場合は元のURLを返してください。
+raw HTMLの場合は `context.tagName` と `context.attrName` から、どの属性由来か判断できます。
+
+```typescript
+// 相対URLだけに接頭辞を付ける
+await processor.process(markdown, 'id', {
+  resolveUrl: (url, context) => {
+    if (/^(https?:)?\/\//.test(url) || url.startsWith('#')) {
+      return url;
+    }
+    return `/docs/${url}`;
+  },
+});
+```
+
 ### CLIインターフェイス
 
 MarkDecoはライブラリですが、MarkDecoを気軽に試すことが出来るCLIインターフェイスもパッケージで公開されています。これを使えば、TypeScriptでコードを書かなくても変換を試行したり、別のコードから独立したアプリケーションとして呼び出せます。

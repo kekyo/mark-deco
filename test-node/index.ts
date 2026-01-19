@@ -9,6 +9,7 @@ import {
   createCardPlugin,
   createMermaidPlugin,
   createCachedFetcher,
+  type HeadingNode,
 } from 'mark-deco';
 import { defaultProviderList } from 'mark-deco/misc';
 
@@ -21,7 +22,7 @@ interface ProcessorOptions {
 }
 
 // Helper function to count total headings in the tree
-function countHeadings(headingTree: any[]): number {
+function countHeadings(headingTree: readonly HeadingNode[]): number {
   let count = 0;
   for (const heading of headingTree) {
     count++; // Count this heading

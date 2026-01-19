@@ -14,6 +14,7 @@ export interface Config {
   contentBasedHeadingId?: boolean;
   headingBaseLevel?: number;
   headerTitleTransform?: 'extract' | 'extractAndRemove' | 'none';
+  relativeUrl?: string;
   // Plugin-specific configurations
   oembed?: {
     enabled?: boolean;
