@@ -50,31 +50,68 @@ console.log(result.html);
 
 ### 組み込みコードハイライト
 
-MarkDecoは Shiki + `rehype-pretty-code` によるコードハイライトを内蔵しています。`ProcessOptions` に `codeHighlight` を指定したときだけ有効になります:
+MarkDecoは [Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code) によるコードハイライトを内蔵しています。`ProcessOptions` に `codeHighlight` を指定したときだけ有効になります:
 
 ```typescript
 // コードブロックをmark-decoでレンダリングする
 const result = await processor.process(markdown, 'id', {
   codeHighlight: {
-    // 使用可能にする言語（下記参照）
-    languages: ['typescript', 'javascript'],
     // テーマ定義
     theme: { light: 'github-light', dark: 'github-dark-dimmed' },
     // 行番号を有効化するかどうか
     lineNumbers: true,
     // デフォルトの言語
-    defaultLanguage: 'plaintext',
+    defaultLanguage: 'text',
   },
 });
 ```
 
-`languages` は省略可能です。未指定または空の場合は、使用された言語を Shiki が必要に応じてロードします。
-`languages` を指定すると、そのリスト（+ `plaintext`）以外はロードされず、未指定の言語はプレーンテキストとして扱われます（ハイライトなし）。
+- 組み込み言語・テーマ一覧: [textmate-grammars-themes](https://textmate-grammars-themes.netlify.app/) (https://shiki.style/themes)
+
+ShikiはMarkdownで指定された言語を自動的にロードします。独自の言語定義や
+エイリアスを追加したい場合は、`languageDefinitions` と `languageAliases` を
+指定してください。カスタム定義は同名の組み込み言語よりも優先されます。
+
+Shikiの言語/テーマ定義を直接渡して拡張することもできます:
+
+```typescript
+import type { LanguageRegistration, ThemeRegistrationRaw } from 'shiki';
+
+const customLanguage: LanguageRegistration = {
+  name: 'markdeco-test',
+  scopeName: 'source.markdeco-test',
+  patterns: [{ name: 'keyword.markdeco', match: '\\\\bMARK\\\\b' }],
+};
+
+const customTheme: ThemeRegistrationRaw = {
+  name: 'markdeco-test-theme',
+  type: 'dark',
+  fg: '#111111',
+  bg: '#000000',
+  settings: [
+    { settings: { foreground: '#111111', background: '#000000' } },
+    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+  ],
+  tokenColors: [
+    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+  ],
+};
+
+const result = await processor.process(markdown, 'id', {
+  codeHighlight: {
+    languageDefinitions: [customLanguage],
+    languageAliases: { 'markdeco-alias': 'markdeco-test' },
+    theme: customTheme,
+  },
+});
+```
+
+言語定義を渡した場合は、`name`（`aliases`を含む）がホワイトリストに追加されます。同名の組み込み言語がある場合は、指定した定義が優先されます。
 
 `codeHighlight` を有効にするとコードブロックのメタ情報 (`{...}`) はハイライト用に予約され、`remark-attr` によるコードブロック属性は適用されません。
 `advancedOptions.rehypePlugins` で別のコードハイライトを追加する場合は重複適用を避けてください。
 
-また、 `codeHighlight` を適用しなくても、コードハイライトのための基本的なHTMLレンダリングは行われます。
+Note: `codeHighlight` を適用しなくても、コードハイライトのための基本的なHTMLレンダリングは行われます。
 例えば、 [Prism.js](https://prismjs.com/) を使用すれば、ブラウザ内レンダリングで容易にコードハイライトを実現できます。
 
 ### oEmbedプラグイン

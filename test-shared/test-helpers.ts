@@ -2,7 +2,15 @@
  * Common test helpers shared between Node.js and E2E tests
  */
 
-import { createMarkdownProcessor, createOEmbedPlugin, createCardPlugin, createMermaidPlugin, createCachedFetcher, type MarkdownProcessorPlugin } from 'mark-deco';
+import {
+  createMarkdownProcessor,
+  createOEmbedPlugin,
+  createCardPlugin,
+  createMermaidPlugin,
+  createCachedFetcher,
+  type MarkdownProcessorPlugin,
+  type HeadingNode,
+} from 'mark-deco';
 
 /**
  * Create custom oEmbed providers for testing
@@ -127,10 +135,10 @@ export function extractMermaidInfo(html: string): {
 /**
  * Count total headings in heading tree
  */
-export function countTotalHeadings(headingTree: any[]): number {
+export function countTotalHeadings(headingTree: readonly HeadingNode[]): number {
   let count = 0;
 
-  function countHeadings(items: any[]): void {
+  function countHeadings(items: readonly HeadingNode[]): void {
     for (const item of items) {
       count++;
       if (item.children && item.children.length > 0) {

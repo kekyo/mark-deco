@@ -13,6 +13,7 @@ import {
 import * as testHelpers from '../test-shared/test-helpers';
 import * as testServerModule from '../test-shared/test-server';
 import type { TestServer } from '../test-shared/test-server';
+import type { HeadingNode } from 'mark-deco';
 
 const {
   createTestProcessor,
@@ -88,7 +89,7 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
   async function processMarkdownFile(filename: string): Promise<{
     html: string;
     frontmatter: Record<string, unknown>;
-    headingTree: unknown[];
+    headingTree: readonly HeadingNode[];
   }> {
     const filePath = path.join(testFilesDir, filename);
     let markdownContent = await readFile(filePath, 'utf-8');
@@ -127,7 +128,7 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
     result: {
       html: string;
       frontmatter: Record<string, unknown>;
-      headingTree: unknown[];
+      headingTree: readonly HeadingNode[];
     }
   ): Promise<string> {
     const baseName = path.parse(filename).name;
@@ -162,7 +163,7 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
     result: {
       html: string;
       frontmatter: Record<string, unknown>;
-      headingTree: unknown[];
+      headingTree: readonly HeadingNode[];
     }
   ): Promise<void> {
     const baseName = path.parse(filename).name;
@@ -218,7 +219,7 @@ describe('Integrated Node.js Tests - Asset-based Processing', () => {
     result: {
       html: string;
       frontmatter: Record<string, unknown>;
-      headingTree: unknown[];
+      headingTree: readonly HeadingNode[];
     }
   ): void {
     const baseName = path.parse(filename).name;

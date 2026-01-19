@@ -4,6 +4,25 @@
 // https://github.com/kekyo/mark-deco
 
 /**
+ * oEmbed provider endpoint interface
+ */
+export interface OEmbedEndpoint {
+  url: string;
+  schemes?: string[];
+  discovery?: boolean;
+  formats?: string[];
+}
+
+/**
+ * oEmbed provider interface from providers.json
+ */
+export interface OEmbedProvider {
+  provider_name: string;
+  provider_url: string;
+  endpoints: OEmbedEndpoint[];
+}
+
+/**
  * oEmbed response interface
  */
 export interface OEmbedResponse {
@@ -45,25 +64,6 @@ export interface OEmbedResponse {
   // Additional fields
   /** The web page URL for the resource */
   web_page?: string;
-}
-
-/**
- * oEmbed provider endpoint interface
- */
-export interface OEmbedEndpoint {
-  url: string;
-  schemes?: string[];
-  discovery?: boolean;
-  formats?: string[];
-}
-
-/**
- * oEmbed provider interface from providers.json
- */
-export interface OEmbedProvider {
-  provider_name: string;
-  provider_url: string;
-  endpoints: OEmbedEndpoint[];
 }
 
 /**

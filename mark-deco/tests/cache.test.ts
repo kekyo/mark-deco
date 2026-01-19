@@ -7,6 +7,7 @@ import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
+import { gunzipSync } from 'zlib';
 import {
   describe,
   it,
@@ -966,7 +967,21 @@ describe('FileSystemCache', () => {
       // Check that file was created with correct naming pattern
       const files = await fs.readdir(testCacheDir);
       expect(files.length).toBe(1);
-      expect(files[0]).toMatch(/^[a-f0-9]{64}\.json$/); // SHA-256 hash + .json
+      const [fileName] = files;
+      expect(fileName).toBeDefined();
+      if (!fileName) {
+        throw new Error('Expected cache file to exist');
+      }
+      expect(fileName).toMatch(/^[a-f0-9]{64}\.json\.gz$/); // SHA-256 hash + .json.gz
+
+      const fileBuffer = await fs.readFile(path.join(testCacheDir, fileName));
+      expect(fileBuffer[0]).toBe(0x1f);
+      expect(fileBuffer[1]).toBe(0x8b);
+      const decompressed = gunzipSync(fileBuffer);
+      const parsed = JSON.parse(decompressed.toString('utf-8')) as {
+        data: string;
+      };
+      expect(parsed.data).toBe(value);
     });
 
     it('should return null for non-existent keys', async () => {
@@ -1132,6 +1147,55 @@ describe('FileSystemCache', () => {
       } catch {
         // Expected - file should not exist
       }
+    });
+
+    it('should read uncompressed cache when gzip file is missing', async () => {
+      const key = 'legacy-key';
+      const value = 'legacy-value';
+      const hash = createHash('sha256').update(key).digest('hex');
+      const filePath = path.join(testCacheDir, `${hash}.json`);
+
+      await fs.mkdir(testCacheDir, { recursive: true });
+      await fs.writeFile(
+        filePath,
+        JSON.stringify(
+          {
+            data: value,
+            timestamp: Date.now(),
+          },
+          null,
+          2
+        ),
+        'utf-8'
+      );
+
+      expect(await cache.get(key)).toBe(value);
+    });
+
+    it('should write uncompressed cache when compression is disabled', async () => {
+      const uncompressedCache = createFileSystemCacheStorage(testCacheDir, {
+        enableCompression: false,
+      });
+      const key = 'plain-key';
+      const value = 'plain-value';
+
+      await uncompressedCache.set(key, value);
+
+      const files = await fs.readdir(testCacheDir);
+      expect(files.length).toBe(1);
+      const [fileName] = files;
+      expect(fileName).toBeDefined();
+      if (!fileName) {
+        throw new Error('Expected cache file to exist');
+      }
+      expect(fileName).toMatch(/^[a-f0-9]{64}\.json$/);
+
+      const fileContent = await fs.readFile(
+        path.join(testCacheDir, fileName),
+        'utf-8'
+      );
+      const parsed = JSON.parse(fileContent) as { data: string };
+      expect(parsed.data).toBe(value);
     });
 
     it('should create cache directory if it does not exist', async () => {
@@ -1373,7 +1437,7 @@ describe('FileSystemCache', () => {
       // Verify file was cleaned up
       const files = await fs.readdir(testCacheDir);
       const hash = createHash('sha256').update(key).digest('hex');
-      const expectedFileName = `${hash}.json`;
+      const expectedFileName = `${hash}.json.gz`;
       expect(files).not.toContain(expectedFileName);
     });
 
@@ -1424,7 +1488,9 @@ describe('FileSystemCache', () => {
 
       // Verify file system consistency
       const files = await fs.readdir(testCacheDir);
-      const jsonFiles = files.filter((f) => f.endsWith('.json'));
+      const jsonFiles = files.filter(
+        (f) => f.endsWith('.json') || f.endsWith('.json.gz')
+      );
       expect(jsonFiles.length).toBe(finalSize);
 
       // Verify we can still perform operations

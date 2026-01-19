@@ -3,10 +3,10 @@ import {
   createOEmbedPlugin,
   createCardPlugin,
   createMermaidPlugin,
-  defaultProviderList,
   type FetcherType,
   type MarkdownProcessor,
 } from 'mark-deco';
+import { defaultProviderList } from 'mark-deco/misc';
 import * as testHelpers from '../test-shared/test-helpers';
 
 const { createTestCustomProviders } = testHelpers;

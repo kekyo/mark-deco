@@ -15,9 +15,6 @@
     "noUnusedParameters": true,
     "exactOptionalPropertyTypes": true,
     "baseUrl": ".",
-    "paths": {
-      "mark-deco": ["../mark-deco/src/index.ts"]
-    },
     "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,

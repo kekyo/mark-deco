@@ -50,31 +50,68 @@ Usually, code block syntax is used for syntax highlighting of program code, but 
 
 ### Built-in Code Highlighting
 
-MarkDeco ships with a built-in code highlighting pipeline (Shiki + `rehype-pretty-code`).
+MarkDeco ships with a built-in code highlighting pipeline ([Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code)).
 It is disabled by default and only runs when `codeHighlight` is provided in `ProcessOptions`:
 
 ```typescript
 // Render code blocks with mark-deco
 const result = await processor.process(markdown, 'id', {
   codeHighlight: {
-    // Accept languages (see below)
-    languages: ['typescript', 'javascript'],
     // Theme definitions
     theme: { light: 'github-light', dark: 'github-dark-dimmed' },
     // Enable line numbers
     lineNumbers: true,
     // Default language
-    defaultLanguage: 'plaintext',
+    defaultLanguage: 'text',
   },
 });
 ```
 
-`languages` is optional. If unspecified or empty, Shiki will load the languages used as needed.
-If `languages` is specified, only the languages in that list (plus `plaintext`) will be loaded; unspecified languages will be treated as plain text (without highlighting).
+- List of language/themes: [textmate-grammars-themes](https://textmate-grammars-themes.netlify.app/) (https://shiki.style/themes)
+
+Shiki loads the languages used in Markdown automatically. Use `languageDefinitions` and
+`languageAliases` to register custom language definitions or aliases. Custom definitions
+take precedence over bundled languages with the same name.
+
+You can also pass Shiki language/theme registrations to extend highlighting:
+
+```typescript
+import type { LanguageRegistration, ThemeRegistrationRaw } from 'shiki';
+
+const customLanguage: LanguageRegistration = {
+  name: 'markdeco-test',
+  scopeName: 'source.markdeco-test',
+  patterns: [{ name: 'keyword.markdeco', match: '\\\\bMARK\\\\b' }],
+};
+
+const customTheme: ThemeRegistrationRaw = {
+  name: 'markdeco-test-theme',
+  type: 'dark',
+  fg: '#111111',
+  bg: '#000000',
+  settings: [
+    { settings: { foreground: '#111111', background: '#000000' } },
+    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+  ],
+  tokenColors: [
+    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+  ],
+};
+
+const result = await processor.process(markdown, 'id', {
+  codeHighlight: {
+    languageDefinitions: [customLanguage],
+    languageAliases: { 'markdeco-alias': 'markdeco-test' },
+    theme: customTheme,
+  },
+});
+```
+
+When you pass language registrations, their `name` (and `aliases`) are added to the whitelist. If a registration shares a name with a bundled language, the registration is used.
 
 When `codeHighlight` is enabled, code block meta (`{...}`) is reserved for highlight options and is not consumed by `remark-attr` for code block attributes. Avoid mixing `codeHighlight` with other code highlighters added through `advancedOptions.rehypePlugins`.
 
-Additionally, basic HTML rendering for code highlighting occurs even without applying `codeHighlight`.
+Note: Basic HTML rendering for code highlighting occurs even without applying `codeHighlight`.
 For example, using [Prism.js](https://prismjs.com/) allows you to easily achieve code highlighting with browser-based rendering.
 
 ### oEmbed Plugin

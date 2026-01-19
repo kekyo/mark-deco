@@ -5,7 +5,27 @@
 
 import type { HTMLBeautifyOptions } from 'js-beautify';
 import type { Options as RemarkGfmOptions } from 'remark-gfm';
+import type { LanguageRegistration, ThemeRegistrationRaw } from 'shiki';
 import type { PluggableList } from 'unified';
+
+///////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Log levels for the logger interface
+ */
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+/**
+ * Logger interface for customizable logging
+ */
+export interface Logger {
+  readonly debug: (message: string, ...args: unknown[]) => void;
+  readonly info: (message: string, ...args: unknown[]) => void;
+  readonly warn: (message: string, ...args: unknown[]) => void;
+  readonly error: (message: string, ...args: unknown[]) => void;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
 
 // Re-export HTMLBeautifyOptions for external use
 export type { HTMLBeautifyOptions };
@@ -63,7 +83,7 @@ export interface FrontmatterPostTransformContext {
   /** Frontmatter produced after preprocessing */
   readonly frontmatter: FrontmatterData;
   /** Heading structure generated during HTML conversion */
-  readonly headingTree: HeadingNode[];
+  readonly headingTree: readonly HeadingNode[];
 }
 
 /**
@@ -87,6 +107,8 @@ export interface HeadingNode {
   readonly children: HeadingNode[];
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Fetcher interface that encapsulates both fetching function and metadata
  */
@@ -101,6 +123,8 @@ export interface FetcherType {
   /** User-Agent string used for fetcher HTTP requests */
   readonly userAgent: string;
 }
+
+///////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Context provided to plugins during processing
@@ -137,6 +161,8 @@ export interface MarkdownProcessorPlugin {
   ) => Promise<string>;
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Options for creating a markdown processor
  */
@@ -168,25 +194,44 @@ export interface AdvancedOptions {
 /**
  * Theme config for code highlighting
  */
+export type CodeHighlightTheme = string | ThemeRegistrationRaw;
+
+/**
+ * Theme config for code highlighting
+ */
 export interface CodeHighlightThemeConfig {
-  /** Theme name to use in light mode */
-  readonly light?: string;
-  /** Theme name to use in dark mode */
-  readonly dark?: string;
+  /** Theme to use in light mode */
+  light?: CodeHighlightTheme;
+  /** Theme to use in dark mode */
+  dark?: CodeHighlightTheme;
 }
 
 /**
  * Options for built-in code highlighting
  */
 export interface CodeHighlightOptions {
-  /** Whitelist of languages to load (empty or undefined loads none explicitly) */
-  readonly languages?: readonly string[];
-  /** Theme name or theme pair for light/dark */
-  readonly theme?: string | CodeHighlightThemeConfig;
+  /** Custom language definitions to register with Shiki */
+  languageDefinitions?: LanguageRegistration[];
+  /** Additional language alias mappings */
+  languageAliases?: Record<string, string>;
+  /** Theme name, theme registration, or theme pair for light/dark */
+  theme?: CodeHighlightTheme | CodeHighlightThemeConfig;
   /** Whether to show line numbers for code blocks */
-  readonly lineNumbers?: boolean;
+  lineNumbers?: boolean;
   /** Default language for code blocks without an explicit language */
-  readonly defaultLanguage?: string;
+  defaultLanguage?: string;
+}
+
+/**
+ * Context information for resolveUrl hook
+ */
+export interface ResolveUrlContext {
+  /** Source of the URL */
+  readonly kind: 'link' | 'image' | 'definition' | 'html';
+  /** HTML tag name (only for raw HTML) */
+  readonly tagName?: string;
+  /** HTML attribute name (only for raw HTML) */
+  readonly attrName?: string;
 }
 
 /**
@@ -207,6 +252,8 @@ export interface ProcessOptions {
   defaultImageOuterClassName?: string;
   /** Options for built-in code highlighting (enable when provided) */
   codeHighlight?: CodeHighlightOptions;
+  /** Optional URL resolver hook for links, images, and raw HTML attributes */
+  resolveUrl?: (url: string, context: ResolveUrlContext) => string;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
@@ -233,6 +280,8 @@ export interface ProcessWithFrontmatterTransformOptions {
   defaultImageOuterClassName?: string;
   /** Options for built-in code highlighting (enable when provided) */
   codeHighlight?: CodeHighlightOptions;
+  /** Optional URL resolver hook for links, images, and raw HTML attributes */
+  resolveUrl?: (url: string, context: ResolveUrlContext) => string;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
@@ -246,7 +295,7 @@ export interface ProcessResult {
   /** Extracted frontmatter data */
   readonly frontmatter: FrontmatterData;
   /** Heading node tree (representing a hierarchical structure) */
-  readonly headingTree: HeadingNode[];
+  readonly headingTree: readonly HeadingNode[];
 }
 
 /**
@@ -289,19 +338,4 @@ export interface MarkdownProcessor {
     uniqueIdPrefix: string,
     options: ProcessWithFrontmatterTransformOptions
   ) => Promise<ProcessResultWithFrontmatterTransform | undefined>;
-}
-
-/**
- * Log levels for the logger interface
- */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-
-/**
- * Logger interface for customizable logging
- */
-export interface Logger {
-  readonly debug: (message: string, ...args: unknown[]) => void;
-  readonly info: (message: string, ...args: unknown[]) => void;
-  readonly warn: (message: string, ...args: unknown[]) => void;
-  readonly error: (message: string, ...args: unknown[]) => void;
 }

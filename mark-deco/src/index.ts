@@ -5,15 +5,15 @@
 
 // Type exports
 export * from './types';
+export * from './plugins/oembed/types';
+export * from './plugins/card/types';
+export * from './plugins/mermaid/types';
 
 // Main exports
 export { createMarkdownProcessor, defaultHtmlOptions } from './processor';
 export { createOEmbedPlugin } from './plugins/oembed-plugin';
 export { createCardPlugin } from './plugins/card-plugin';
 export { createMermaidPlugin } from './plugins/mermaid-plugin';
-
-// oEmbed specific exports
-export { defaultProviderList } from './plugins/oembed/providers';
 
 // Utility exports
 export { generateHeadingId, fetchData, fetchText, fetchJson } from './utils';
@@ -28,6 +28,3 @@ export type { CacheStorage } from './cache/index';
 
 // Logger exports
 export { getNoOpLogger, getConsoleLogger } from './logger';
-
-// oEmbed specific type exports
-export type { OEmbedProvider } from './plugins/oembed/types';

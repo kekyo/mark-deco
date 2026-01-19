@@ -182,6 +182,36 @@ Body text.`;
     }
   });
 
+  it('should prefix relative URLs when --relative-url is specified', async () => {
+    const markdown = [
+      '[Doc](docs/page.html)',
+      '![Alt](./image.png)',
+      '<a href="raw.html"><img src="raw.png"></a>',
+      '[Absolute](https://example.com/abs)',
+      '[Root](/root/path)',
+    ].join('\n\n');
+
+    const { stdout, code } = await spawnAsync(
+      'node',
+      [
+        CLI_PATH,
+        ...NO_TITLE_ARGS,
+        '--no-plugins',
+        '--relative-url',
+        '../images',
+      ],
+      markdown
+    );
+
+    expect(code).toBe(0);
+    expect(stdout).toContain('href="../images/docs/page.html"');
+    expect(stdout).toContain('src="../images/image.png"');
+    expect(stdout).toContain('href="../images/raw.html"');
+    expect(stdout).toContain('src="../images/raw.png"');
+    expect(stdout).toContain('href="https://example.com/abs"');
+    expect(stdout).toContain('href="/root/path"');
+  });
+
   it('should handle non-existent input file gracefully', async () => {
     const { code, stderr } = await spawnAsync('node', [
       CLI_PATH,

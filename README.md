@@ -122,6 +122,25 @@ await processor.process(markdown, 'id', {
 });
 ```
 
+### URL Resolver Hook
+
+`resolveUrl` lets you rewrite URLs generated from Markdown before HTML output.
+It is called for Markdown links, images, reference definitions, and raw HTML attributes such as `href`, `src`, `srcset`, `poster`, `data`, `action`, `formaction`, `cite`, and `xlink:href`.
+The hook always runs, so return the original URL when no change is needed.
+For raw HTML, `context.tagName` and `context.attrName` identify the source attribute.
+
+```typescript
+// Prefix relative URLs
+await processor.process(markdown, 'id', {
+  resolveUrl: (url, context) => {
+    if (/^(https?:)?\/\//.test(url) || url.startsWith('#')) {
+      return url;
+    }
+    return `/docs/${url}`;
+  },
+});
+```
+
 ### CLI Interface
 
 Although MarkDeco is a library, a CLI interface is also available in the package that allows you to easily try out MarkDeco. This allows you to try out conversions without having to write code in TypeScript, or call it as an independent application from another code.

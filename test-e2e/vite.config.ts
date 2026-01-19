@@ -23,13 +23,6 @@ export default defineConfig({
   server: {
     host: 'localhost',
   },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, '.'),
-      // Directly reference library source files during development
-      'mark-deco': resolve(__dirname, '../mark-deco/src/index.ts'),
-    },
-  },
   define: {
     'process.env.NODE_ENV': '"production"',
   },

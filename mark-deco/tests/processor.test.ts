@@ -4,6 +4,7 @@
 // https://github.com/kekyo/mark-deco
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import type { LanguageRegistration, ThemeRegistrationRaw } from 'shiki';
 import { createCachedFetcher, createDirectFetcher } from '../src/fetcher';
 import { getConsoleLogger } from '../src/logger';
 import { createMarkdownProcessor } from '../src/processor';
@@ -170,13 +171,75 @@ console.log('Hello, World!');
         useHierarchicalHeadingId: false,
         headerTitleTransform: 'none',
         codeHighlight: {
-          languages: ['javascript'],
           lineNumbers: true,
         },
       });
 
       expect(result.html).toContain('data-rehype-pretty-code-figure');
       expect(result.html).toContain('data-line-numbers');
+    });
+
+    it('should accept custom languages and themes for code highlighting', async () => {
+      const customLanguage: LanguageRegistration = {
+        name: 'markdeco-test',
+        scopeName: 'source.markdeco-test',
+        repository: {},
+        patterns: [
+          {
+            name: 'keyword.markdeco',
+            match: '\\bMARK\\b',
+          },
+        ],
+      };
+      const customTheme: ThemeRegistrationRaw = {
+        name: 'markdeco-test-theme',
+        type: 'dark',
+        fg: '#111111',
+        bg: '#000000',
+        settings: [
+          {
+            settings: {
+              foreground: '#111111',
+              background: '#000000',
+            },
+          },
+          {
+            scope: 'keyword.markdeco',
+            settings: {
+              foreground: '#ff0000',
+            },
+          },
+        ],
+        tokenColors: [
+          {
+            scope: 'keyword.markdeco',
+            settings: {
+              foreground: '#ff0000',
+            },
+          },
+        ],
+      };
+      const markdown = `\`\`\`markdeco-alias
+MARK
+\`\`\``;
+
+      const result = await processor.process(markdown, 'id', {
+        useContentStringHeaderId: true,
+        useHierarchicalHeadingId: false,
+        headerTitleTransform: 'none',
+        codeHighlight: {
+          languageDefinitions: [customLanguage],
+          languageAliases: {
+            'markdeco-alias': 'markdeco-test',
+          },
+          theme: customTheme,
+        },
+      });
+
+      expect(result.html).toContain('data-rehype-pretty-code-figure');
+      expect(result.html).toContain('data-language="markdeco-alias"');
+      expect(result.html).toContain('data-theme="markdeco-test-theme"');
+      expect(result.html.toLowerCase()).toContain('#ff0000');
     });
 
     it('should apply default image class and preserve existing classes', async () => {
