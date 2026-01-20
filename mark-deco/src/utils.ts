@@ -7,32 +7,6 @@
 
 import type { FetcherType, Logger } from './types';
 
-// https://github.com/kekyo/prettier-max/tree/main?tab=readme-ov-file#default-import-detection-advanced-option
-export const resolveDefaultExport = <T>(module: T | { default?: T }): T => {
-  const maybeModule = module as { default?: T };
-
-  if (
-    maybeModule &&
-    typeof maybeModule === 'object' &&
-    'default' in maybeModule
-  ) {
-    const first = maybeModule.default;
-
-    if (first && typeof first === 'object' && 'default' in (first as object)) {
-      const second = (first as { default?: T }).default;
-      if (second !== undefined) {
-        return second;
-      }
-    }
-
-    if (first !== undefined) {
-      return first;
-    }
-  }
-
-  return module as T;
-};
-
 /**
  * Check if an error is a CORS error
  * @param error - The error to check
