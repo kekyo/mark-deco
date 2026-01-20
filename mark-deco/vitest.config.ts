@@ -11,6 +11,7 @@ export default defineConfig({
     environment: 'jsdom',
     testTimeout: 30000,
     setupFiles: ['./tests/setup.ts'],
+    environmentMatchGlobs: [['**/tests/cache.test.ts', 'node']],
     exclude: [
       '**/node_modules/**',
       '**/dist/**',

@@ -4,8 +4,17 @@
 // https://github.com/kekyo/mark-deco
 
 import { createHash } from 'crypto';
-import { promises as fs } from 'fs';
-import path from 'path';
+import {
+  readdir,
+  rm,
+  readFile,
+  mkdir,
+  writeFile,
+  access,
+  chmod,
+  stat,
+} from 'fs/promises';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'zlib';
 import {
@@ -930,9 +939,9 @@ describe('FileSystemCache', () => {
 
   beforeAll(async () => {
     // Create a temporary directory for testing
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const __dirname = dirname(fileURLToPath(import.meta.url));
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    testCacheDir = path.join(__dirname, `.test-cache-${timestamp}`);
+    testCacheDir = join(__dirname, `.test-cache-${timestamp}`);
   });
 
   beforeEach(async () => {
@@ -948,7 +957,7 @@ describe('FileSystemCache', () => {
   afterAll(async () => {
     // Clean up test directory
     try {
-      await fs.rm(testCacheDir, { recursive: true, force: true });
+      await rm(testCacheDir, { recursive: true, force: true });
     } catch {
       // Ignore cleanup errors
     }
@@ -965,7 +974,7 @@ describe('FileSystemCache', () => {
       expect(retrieved).toBe(value);
 
       // Check that file was created with correct naming pattern
-      const files = await fs.readdir(testCacheDir);
+      const files = await readdir(testCacheDir);
       expect(files.length).toBe(1);
       const [fileName] = files;
       expect(fileName).toBeDefined();
@@ -974,7 +983,7 @@ describe('FileSystemCache', () => {
       }
       expect(fileName).toMatch(/^[a-f0-9]{64}\.json\.gz$/); // SHA-256 hash + .json.gz
 
-      const fileBuffer = await fs.readFile(path.join(testCacheDir, fileName));
+      const fileBuffer = await readFile(join(testCacheDir, fileName));
       expect(fileBuffer[0]).toBe(0x1f);
       expect(fileBuffer[1]).toBe(0x8b);
       const decompressed = gunzipSync(fileBuffer);
@@ -1000,7 +1009,7 @@ describe('FileSystemCache', () => {
       expect(await cache.get(key)).toBeNull();
 
       // Verify file is removed
-      const files = await fs.readdir(testCacheDir);
+      const files = await readdir(testCacheDir);
       expect(files.length).toBe(0);
     });
 
@@ -1018,7 +1027,7 @@ describe('FileSystemCache', () => {
       expect(await cache.get('key3')).toBeNull();
 
       // Verify all files are removed
-      const files = await fs.readdir(testCacheDir);
+      const files = await readdir(testCacheDir);
       expect(files.length).toBe(0);
     });
 
@@ -1066,7 +1075,7 @@ describe('FileSystemCache', () => {
       expect(await cache.get(key)).toBeNull();
 
       // File should be removed from file system
-      const files = await fs.readdir(testCacheDir);
+      const files = await readdir(testCacheDir);
       expect(files.length).toBe(0);
     });
 
@@ -1121,7 +1130,7 @@ describe('FileSystemCache', () => {
       expect(await cache.get(key)).toBeNull();
 
       // File should not exist
-      const files = await fs.readdir(testCacheDir);
+      const files = await readdir(testCacheDir);
       expect(files.length).toBe(0);
     });
   });
@@ -1131,18 +1140,18 @@ describe('FileSystemCache', () => {
       const key = 'corrupted-key';
 
       // Create a file with invalid JSON directly
-      await fs.mkdir(testCacheDir, { recursive: true });
+      await mkdir(testCacheDir, { recursive: true });
       const hash = createHash('sha256').update(key).digest('hex');
       const fileName = `${hash}.json`;
-      const filePath = path.join(testCacheDir, fileName);
-      await fs.writeFile(filePath, 'invalid-json', 'utf-8');
+      const filePath = join(testCacheDir, fileName);
+      await writeFile(filePath, 'invalid-json', 'utf-8');
 
       // Should return null and clean up the corrupted file
       expect(await cache.get(key)).toBeNull();
 
       // File should be removed
       try {
-        await fs.access(filePath);
+        await access(filePath);
         expect.fail('File should have been removed');
       } catch {
         // Expected - file should not exist
@@ -1153,10 +1162,10 @@ describe('FileSystemCache', () => {
       const key = 'legacy-key';
       const value = 'legacy-value';
       const hash = createHash('sha256').update(key).digest('hex');
-      const filePath = path.join(testCacheDir, `${hash}.json`);
+      const filePath = join(testCacheDir, `${hash}.json`);
 
-      await fs.mkdir(testCacheDir, { recursive: true });
-      await fs.writeFile(
+      await mkdir(testCacheDir, { recursive: true });
+      await writeFile(
         filePath,
         JSON.stringify(
           {
@@ -1181,7 +1190,7 @@ describe('FileSystemCache', () => {
 
       await uncompressedCache.set(key, value);
 
-      const files = await fs.readdir(testCacheDir);
+      const files = await readdir(testCacheDir);
       expect(files.length).toBe(1);
       const [fileName] = files;
       expect(fileName).toBeDefined();
@@ -1190,32 +1199,24 @@ describe('FileSystemCache', () => {
       }
       expect(fileName).toMatch(/^[a-f0-9]{64}\.json$/);
 
-      const fileContent = await fs.readFile(
-        path.join(testCacheDir, fileName),
-        'utf-8'
-      );
+      const fileContent = await readFile(join(testCacheDir, fileName), 'utf-8');
       const parsed = JSON.parse(fileContent) as { data: string };
       expect(parsed.data).toBe(value);
     });
 
     it('should create cache directory if it does not exist', async () => {
-      const nonExistentDir = path.join(
-        testCacheDir,
-        'nested',
-        'deep',
-        'directory'
-      );
+      const nonExistentDir = join(testCacheDir, 'nested', 'deep', 'directory');
       const nestedCache = createFileSystemCacheStorage(nonExistentDir);
 
       await nestedCache.set('test', 'value');
       expect(await nestedCache.get('test')).toBe('value');
 
       // Verify directory was created
-      const stats = await fs.stat(nonExistentDir);
+      const stats = await stat(nonExistentDir);
       expect(stats.isDirectory()).toBe(true);
 
       // Clean up
-      await fs.rm(path.join(testCacheDir, 'nested'), {
+      await rm(join(testCacheDir, 'nested'), {
         recursive: true,
         force: true,
       });
@@ -1249,7 +1250,7 @@ describe('FileSystemCache', () => {
       await cache.set('valid', 'value3', 1000);
 
       // Verify all files exist
-      let files = await fs.readdir(testCacheDir);
+      let files = await readdir(testCacheDir);
       expect(files.length).toBe(3);
 
       // Wait for first two to expire
@@ -1260,7 +1261,7 @@ describe('FileSystemCache', () => {
       expect(size).toBe(1);
 
       // Verify expired files are removed
-      files = await fs.readdir(testCacheDir);
+      files = await readdir(testCacheDir);
       expect(files.length).toBe(1);
 
       expect(await cache.get('expired1')).toBeNull();
@@ -1270,12 +1271,12 @@ describe('FileSystemCache', () => {
 
     it('should handle file permissions and write errors gracefully', async () => {
       // This test may not work on all systems, but let's try
-      const restrictedDir = path.join(testCacheDir, 'restricted');
-      await fs.mkdir(restrictedDir, { recursive: true });
+      const restrictedDir = join(testCacheDir, 'restricted');
+      await mkdir(restrictedDir, { recursive: true });
 
       try {
         // Try to make directory read-only (may not work on Windows)
-        await fs.chmod(restrictedDir, 0o444);
+        await chmod(restrictedDir, 0o444);
 
         const restrictedCache = createFileSystemCacheStorage(restrictedDir);
 
@@ -1283,7 +1284,7 @@ describe('FileSystemCache', () => {
         await expect(restrictedCache.set('test', 'value')).rejects.toThrow();
 
         // Restore permissions for cleanup
-        await fs.chmod(restrictedDir, 0o755);
+        await chmod(restrictedDir, 0o755);
       } catch {
         // Skip this test if we can't change permissions
       }
@@ -1435,7 +1436,7 @@ describe('FileSystemCache', () => {
       expect(await cache.get(key)).toBeNull();
 
       // Verify file was cleaned up
-      const files = await fs.readdir(testCacheDir);
+      const files = await readdir(testCacheDir);
       const hash = createHash('sha256').update(key).digest('hex');
       const expectedFileName = `${hash}.json.gz`;
       expect(files).not.toContain(expectedFileName);
@@ -1487,7 +1488,7 @@ describe('FileSystemCache', () => {
       expect(finalSize).toBeGreaterThanOrEqual(0);
 
       // Verify file system consistency
-      const files = await fs.readdir(testCacheDir);
+      const files = await readdir(testCacheDir);
       const jsonFiles = files.filter(
         (f) => f.endsWith('.json') || f.endsWith('.json.gz')
       );
@@ -1501,11 +1502,11 @@ describe('FileSystemCache', () => {
 
     it('should handle concurrent directory operations gracefully', async () => {
       // Test concurrent operations when cache directory might not exist
-      const tempDir = path.join(testCacheDir, 'concurrent-test');
+      const tempDir = join(testCacheDir, 'concurrent-test');
 
       // Remove directory if it exists
       try {
-        await fs.rm(tempDir, { recursive: true, force: true });
+        await rm(tempDir, { recursive: true, force: true });
       } catch {
         // Ignore if directory doesn't exist
       }
@@ -1528,11 +1529,11 @@ describe('FileSystemCache', () => {
       expect(await tempCache.size()).toBe(10);
 
       // Verify directory was created properly
-      const stats = await fs.stat(tempDir);
+      const stats = await stat(tempDir);
       expect(stats.isDirectory()).toBe(true);
 
       // Clean up
-      await fs.rm(tempDir, { recursive: true, force: true });
+      await rm(tempDir, { recursive: true, force: true });
     });
   });
 });

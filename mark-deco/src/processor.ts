@@ -3,11 +3,12 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import beautifyPkg from 'js-beautify';
-import rehypeStringify from 'rehype-stringify';
-import remarkGfm from 'remark-gfm';
-import remarkParse from 'remark-parse';
-import remarkRehype from 'remark-rehype';
+import * as beautifyModule from 'js-beautify';
+import type { HTMLBeautifyOptions } from 'js-beautify';
+import * as rehypeStringifyModule from 'rehype-stringify';
+import * as remarkGfmModule from 'remark-gfm';
+import * as remarkParseModule from 'remark-parse';
+import * as remarkRehypeModule from 'remark-rehype';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 import { composeMarkdownFromParts, parseFrontmatter } from './frontmatter';
@@ -41,13 +42,13 @@ import type {
   ProcessResultWithFrontmatterTransform,
   ProcessWithFrontmatterTransformOptions,
 } from './types';
-import type { HTMLBeautifyOptions } from 'js-beautify';
 
-const { html: beautifyHtml } = beautifyPkg;
-const remarkParsePlugin = resolveDefaultExport(remarkParse);
-const remarkGfmPlugin = resolveDefaultExport(remarkGfm);
-const remarkRehypePlugin = resolveDefaultExport(remarkRehype);
-const rehypeStringifyPlugin = resolveDefaultExport(rehypeStringify);
+const beautify = resolveDefaultExport(beautifyModule);
+const { html: beautifyHtml } = beautify;
+const remarkParsePlugin = resolveDefaultExport(remarkParseModule);
+const remarkGfmPlugin = resolveDefaultExport(remarkGfmModule);
+const remarkRehypePlugin = resolveDefaultExport(remarkRehypeModule);
+const rehypeStringifyPlugin = resolveDefaultExport(rehypeStringifyModule);
 type ResolveUrl = NonNullable<ProcessOptions['resolveUrl']>;
 
 /**
