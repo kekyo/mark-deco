@@ -24,17 +24,25 @@ export const isCORSError = (error: unknown): boolean => {
   return false;
 };
 
+export interface TimeoutSignal {
+  readonly signal: AbortSignal;
+  readonly clear: () => void;
+}
+
 /**
  * Create a timeout signal that aborts after the specified timeout
  * @param timeout - Timeout in milliseconds
- * @returns AbortSignal that will abort after the timeout
+ * @returns Timeout signal with cleanup for the underlying timer
  */
-export const createTimeoutSignal = (timeout: number): AbortSignal => {
+export const createTimeoutSignal = (timeout: number): TimeoutSignal => {
   const controller = new AbortController();
-  setTimeout(() => {
+  const timer = setTimeout(() => {
     controller.abort();
   }, timeout);
-  return controller.signal;
+  return {
+    signal: controller.signal,
+    clear: () => clearTimeout(timer),
+  };
 };
 
 /**
@@ -93,20 +101,24 @@ export const fetchData = async (
     method: 'GET',
     headers: headersInit,
   };
-  const timeoutSignal = createTimeoutSignal(timeout);
+  const timeoutController = createTimeoutSignal(timeout);
   requestInit.signal = signal
-    ? combineAbortSignals(signal, timeoutSignal)
-    : timeoutSignal;
+    ? combineAbortSignals(signal, timeoutController.signal)
+    : timeoutController.signal;
 
-  logger?.debug(`Fetching data from URL: ${url}`);
-  const response = await fetch(url, requestInit);
-  if (!response.ok) {
-    logger?.error(`HTTP error for URL ${url}, status: ${response.status}`);
-    throw new Error(`HTTP error, status: ${response.status}`);
+  try {
+    logger?.debug(`Fetching data from URL: ${url}`);
+    const response = await fetch(url, requestInit);
+    if (!response.ok) {
+      logger?.error(`HTTP error for URL ${url}, status: ${response.status}`);
+      throw new Error(`HTTP error, status: ${response.status}`);
+    }
+
+    logger?.debug(`Successfully fetched data from URL: ${url}`);
+    return response;
+  } finally {
+    timeoutController.clear();
   }
-
-  logger?.debug(`Successfully fetched data from URL: ${url}`);
-  return response;
 };
 
 /**
