@@ -38,26 +38,30 @@ export const resolveRedirects = async (
         redirect: 'manual', // Will cause CORS error in browser environment
         headers,
       };
-      const timeoutSignal = createTimeoutSignal(timeoutEachRedirect);
+      const timeoutController = createTimeoutSignal(timeoutEachRedirect);
       options.signal = signal
-        ? combineAbortSignals(signal, timeoutSignal)
-        : timeoutSignal;
+        ? combineAbortSignals(signal, timeoutController.signal)
+        : timeoutController.signal;
 
-      const response = await fetch(currentUrl, options);
+      try {
+        const response = await fetch(currentUrl, options);
 
-      // Check if it's a redirect response
-      if (response.status >= 300 && response.status < 400) {
-        const location = response.headers.get('location');
-        if (location) {
-          // Handle relative URLs
-          currentUrl = new URL(location, currentUrl).toString();
-          redirectCount++;
-          continue;
+        // Check if it's a redirect response
+        if (response.status >= 300 && response.status < 400) {
+          const location = response.headers.get('location');
+          if (location) {
+            // Handle relative URLs
+            currentUrl = new URL(location, currentUrl).toString();
+            redirectCount++;
+            continue;
+          }
         }
-      }
 
-      // No more redirects, return current URL
-      break;
+        // No more redirects, return current URL
+        break;
+      } finally {
+        timeoutController.clear();
+      }
     } catch (error) {
       if (isCORSError(error)) {
         logger.debug(
