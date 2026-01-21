@@ -3,14 +3,15 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import * as beautifyModule from 'js-beautify';
+import beautify from 'js-beautify';
 import type { HTMLBeautifyOptions } from 'js-beautify';
-import * as rehypeStringifyModule from 'rehype-stringify';
-import * as remarkGfmModule from 'remark-gfm';
-import * as remarkParseModule from 'remark-parse';
-import * as remarkRehypeModule from 'remark-rehype';
+import rehypeStringifyPlugin from 'rehype-stringify';
+import remarkGfmPlugin from 'remark-gfm';
+import remarkParsePlugin from 'remark-parse';
+import remarkRehypePlugin from 'remark-rehype';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
+
 import { composeMarkdownFromParts, parseFrontmatter } from './frontmatter';
 import { getNoOpLogger } from './logger';
 import { escapeHtml } from './plugins/oembed/utils';
@@ -21,7 +22,7 @@ import {
 import { remarkAttr } from './plugins/remark-attr';
 import { rehypeResponsiveImages } from './plugins/responsive-images';
 import { rewriteHtmlUrls } from './utils/html-tokenizer';
-import { generateHeadingId, resolveDefaultExport } from './utils';
+import { generateHeadingId } from './utils';
 import { applyTitleFromH1 } from './apply-title-from-h1';
 import {
   clampHeadingLevel,
@@ -43,12 +44,7 @@ import type {
   ProcessWithFrontmatterTransformOptions,
 } from './types';
 
-const beautify = resolveDefaultExport(beautifyModule);
 const { html: beautifyHtml } = beautify;
-const remarkParsePlugin = resolveDefaultExport(remarkParseModule);
-const remarkGfmPlugin = resolveDefaultExport(remarkGfmModule);
-const remarkRehypePlugin = resolveDefaultExport(remarkRehypeModule);
-const rehypeStringifyPlugin = resolveDefaultExport(rehypeStringifyModule);
 type ResolveUrl = NonNullable<ProcessOptions['resolveUrl']>;
 
 /**

@@ -3,7 +3,7 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import * as rehypePrettyCodeModule from 'rehype-pretty-code';
+import rehypePrettyCode from 'rehype-pretty-code';
 import {
   type Options as RehypePrettyCodeOptions,
   type Theme as RehypePrettyCodeTheme,
@@ -14,19 +14,17 @@ import {
   type LanguageInput,
   type LanguageRegistration,
 } from 'shiki';
+
 import type {
   CodeHighlightOptions,
   CodeHighlightTheme,
   CodeHighlightThemeConfig,
 } from '../types';
-import { resolveDefaultExport } from '../utils';
 
 const defaultCodeHighlightTheme = {
   light: 'github-light',
   dark: 'github-dark-dimmed',
 } as const;
-
-const rehypePrettyCode = resolveDefaultExport(rehypePrettyCodeModule);
 
 const coerceTheme = (theme: CodeHighlightTheme): RehypePrettyCodeTheme => {
   if (typeof theme === 'string') {

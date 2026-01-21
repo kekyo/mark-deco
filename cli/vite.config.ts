@@ -43,10 +43,4 @@ export default defineConfig({
     minify: false,
     sourcemap: true,
   },
-  define: {
-    global: 'globalThis',
-  },
-  esbuild: {
-    platform: 'node',
-  },
 });

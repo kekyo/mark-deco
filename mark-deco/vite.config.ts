@@ -14,7 +14,6 @@ export default defineConfig({
     screwUp(),
     prettierMax({
       typescript: 'tsconfig.tests.json',
-      detectDefaultImport: 'all',
     }),
     dts({
       rollupTypes: true,
