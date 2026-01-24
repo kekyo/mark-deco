@@ -28,6 +28,11 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./card-oembed-fallback": {
+      "types": "./dist/card-oembed-fallback.d.ts",
+      "import": "./dist/card-oembed-fallback.mjs",
+      "require": "./dist/card-oembed-fallback.cjs"
+    },
     "./browser": {
       "types": "./dist/browser.d.ts",
       "import": "./dist/browser.mjs",

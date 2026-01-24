@@ -16,6 +16,7 @@ import {
 } from '../src/internal';
 import { getNoOpLogger } from '../src/logger';
 import { amazonRules } from '../src/plugins/card/amazon-rules';
+import { createCardPlugin } from '../src/plugins/card';
 import { generateFallbackHtml } from '../src/plugins/card/html-generator';
 import { extractEnhancedData } from '../src/plugins/card/utils';
 import { createMarkdownProcessor } from '../src/processor';
@@ -137,6 +138,51 @@ describe('CardPlugin', () => {
   it('should implement MarkdownProcessorPlugin interface', () => {
     expect(typeof plugin.processBlock).toBe('function');
     expect(plugin.name).toBeDefined();
+  });
+
+  it('should use oembed fallback when provided', async () => {
+    const fallbackHtml = '<div class="oembed-fallback-test">ok</div>';
+    const fallbackPlugin = createCardPlugin({
+      oembedFallback: {
+        render: async () => fallbackHtml,
+      },
+    });
+    const fallbackProcessor = createMarkdownProcessor({
+      plugins: [fallbackPlugin],
+      fetcher: {
+        rawFetcher: async () => {
+          throw new Error('Not implemented in test');
+        },
+        userAgent: 'test-userAgent',
+      },
+    });
+
+    const markdown = '```card\nhttps://example.com/some-content\n```';
+    const result = await fallbackProcessor.process(markdown, 'id');
+
+    expect(result.html).toContain('oembed-fallback-test');
+  });
+
+  it('should continue to card rendering when oembed fallback returns undefined', async () => {
+    const fallbackPlugin = createCardPlugin({
+      oembedFallback: {
+        render: async () => undefined,
+      },
+    });
+    const fallbackProcessor = createMarkdownProcessor({
+      plugins: [fallbackPlugin],
+      fetcher: {
+        rawFetcher: async () => {
+          throw new Error('Not implemented in test');
+        },
+        userAgent: 'test-userAgent',
+      },
+    });
+
+    const markdown = '```card\nhttps://example.com/some-content\n```';
+    const result = await fallbackProcessor.process(markdown, 'id');
+
+    expect(result.html).toContain('card-container card-fallback');
   });
 
   describe('URL validation', () => {

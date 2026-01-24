@@ -382,6 +382,24 @@ const result = await processor.process(markdown, 'id');
 console.log(result.html);
 ```
 
+#### カードブロックのoEmbedフォールバック
+
+カードブロックで、oEmbedが利用可能な場合はoEmbed表示に切り替え、利用不可の場合はカード表示にフォールバックさせることができます。
+
+```typescript
+import { createCardPlugin } from 'mark-deco';
+import { createCardOEmbedFallback } from 'mark-deco/card-oembed-fallback';
+import { defaultProviderList } from 'mark-deco/misc';
+
+const cardPlugin = createCardPlugin({
+  oembedFallback: createCardOEmbedFallback(defaultProviderList),
+});
+```
+
+oEmbedプロバイダが見つからない場合やCORSでアクセスできない場合は、カードプラグインがそのままカード表示を行います。
+バンドルサイズを抑えるために、oEmbedフォールバックは別エントリとして提供されており、
+`mark-deco/card-oembed-fallback` を読み込まない限り oEmbed コードはバンドルに含まれません。
+
 以下は生成されるHTMLの例です (対象のページから得られるメタデータの組によって異なります):
 
 ```html

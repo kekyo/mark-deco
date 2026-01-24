@@ -3,6 +3,8 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
+import type { MarkdownProcessorPluginContext } from '../../types';
+
 /**
  * Card plugin display fields configuration
  *
@@ -14,6 +16,17 @@
 export type CardPluginDisplayFields = Record<string, number>;
 
 /**
+ * Optional oEmbed fallback renderer for card blocks
+ */
+export interface CardOEmbedFallback {
+  /** Render oEmbed HTML for the URL, or return undefined to continue with card rendering */
+  render: (
+    url: string,
+    context: MarkdownProcessorPluginContext
+  ) => Promise<string | undefined>;
+}
+
+/**
  * Card plugin options
  */
 export interface CardPluginOptions {
@@ -23,6 +36,8 @@ export interface CardPluginOptions {
   displayFields?: CardPluginDisplayFields;
   /** Custom scraping rules to apply before OGP fallback rules (OGP rules are always appended) */
   scrapingRules?: ScrapingRule[];
+  /** Optional oEmbed fallback renderer (when provided, card tries oEmbed first) */
+  oembedFallback?: CardOEmbedFallback;
 }
 
 /**

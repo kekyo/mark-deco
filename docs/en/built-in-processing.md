@@ -382,6 +382,24 @@ const result = await processor.process(markdown, 'id');
 console.log(result.html);
 ```
 
+#### oEmbed Fallback for Card Blocks
+
+If you want card blocks to render oEmbed content when available (and fall back to card rendering otherwise), enable the oEmbed fallback:
+
+```typescript
+import { createCardPlugin } from 'mark-deco';
+import { createCardOEmbedFallback } from 'mark-deco/card-oembed-fallback';
+import { defaultProviderList } from 'mark-deco/misc';
+
+const cardPlugin = createCardPlugin({
+  oembedFallback: createCardOEmbedFallback(defaultProviderList),
+});
+```
+
+When no oEmbed provider is found (or access is blocked by CORS), the card plugin continues with card rendering.
+To keep bundles lean, the oEmbed fallback helper is a separate entry point; if you don't import
+`mark-deco/card-oembed-fallback`, bundlers can exclude oEmbed code.
+
 Example generated HTML (varies depending on metadata obtained from target page):
 
 ```html
