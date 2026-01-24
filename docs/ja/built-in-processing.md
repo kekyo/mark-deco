@@ -48,6 +48,22 @@ console.log(result.html);
 プラグインによる拡張は、Markdownのコードブロック構文によって行われます。
 通常、コードブロック構文は、プログラムコードのシンタックスハイライトで使われますが、プラグインが認識されると、プラグイン名称が指定されたコードブロック構文の内容が、プラグインによって処理されます。
 
+### リンクのデフォルトtarget
+
+Markdown から生成されるすべてのリンクに対して、デフォルトの `target`（および `rel`）を指定できます。
+
+```typescript
+const result = await processor.process(markdown, 'id', {
+  linkTarget: '_blank',
+  // 任意: rel の既定値を上書きする
+  linkRel: 'noopener noreferrer',
+});
+```
+
+`linkRel` を省略して `linkTarget` を `_blank` にした場合、
+MarkDeco は自動的に `rel="noopener noreferrer"` を付与します。
+`remark-attr` で `target` や `rel` を明示している場合は、その値が優先されます。
+
 ### 組み込みコードハイライト
 
 MarkDecoは [Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code) によるコードハイライトを内蔵しています。`ProcessOptions` に `codeHighlight` を指定したときだけ有効になります:
@@ -365,6 +381,24 @@ const result = await processor.process(markdown, 'id');
 // リッチカードHTMLが生成される
 console.log(result.html);
 ```
+
+#### カードブロックのoEmbedフォールバック
+
+カードブロックで、oEmbedが利用可能な場合はoEmbed表示に切り替え、利用不可の場合はカード表示にフォールバックさせることができます。
+
+```typescript
+import { createCardPlugin } from 'mark-deco';
+import { createCardOEmbedFallback } from 'mark-deco/card-oembed-fallback';
+import { defaultProviderList } from 'mark-deco/misc';
+
+const cardPlugin = createCardPlugin({
+  oembedFallback: createCardOEmbedFallback(defaultProviderList),
+});
+```
+
+oEmbedプロバイダが見つからない場合やCORSでアクセスできない場合は、カードプラグインがそのままカード表示を行います。
+バンドルサイズを抑えるために、oEmbedフォールバックは別エントリとして提供されており、
+`mark-deco/card-oembed-fallback` を読み込まない限り oEmbed コードはバンドルに含まれません。
 
 以下は生成されるHTMLの例です (対象のページから得られるメタデータの組によって異なります):
 

@@ -254,6 +254,10 @@ export interface ProcessOptions {
   codeHighlight?: CodeHighlightOptions;
   /** Optional URL resolver hook for links, images, and raw HTML attributes */
   resolveUrl?: (url: string, context: ResolveUrlContext) => string;
+  /** Default target attribute for markdown links */
+  linkTarget?: string;
+  /** Default rel attribute for markdown links (used when linkTarget is applied) */
+  linkRel?: string;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }
@@ -282,6 +286,10 @@ export interface ProcessWithFrontmatterTransformOptions {
   codeHighlight?: CodeHighlightOptions;
   /** Optional URL resolver hook for links, images, and raw HTML attributes */
   resolveUrl?: (url: string, context: ResolveUrlContext) => string;
+  /** Default target attribute for markdown links */
+  linkTarget?: string;
+  /** Default rel attribute for markdown links (used when linkTarget is applied) */
+  linkRel?: string;
   /** For advanced configuration */
   advancedOptions?: AdvancedOptions;
 }

@@ -38,6 +38,21 @@ export const createCardPlugin = (
       throw new Error(`Invalid URL: ${url}`);
     }
 
+    if (options.oembedFallback) {
+      try {
+        const oembedHtml = await options.oembedFallback.render(url, context);
+        if (typeof oembedHtml === 'string') {
+          return oembedHtml;
+        }
+      } catch (error) {
+        context.logger.warn(
+          'Card plugin oEmbed fallback failed for URL:',
+          url,
+          error
+        );
+      }
+    }
+
     try {
       const metadata = await fetchMetadata(url, options, context);
       return generateCardHtml(metadata, url, options);

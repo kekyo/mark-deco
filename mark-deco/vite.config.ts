@@ -22,6 +22,10 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
+        'card-oembed-fallback': resolve(
+          __dirname,
+          'src/card-oembed-fallback.ts'
+        ),
         browser: resolve(__dirname, 'src/browser.ts'),
         index: resolve(__dirname, 'src/index.ts'),
         internal: resolve(__dirname, 'src/internal.ts'),
