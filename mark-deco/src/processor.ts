@@ -46,6 +46,8 @@ import type {
 
 const { html: beautifyHtml } = beautify;
 type ResolveUrl = NonNullable<ProcessOptions['resolveUrl']>;
+type LinkTarget = NonNullable<ProcessOptions['linkTarget']>;
+type LinkRel = NonNullable<ProcessOptions['linkRel']>;
 
 /**
  * Default HTML beautify options with improved div structure handling
@@ -324,6 +326,40 @@ export const createMarkdownProcessor = (
   };
 
   /**
+   * Create a remark plugin for applying default link target/rel
+   */
+  const createLinkTargetPlugin = (target: LinkTarget, rel?: LinkRel) => {
+    return () => {
+      return (tree: any) => {
+        visit(tree, 'link', (node: any) => {
+          if (!node) {
+            return;
+          }
+          if (!node.data) {
+            node.data = {};
+          }
+          if (!node.data.hProperties) {
+            node.data.hProperties = {};
+          }
+          const props = node.data.hProperties as Record<string, unknown>;
+          if (props.target !== undefined) {
+            return;
+          }
+          props.target = target;
+          if (props.rel !== undefined) {
+            return;
+          }
+          const resolvedRel =
+            rel ?? (target === '_blank' ? 'noopener noreferrer' : undefined);
+          if (resolvedRel !== undefined) {
+            props.rel = resolvedRel;
+          }
+        });
+      };
+    };
+  };
+
+  /**
    * Create a remark plugin for building heading tree and setting IDs
    */
   const createHeadingTreePlugin = (
@@ -486,6 +522,8 @@ export const createMarkdownProcessor = (
       defaultImageOuterClassName,
       codeHighlight,
       resolveUrl,
+      linkTarget,
+      linkRel,
       advancedOptions,
     } = options ?? {};
     const resolvedHeadingBaseLevel = resolveHeadingBaseLevel(headingBaseLevel);
@@ -527,10 +565,26 @@ export const createMarkdownProcessor = (
       defaultImageOuterClassName === undefined
         ? undefined
         : { defaultOuterClassName: defaultImageOuterClassName };
+    const normalizedLinkTarget =
+      typeof linkTarget === 'string' && linkTarget.trim().length > 0
+        ? linkTarget
+        : undefined;
+    const normalizedLinkRel =
+      typeof linkRel === 'string' && linkRel.trim().length > 0
+        ? linkRel
+        : undefined;
 
     let processor: any = processor0
       .use(remarkGfmPlugin, gfmOptions)
-      .use(remarkAttr)
+      .use(remarkAttr);
+
+    if (normalizedLinkTarget) {
+      processor = processor.use(
+        createLinkTargetPlugin(normalizedLinkTarget, normalizedLinkRel)
+      );
+    }
+
+    processor = processor
       .use(
         createHeadingTreePlugin(
           headingTree,

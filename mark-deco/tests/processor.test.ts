@@ -252,6 +252,31 @@ MARK
       expect(result.html).toContain('<p class="existing img-default">');
     });
 
+    it('should apply default link target to markdown links', async () => {
+      const markdown = '[Link](https://example.com)';
+      const result = await processor.process(markdown, 'id', {
+        headerTitleTransform: 'none',
+        linkTarget: '_blank',
+      });
+
+      expect(result.html).toContain('target="_blank"');
+      expect(result.html).toContain('rel="noopener noreferrer"');
+    });
+
+    it('should not override explicit link target and rel', async () => {
+      const markdown =
+        '[Link](https://example.com){target="_self" rel="nofollow"} after';
+      const result = await processor.process(markdown, 'id', {
+        headerTitleTransform: 'none',
+        linkTarget: '_blank',
+        linkRel: 'noopener noreferrer',
+      });
+
+      expect(result.html).toContain(
+        '<a href="https://example.com" target="_self" rel="nofollow">Link</a>'
+      );
+    });
+
     it('should collect headings in hierarchical tree structure', async () => {
       const markdown = `
 # First Title

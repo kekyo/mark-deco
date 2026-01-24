@@ -48,6 +48,22 @@ console.log(result.html);
 プラグインによる拡張は、Markdownのコードブロック構文によって行われます。
 通常、コードブロック構文は、プログラムコードのシンタックスハイライトで使われますが、プラグインが認識されると、プラグイン名称が指定されたコードブロック構文の内容が、プラグインによって処理されます。
 
+### リンクのデフォルトtarget
+
+Markdown から生成されるすべてのリンクに対して、デフォルトの `target`（および `rel`）を指定できます。
+
+```typescript
+const result = await processor.process(markdown, 'id', {
+  linkTarget: '_blank',
+  // 任意: rel の既定値を上書きする
+  linkRel: 'noopener noreferrer',
+});
+```
+
+`linkRel` を省略して `linkTarget` を `_blank` にした場合、
+MarkDeco は自動的に `rel="noopener noreferrer"` を付与します。
+`remark-attr` で `target` や `rel` を明示している場合は、その値が優先されます。
+
 ### 組み込みコードハイライト
 
 MarkDecoは [Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code) によるコードハイライトを内蔵しています。`ProcessOptions` に `codeHighlight` を指定したときだけ有効になります:
