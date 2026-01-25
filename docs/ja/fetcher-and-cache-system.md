@@ -48,13 +48,11 @@ const fetcher = createCachedFetcher('MyApp/1.0', 60000, localStorage);
 import { createFileSystemCacheStorage } from 'mark-deco';
 
 // キャッシュファイルの保存先を指定
-const fileStorage = createFileSystemCacheStorage('./cache', {
-  enableCompression: true, // デフォルト: true
-});
+const fileStorage = createFileSystemCacheStorage('./cache');
 const fetcher = createCachedFetcher('MyApp/1.0', 60000, fileStorage);
 ```
 
-圧縮が有効な場合、キャッシュファイルは `.json.gz` として保存されます。`.json.gz` が存在しない場合は、同じキーの既存 `.json` ファイルを読み込みます。
+キャッシュファイルは `.json.gz`（gzip）で保存されます。
 
 ### キャッシュオプション
 

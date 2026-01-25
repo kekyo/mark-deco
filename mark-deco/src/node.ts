@@ -4,7 +4,4 @@
 // https://github.com/kekyo/mark-deco
 
 // Cache exports
-export {
-  createFileSystemCacheStorage,
-  type FileSystemCacheOptions,
-} from './cache/filesystem';
+export { createFileSystemCacheStorage } from './cache/filesystem';
