@@ -48,13 +48,11 @@ const fetcher = createCachedFetcher('MyApp/1.0', 60000, localStorage);
 import { createFileSystemCacheStorage } from 'mark-deco';
 
 // Specify cache file storage location
-const fileStorage = createFileSystemCacheStorage('./cache', {
-  enableCompression: true, // default: true
-});
+const fileStorage = createFileSystemCacheStorage('./cache');
 const fetcher = createCachedFetcher('MyApp/1.0', 60000, fileStorage);
 ```
 
-When compression is enabled, cache files are stored as `.json.gz`. If a `.json.gz` file is missing, the cache falls back to a legacy `.json` file for that key.
+Cache files are stored as `.json.gz` (gzip).
 
 ### Cache Options
 

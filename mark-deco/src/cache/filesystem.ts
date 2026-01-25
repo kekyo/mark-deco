@@ -3,9 +3,16 @@
 // Under MIT.
 // https://github.com/kekyo/mark-deco
 
-import { mkdir, readdir, readFile, unlink, writeFile } from 'fs/promises';
+import {
+  mkdir,
+  readdir,
+  readFile,
+  rename,
+  unlink,
+  writeFile,
+} from 'fs/promises';
 import { join } from 'path';
-import { createHash } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 import { createMutex } from 'async-primitives';
 import { promisify } from 'util';
 
@@ -28,22 +35,15 @@ const generateFileHash = async (input: string): Promise<string> => {
   }
 };
 
-export interface FileSystemCacheOptions {
-  /** Enable gzip compression for cache files (default: true) */
-  enableCompression?: boolean;
-}
-
 /**
  * Create file system-based cache storage instance
- * Uses Node.js file system to store cache entries as JSON files
+ * Uses Node.js file system to store cache entries as gzip-compressed JSON files
  * @param cacheDir - Directory path to store cache files (will be created if it doesn't exist)
- * @param options - File system cache options (optional)
  * @returns FileSystemCache instance that uses file system
  * @throws Error if file system operations fail or if not running in Node.js environment
  */
 export const createFileSystemCacheStorage = (
-  cacheDir: string,
-  options: FileSystemCacheOptions = {}
+  cacheDir: string
 ): CacheStorage => {
   // Check if we're in a browser environment
   if (isBrowser()) {
@@ -51,8 +51,6 @@ export const createFileSystemCacheStorage = (
       'File system cache is only available in Node.js environment, not in browsers'
     );
   }
-
-  const { enableCompression = true } = options;
 
   const mutex = createMutex();
   let gzipAsync: ((input: string | Buffer) => Promise<Buffer>) | null = null;
@@ -76,23 +74,14 @@ export const createFileSystemCacheStorage = (
     return hash;
   };
 
-  const getPlainFileName = (baseName: string): string => `${baseName}.json`;
   const getCompressedFileName = (baseName: string): string =>
     `${baseName}.json.gz`;
 
-  const readCacheEntry = async (
-    filePath: string,
-    compressed: boolean
-  ): Promise<CacheEntry> => {
-    if (compressed) {
-      await ensureCompression();
-      const buffer = await readFile(filePath);
-      const unzipped = await gunzipAsync!(buffer);
-      return JSON.parse(unzipped.toString('utf-8'));
-    }
-
-    const content = await readFile(filePath, 'utf-8');
-    return JSON.parse(content);
+  const readCacheEntry = async (filePath: string): Promise<CacheEntry> => {
+    await ensureCompression();
+    const buffer = await readFile(filePath);
+    const unzipped = await gunzipAsync!(buffer);
+    return JSON.parse(unzipped.toString('utf-8'));
   };
 
   const isMissingFileError = (error: unknown): boolean =>
@@ -119,7 +108,6 @@ export const createFileSystemCacheStorage = (
   const get = async (key: string): Promise<string | null> => {
     // Pre-compute file name outside of lock (pure function)
     const baseName = await generateFileBaseName(key);
-    const plainFilePath = join(cacheDir, getPlainFileName(baseName));
     const compressedFilePath = join(cacheDir, getCompressedFileName(baseName));
 
     // Ensure cache directory exists (idempotent operation)
@@ -130,50 +118,18 @@ export const createFileSystemCacheStorage = (
     }
 
     let entry: CacheEntry;
-    let filePath: string;
 
-    if (enableCompression) {
-      try {
-        entry = await readCacheEntry(compressedFilePath, true);
-        filePath = compressedFilePath;
-      } catch (error) {
-        if (!isMissingFileError(error)) {
-          try {
-            await unlink(compressedFilePath);
-          } catch {
-            // Ignore cleanup errors
-          }
-          return null;
-        }
-
+    try {
+      entry = await readCacheEntry(compressedFilePath);
+    } catch (error) {
+      if (!isMissingFileError(error)) {
         try {
-          entry = await readCacheEntry(plainFilePath, false);
-          filePath = plainFilePath;
-        } catch (plainError) {
-          if (!isMissingFileError(plainError)) {
-            try {
-              await unlink(plainFilePath);
-            } catch {
-              // Ignore cleanup errors
-            }
-          }
-          return null;
+          await unlink(compressedFilePath);
+        } catch {
+          // Ignore cleanup errors
         }
       }
-    } else {
-      try {
-        entry = await readCacheEntry(plainFilePath, false);
-        filePath = plainFilePath;
-      } catch (error) {
-        if (!isMissingFileError(error)) {
-          try {
-            await unlink(plainFilePath);
-          } catch {
-            // Ignore cleanup errors
-          }
-        }
-        return null;
-      }
+      return null;
     }
 
     // Check TTL expiration - only lock if we need to delete expired file
@@ -189,20 +145,7 @@ export const createFileSystemCacheStorage = (
           const stillExpired =
             entry.ttl === 0 || currentTime > entry.timestamp + entry.ttl;
           if (stillExpired) {
-            await unlink(filePath);
-            if (filePath === compressedFilePath) {
-              try {
-                await unlink(plainFilePath);
-              } catch {
-                // Ignore cleanup errors
-              }
-            } else if (filePath === plainFilePath) {
-              try {
-                await unlink(compressedFilePath);
-              } catch {
-                // Ignore cleanup errors
-              }
-            }
+            await unlink(compressedFilePath);
           }
           return null;
         } catch {
@@ -224,7 +167,6 @@ export const createFileSystemCacheStorage = (
   ): Promise<void> => {
     // Pre-compute everything possible outside of lock
     const baseName = await generateFileBaseName(key);
-    const plainFilePath = join(cacheDir, getPlainFileName(baseName));
     const compressedFilePath = join(cacheDir, getCompressedFileName(baseName));
     const entry: CacheEntry = {
       data: value,
@@ -236,39 +178,40 @@ export const createFileSystemCacheStorage = (
     }
 
     const serialized = JSON.stringify(entry, null, 2);
-    let payload: string | Buffer;
-    if (enableCompression) {
-      await ensureCompression();
-      payload = await gzipAsync!(serialized);
-    } else {
-      payload = serialized;
-    }
+    await ensureCompression();
+    const payload = await gzipAsync!(serialized);
 
     const lockHandle = await mutex.lock();
     try {
       await ensureCacheDir();
 
-      const filePath = enableCompression ? compressedFilePath : plainFilePath;
+      const tempSuffix = `${process.pid}-${Date.now()}-${randomBytes(6).toString('hex')}`;
+      const tempFilePath = join(
+        cacheDir,
+        `${baseName}.json.gz.tmp-${tempSuffix}`
+      );
 
       try {
-        // For cache systems, last-write-wins is often acceptable
-        // We minimize lock time by only protecting the actual write operation
-        if (enableCompression) {
-          await writeFile(filePath, payload);
-          try {
-            await unlink(plainFilePath);
-          } catch {
-            // Ignore cleanup errors
-          }
-        } else {
-          await writeFile(filePath, payload, 'utf-8');
+        // Write to a temp file then rename to avoid partial reads.
+        await writeFile(tempFilePath, payload);
+        try {
+          await rename(tempFilePath, compressedFilePath);
+        } catch {
+          // Fallback: remove existing file then rename (Windows-friendly).
           try {
             await unlink(compressedFilePath);
           } catch {
             // Ignore cleanup errors
           }
+          await rename(tempFilePath, compressedFilePath);
         }
       } catch (error) {
+        try {
+          // Best-effort cleanup of temp file
+          await unlink(tempFilePath);
+        } catch {
+          // Ignore cleanup errors
+        }
         throw new Error(`Failed to write cache entry: ${error}`);
       }
     } catch (importError) {
@@ -281,18 +224,11 @@ export const createFileSystemCacheStorage = (
   const deleteEntry = async (key: string): Promise<void> => {
     // Pre-compute file name outside of lock
     const baseName = await generateFileBaseName(key);
-    const plainFilePath = join(cacheDir, getPlainFileName(baseName));
     const compressedFilePath = join(cacheDir, getCompressedFileName(baseName));
 
     const lockHandle = await mutex.lock();
     try {
       await ensureCacheDir();
-
-      try {
-        await unlink(plainFilePath);
-      } catch {
-        // File doesn't exist, ignore the error
-      }
 
       try {
         await unlink(compressedFilePath);
@@ -313,8 +249,8 @@ export const createFileSystemCacheStorage = (
       const files = await readdir(cacheDir);
 
       // Filter files outside the deletion loop for better performance
-      const cacheFiles = files.filter(
-        (file: string) => file.endsWith('.json') || file.endsWith('.json.gz')
+      const cacheFiles = files.filter((file: string) =>
+        file.endsWith('.json.gz')
       );
 
       for (const file of cacheFiles) {
@@ -337,8 +273,8 @@ export const createFileSystemCacheStorage = (
 
     // Get file list without lock first
     const files = await readdir(cacheDir);
-    const cacheFiles = files.filter(
-      (file: string) => file.endsWith('.json') || file.endsWith('.json.gz')
+    const cacheFiles = files.filter((file: string) =>
+      file.endsWith('.json.gz')
     );
 
     if (cacheFiles.length === 0) {
@@ -353,9 +289,8 @@ export const createFileSystemCacheStorage = (
 
       for (const file of cacheFiles) {
         const filePath = join(cacheDir, file);
-        const isCompressed = file.endsWith('.json.gz');
         try {
-          const entry = await readCacheEntry(filePath, isCompressed);
+          const entry = await readCacheEntry(filePath);
 
           // Check if entry is expired
           if (entry.ttl !== undefined) {

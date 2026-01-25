@@ -1136,15 +1136,15 @@ describe('FileSystemCache', () => {
   });
 
   describe('File system specific features', () => {
-    it('should handle corrupted JSON files', async () => {
+    it('should handle corrupted gzip files', async () => {
       const key = 'corrupted-key';
 
-      // Create a file with invalid JSON directly
+      // Create a file with invalid gzip data directly
       await mkdir(testCacheDir, { recursive: true });
       const hash = createHash('sha256').update(key).digest('hex');
-      const fileName = `${hash}.json`;
+      const fileName = `${hash}.json.gz`;
       const filePath = join(testCacheDir, fileName);
-      await writeFile(filePath, 'invalid-json', 'utf-8');
+      await writeFile(filePath, 'invalid-gzip', 'utf-8');
 
       // Should return null and clean up the corrupted file
       expect(await cache.get(key)).toBeNull();
@@ -1156,52 +1156,6 @@ describe('FileSystemCache', () => {
       } catch {
         // Expected - file should not exist
       }
-    });
-
-    it('should read uncompressed cache when gzip file is missing', async () => {
-      const key = 'legacy-key';
-      const value = 'legacy-value';
-      const hash = createHash('sha256').update(key).digest('hex');
-      const filePath = join(testCacheDir, `${hash}.json`);
-
-      await mkdir(testCacheDir, { recursive: true });
-      await writeFile(
-        filePath,
-        JSON.stringify(
-          {
-            data: value,
-            timestamp: Date.now(),
-          },
-          null,
-          2
-        ),
-        'utf-8'
-      );
-
-      expect(await cache.get(key)).toBe(value);
-    });
-
-    it('should write uncompressed cache when compression is disabled', async () => {
-      const uncompressedCache = createFileSystemCacheStorage(testCacheDir, {
-        enableCompression: false,
-      });
-      const key = 'plain-key';
-      const value = 'plain-value';
-
-      await uncompressedCache.set(key, value);
-
-      const files = await readdir(testCacheDir);
-      expect(files.length).toBe(1);
-      const [fileName] = files;
-      expect(fileName).toBeDefined();
-      if (!fileName) {
-        throw new Error('Expected cache file to exist');
-      }
-      expect(fileName).toMatch(/^[a-f0-9]{64}\.json$/);
-
-      const fileContent = await readFile(join(testCacheDir, fileName), 'utf-8');
-      const parsed = JSON.parse(fileContent) as { data: string };
-      expect(parsed.data).toBe(value);
     });
 
     it('should create cache directory if it does not exist', async () => {
@@ -1489,9 +1443,7 @@ describe('FileSystemCache', () => {
 
       // Verify file system consistency
       const files = await readdir(testCacheDir);
-      const jsonFiles = files.filter(
-        (f) => f.endsWith('.json') || f.endsWith('.json.gz')
-      );
+      const jsonFiles = files.filter((f) => f.endsWith('.json.gz'));
       expect(jsonFiles.length).toBe(finalSize);
 
       // Verify we can still perform operations
