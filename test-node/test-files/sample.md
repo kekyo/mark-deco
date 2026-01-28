@@ -3,12 +3,12 @@ title: Sample Article
 author: Test User
 date: 2024-01-01
 tags: [markdown, test]
-description: Test page for MarkDeco
+description: Test page for mark-deco
 ---
 
 # Sample Article
 
-This is a test page for **MarkDeco**.
+This is a test page for **mark-deco**.
 
 ## Features
 
@@ -22,7 +22,7 @@ This is a test page for **MarkDeco**.
 
 ```javascript
 console.log('Hello, World!');
-const message = 'MarkDeco';
+const message = 'mark-deco';
 console.log(message);
 ```
 

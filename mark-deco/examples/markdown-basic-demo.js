@@ -32,9 +32,9 @@ tags: [test, markdown, oembed]
 published: true
 ---
 
-# MarkDeco Test
+# mark-deco Test
 
-This is a test for **MarkDeco**.
+This is a test for **mark-deco**.
 
 ## Basic Markdown
 
@@ -61,7 +61,7 @@ This completes the test.`;
 // Execute processing
 async function main() {
   try {
-    console.log('🚀 Starting MarkDeco test...\n');
+    console.log('🚀 Starting mark-deco test...\n');
 
     const result = await processor.process(markdown, 'demo', {
       // No longer has timeout option directly, can use AbortSignal if needed

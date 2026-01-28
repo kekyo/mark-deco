@@ -1,6 +1,6 @@
 ## Frontmatter情報の取得
 
-MarkDecoは、Markdownファイルの先頭にある"YAML frontmatter"を自動的に解析し、処理結果として提供します。Frontmatterは記事のメタデータ（タイトル、著者、タグ、公開日など）を記述するために使用されます。
+mark-decoは、Markdownファイルの先頭にある"YAML frontmatter"を自動的に解析し、処理結果として提供します。Frontmatterは記事のメタデータ（タイトル、著者、タグ、公開日など）を記述するために使用されます。
 
 ```typescript
 const markdown = `---
@@ -38,14 +38,14 @@ Frontmatterデータは以下のような用途で活用できます:
 - SEO情報の抽出
 - カスタムレンダリングロジックの制御
 
-注意: MarkDecoプロセッサ自身は、Frontmatterの情報を使用しません。
+注意: mark-decoプロセッサ自身は、Frontmatterの情報を使用しません。
 後述のプラグインは、プラグインの実装によっては情報を使用する可能性があります。
 Frontmatter のスカラー値は JSON スキーマで解析され、`null` / `true` / `false` / 数値 / 文字列といった JSON 互換型で受け取れます。
 
 ### 先頭ベース見出しからのtitle自動抽出
 
 Markdown本文で最初の（ホワイトスペースを除いた）ブロックがベース見出しの場合、
-MarkDecoはデフォルトでその見出し文字列を `frontmatter.title` に書き込み、元の見出しを本文から取り除きます。
+mark-decoはデフォルトでその見出し文字列を `frontmatter.title` に書き込み、元の見出しを本文から取り除きます。
 ベース見出しは `headingBaseLevel` (デフォルト: 1) で決まります。
 `headerTitleTransform` オプションで挙動を切り替えられます:
 

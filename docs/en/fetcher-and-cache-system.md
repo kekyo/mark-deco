@@ -1,10 +1,10 @@
 ## Fetcher and Cache System
 
-MarkDeco provides a fetcher system that uniformly manages external server access. All external server access (oEmbed API calls, page scraping, etc.) is executed through fetchers, and responses are automatically cached.
+mark-deco provides a fetcher system that uniformly manages external server access. All external server access (oEmbed API calls, page scraping, etc.) is executed through fetchers, and responses are automatically cached.
 
 ### Fetcher Types
 
-MarkDeco provides two types of fetchers:
+mark-deco provides two types of fetchers:
 
 ```typescript
 import { createCachedFetcher, createDirectFetcher } from 'mark-deco';

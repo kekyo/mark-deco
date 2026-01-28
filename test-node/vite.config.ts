@@ -10,7 +10,7 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: resolve(__dirname, 'index.ts'),
-      name: 'MarkDecoNode',
+      name: 'mark-deco-node',
       fileName: 'index',
       formats: ['es'],
     },

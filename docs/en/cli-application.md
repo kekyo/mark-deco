@@ -1,6 +1,6 @@
 ## CLI Application
 
-MarkDeco includes a CLI application for processing Markdown files from the command line. It supports reading from standard input, file processing, and detailed customization using configuration files.
+mark-deco includes a CLI application for processing Markdown files from the command line. It supports reading from standard input, file processing, and detailed customization using configuration files.
 
 ### Installation
 

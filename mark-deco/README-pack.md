@@ -1,8 +1,8 @@
-# MarkDeco
+# mark-deco
 
 Flexible Markdown to HTML conversion library.
 
-[![npm version](https://img.shields.io/npm/v/mark-deco.svg)](https://www.npmjs.com/package/mark-deco)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## What is this?
@@ -32,7 +32,7 @@ import { createMarkdownProcessor, createCachedFetcher } from 'mark-deco';
 // Create a memory-cached fetcher
 const fetcher = createCachedFetcher('MyApp/1.0');
 
-// Create MarkDeco processor
+// Create mark-deco processor
 const processor = createMarkdownProcessor({
   fetcher,
 });
@@ -68,11 +68,11 @@ This will render HTML like this:
 A "fetcher" is an abstraction for external server access. It's primarily used by oEmbed and card plugins for external API calls and page scraping.
 The argument passed to the fetcher is a user agent string, which is applied to HTTP request headers when accessing external servers.
 
-HTML converted by the MarkDeco processor is formatted in a readable manner. Advanced options allow fine-tuning of formatting conditions.
+HTML converted by the mark-deco processor is formatted in a readable manner. Advanced options allow fine-tuning of formatting conditions.
 
 ### Aborting Processor Operations
 
-While the MarkDeco processor engine itself doesn't access external servers, plugins may access external servers as needed (e.g., when using oEmbed APIs or performing page scraping).
+While the mark-deco processor engine itself doesn't access external servers, plugins may access external servers as needed (e.g., when using oEmbed APIs or performing page scraping).
 
 To enable operation cancellation in such cases, pass an ECMAScript standard `AbortSignal` instance to notify cancellation signals:
 
@@ -93,18 +93,14 @@ For usage of `AbortController` and `AbortSignal`, refer to ECMAScript documentat
 
 ### CLI Interface
 
-Although MarkDeco is a library, a CLI interface is also available in the package that allows you to easily try out MarkDeco. This allows you to try out conversions without having to write code in TypeScript, or call it as an independent application from another code.
+Although mark-deco is a library, a CLI interface is also available in the package that allows you to easily try out mark-deco. This allows you to try out conversions without having to write code in TypeScript, or call it as an independent application from another code.
 
 ```bash
 # Take Markdown from standard input and output HTML
 echo "# Hello World" | mark-deco-cli
 ```
 
-## Documentation
-
-For detailed documentation and advanced features, please visit our [GitHub repository](https://github.com/kekyo/mark-deco).
-
-Key features include:
+## Supported Features
 
 - Frontmatter Information Extraction - Parse YAML frontmatter from Markdown files
 - Heading ID Generation and Heading Information Extraction - Automatically generate unique IDs for headings
@@ -112,6 +108,19 @@ Key features include:
 - Built-in Plugins - oEmbed, card, and Mermaid plugins for rich content embedding
 - Creating Custom Plugins - Develop custom plugins to extend Markdown processing
 - CLI Application - Command-line interface for batch processing
+
+---
+
+## Documentation
+
+For detailed documentation and advanced features, please visit our [GitHub repository](https://github.com/kekyo/mark-deco/).
+
+## Note
+
+This library was born when we determined during the development of [a-terra-forge](https://github.com/kekyo/a-terra-forge/) that it would be better to separate the conversion engine into a standalone component.
+
+The project includes a demonstration page that can be run with `npm run dev`.
+Additionally, using a-terra-forge allows you to verify the implementation of a site generator utilizing mark-deco.
 
 ## License
 
