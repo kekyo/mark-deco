@@ -1,6 +1,6 @@
 ## Frontmatter Information Extraction
 
-MarkDeco automatically parses "YAML frontmatter" at the beginning of Markdown files and provides it as processing results. Frontmatter is used to describe article metadata (title, author, tags, publication date, etc.).
+mark-deco automatically parses "YAML frontmatter" at the beginning of Markdown files and provides it as processing results. Frontmatter is used to describe article metadata (title, author, tags, publication date, etc.).
 
 ```typescript
 const markdown = `---
@@ -38,14 +38,14 @@ Frontmatter data can be utilized for:
 - SEO information extraction
 - Custom rendering logic control
 
-Note: The MarkDeco processor itself doesn't use frontmatter information.
+Note: The mark-deco processor itself doesn't use frontmatter information.
 Plugins may use this information depending on their implementation.
 Frontmatter scalars are parsed with the JSON schema, so you receive JSON-compatible types (`null`, `true`/`false`, numbers, strings).
 
 ### Automatic Title Extraction from Base-Level Heading
 
 When the first non-whitespace block in the Markdown body is a base-level heading,
-MarkDeco applies that heading to `frontmatter.title` by default and removes the heading from the content.
+mark-deco applies that heading to `frontmatter.title` by default and removes the heading from the content.
 The base level is controlled by `headingBaseLevel` (default: 1).
 Control this behaviour with the `headerTitleTransform` option:
 

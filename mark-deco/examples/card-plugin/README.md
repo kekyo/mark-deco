@@ -1,6 +1,6 @@
 # Card Plugin Examples
 
-This directory contains example files demonstrating the Card Plugin functionality for the MarkDeco.
+This directory contains example files demonstrating the Card Plugin functionality for the mark-deco.
 
 ## Files Overview
 

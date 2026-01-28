@@ -191,5 +191,5 @@ When the resulting ID is too short (less than 3 characters) or empty, the proces
 | `"🎉 パーティー"`  | `"id-2"`        | Fallback (emoji + Japanese)  |
 | `"A"`              | `"id-3"`        | Fallback (too short)         |
 
-Note: While many sites adopt such content-based IDs, MarkDeco doesn't use them by default.
+Note: While many sites adopt such content-based IDs, mark-deco doesn't use them by default.
 The reason is that building IDs with non-English characters makes them very difficult to recognize and manage, and search systems don't particularly value them highly nowadays.

@@ -1,8 +1,8 @@
-# MarkDeco
+# mark-deco
 
 高機能なMarkdown-->HTML変換ライブラリ
 
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 |Package|npm|
@@ -10,7 +10,7 @@
 |`mark-deco`|[![npm version](https://img.shields.io/npm/v/mark-deco.svg)](https://www.npmjs.com/package/mark-deco)|
 |`mark-deco-cli`|[![npm version](https://img.shields.io/npm/v/mark-deco-cli.svg)](https://www.npmjs.com/package/mark-deco-cli)|
 
-[(English is here)](./README.md)
+[(English language is here)](./README.md)
 
 ## これは何？
 
@@ -39,7 +39,7 @@ import { createMarkdownProcessor, createCachedFetcher } from 'mark-deco';
 // メモリにキャッシュするフェッチャーを作成する
 const fetcher = createCachedFetcher('MyApp/1.0');
 
-// MarkDecoプロセッサを生成する
+// mark-decoプロセッサを生成する
 const processor = createMarkdownProcessor({
   fetcher
 });
@@ -77,11 +77,11 @@ console.log(result.headingTree);
 「フェッチャー」は、外部サーバーにアクセスする処理を抽象化したものです。主にoEmbedプラグインやカードプラグインによる外部API呼び出し、ページスクレイピング時に使用します。詳しくは後述を参照して下さい。
 フェッチャーに指定した引数はユーザーエージェント文字列で、外部サーバーにアクセスする際のHTTPリクエストヘッダに適用されます。
 
-MarkDecoプロセッサーによって変換されたHTMLは、読みやすい形式に整形されています。高度なオプションを使用することで、整形条件を細かく調整できます（後述）。
+mark-decoプロセッサーによって変換されたHTMLは、読みやすい形式に整形されています。高度なオプションを使用することで、整形条件を細かく調整できます（後述）。
 
 ### プロセッサー処理の中断
 
-MarkDecoのプロセッサーエンジン自身は外部サーバーにアクセスすることはありませんが、プラグインが必要に応じて外部サーバーにアクセスする可能性があります（例えば、oEmbed APIを使う場合や、ページのスクレイピングを行う場合）。
+mark-decoのプロセッサーエンジン自身は外部サーバーにアクセスすることはありませんが、プラグインが必要に応じて外部サーバーにアクセスする可能性があります（例えば、oEmbed APIを使う場合や、ページのスクレイピングを行う場合）。
 
 そのような場合に処理を中断できるようにするには、ECMAScript標準の `AbortSignal` のインスタンスを渡し、中断シグナルを通知してください:
 
@@ -103,7 +103,7 @@ const result = await processor.process(
 
 ### タイトルの自動抽出
 
-MarkDecoはデフォルトで先頭のベース見出しを `frontmatter.title` にコピーし、その見出しを本文から削除します。`headerTitleTransform` で挙動を切り替えられます:
+mark-decoはデフォルトで先頭のベース見出しを `frontmatter.title` にコピーし、その見出しを本文から削除します。`headerTitleTransform` で挙動を切り替えられます:
 
 ```typescript
 await processor.process(markdown, 'id', { headerTitleTransform: 'extract' });
@@ -143,7 +143,7 @@ await processor.process(markdown, 'id', {
 
 ### CLIインターフェイス
 
-MarkDecoはライブラリですが、MarkDecoを気軽に試すことが出来るCLIインターフェイスもパッケージで公開されています。これを使えば、TypeScriptでコードを書かなくても変換を試行したり、別のコードから独立したアプリケーションとして呼び出せます。
+mark-decoはライブラリですが、mark-decoを気軽に試すことが出来るCLIインターフェイスもパッケージで公開されています。これを使えば、TypeScriptでコードを書かなくても変換を試行したり、別のコードから独立したアプリケーションとして呼び出せます。
 
 ```bash
 # 標準入力からMarkdownを受け取って、HTMLを出力する
@@ -156,7 +156,7 @@ $ echo "# Hello World" | mark-deco
 
 ## ドキュメント
 
-MarkDecoには、便利な機能が沢山あります。さらなる詳細は、以下を参照して下さい。
+mark-decoには、便利な機能が沢山あります。さらなる詳細は、以下を参照して下さい。
 
 - [Frontmatter情報の取得](./docs/ja/frontmatter-extraction.md) - Markdownファイルの先頭にあるYAML frontmatterから、タイトル、著者、タグ、公開日などのメタデータを抽出
 - [見出しID生成と見出し情報の取得](./docs/ja/heading-id-generation.md) - 見出しに対して階層的またはコンテンツベースの命名戦略でユニークなIDを自動生成
@@ -167,11 +167,13 @@ MarkDecoには、便利な機能が沢山あります。さらなる詳細は、
 
 ----
 
+## 備考
+
+このライブラリは、 [a-terra-forge](https://github.com/kekyo/a-terra-forge/) を開発中に、変換エンジンだけを独立させたほうが良いと判断した結果生まれました。
+
+プロジェクト内にはデモンストレーションページがあり、`npm run dev` で動作させることが出来ます。
+また、a-terra-forgeを使えば、mark-decoを応用したサイトジェネレータの実装を確かめることが出来ます。
+
 ## ライセンス
 
 Under MIT.
-
-## 変更履歴
-
-* 0.1.0:
-  * First public release.

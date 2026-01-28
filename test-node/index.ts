@@ -168,7 +168,7 @@ async function main(): Promise<void> {
         timeout: runtimeOptions.timeout,
       };
 
-      console.log('🚀 MarkDeco Demo');
+      console.log('🚀 mark-deco Demo');
       console.log('='.repeat(50));
 
       await processMarkdownFile(path.resolve(file), processorOptions);

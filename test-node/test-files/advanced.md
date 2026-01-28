@@ -9,7 +9,7 @@ published: true
 
 # Advanced Features Test
 
-This file tests advanced features of the MarkDeco.
+This file tests advanced features of the mark-deco.
 
 ## Complex Frontmatter
 

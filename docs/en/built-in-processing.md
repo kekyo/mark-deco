@@ -1,6 +1,6 @@
 ## Built-in Processing
 
-MarkDeco ships built-in processing features, including a plugin system and code highlighting. Here are the built-in plugins:
+mark-deco ships built-in processing features, including a plugin system and code highlighting. Here are the built-in plugins:
 
 | Processing | Details                                                                         |
 | :---------- | :------------------------------------------------------------------------------ |
@@ -61,12 +61,12 @@ const result = await processor.process(markdown, 'id', {
 ```
 
 When `linkRel` is omitted and `linkTarget` is `_blank`,
-MarkDeco automatically applies `rel="noopener noreferrer"`.
+mark-deco automatically applies `rel="noopener noreferrer"`.
 If a link already has `target` or `rel` specified via `remark-attr`, those attributes are preserved.
 
 ### Built-in Code Highlighting
 
-MarkDeco ships with a built-in code highlighting pipeline ([Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code)).
+mark-deco ships with a built-in code highlighting pipeline ([Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code)).
 It is disabled by default and only runs when `codeHighlight` is provided in `ProcessOptions`:
 
 ```typescript
@@ -95,29 +95,29 @@ You can also pass Shiki language/theme registrations to extend highlighting:
 import type { LanguageRegistration, ThemeRegistrationRaw } from 'shiki';
 
 const customLanguage: LanguageRegistration = {
-  name: 'markdeco-test',
-  scopeName: 'source.markdeco-test',
-  patterns: [{ name: 'keyword.markdeco', match: '\\\\bMARK\\\\b' }],
+  name: 'mark-deco-test',
+  scopeName: 'source.mark-deco-test',
+  patterns: [{ name: 'keyword.mark-deco', match: '\\\\bMARK\\\\b' }],
 };
 
 const customTheme: ThemeRegistrationRaw = {
-  name: 'markdeco-test-theme',
+  name: 'mark-deco-test-theme',
   type: 'dark',
   fg: '#111111',
   bg: '#000000',
   settings: [
     { settings: { foreground: '#111111', background: '#000000' } },
-    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+    { scope: 'keyword.mark-deco', settings: { foreground: '#ff0000' } },
   ],
   tokenColors: [
-    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+    { scope: 'keyword.mark-deco', settings: { foreground: '#ff0000' } },
   ],
 };
 
 const result = await processor.process(markdown, 'id', {
   codeHighlight: {
     languageDefinitions: [customLanguage],
-    languageAliases: { 'markdeco-alias': 'markdeco-test' },
+    languageAliases: { 'mark-deco-alias': 'mark-deco-test' },
     theme: customTheme,
   },
 });
@@ -807,7 +807,7 @@ Here's a simple example of dynamically updating HTML containing Mermaid diagrams
 const processAndUpdate = async () => {
   // ...
 
-  // Execute MarkDeco processor
+  // Execute mark-deco processor
   const result = await processor.process(markdown, 'id');
 
   // Update DOM

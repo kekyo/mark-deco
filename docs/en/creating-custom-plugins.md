@@ -1,6 +1,6 @@
 ## Creating Custom Plugins
 
-MarkDeco allows you to implement and use your own plugins, not just built-in ones.
+mark-deco allows you to implement and use your own plugins, not just built-in ones.
 
 Plugins can intercept Markdown code block notation. In the following example, processing is delegated to a plugin named `foobar`:
 

@@ -181,18 +181,18 @@ console.log('Hello, World!');
 
     it('should accept custom languages and themes for code highlighting', async () => {
       const customLanguage: LanguageRegistration = {
-        name: 'markdeco-test',
-        scopeName: 'source.markdeco-test',
+        name: 'mark-deco-test',
+        scopeName: 'source.mark-deco-test',
         repository: {},
         patterns: [
           {
-            name: 'keyword.markdeco',
+            name: 'keyword.mark-deco',
             match: '\\bMARK\\b',
           },
         ],
       };
       const customTheme: ThemeRegistrationRaw = {
-        name: 'markdeco-test-theme',
+        name: 'mark-deco-test-theme',
         type: 'dark',
         fg: '#111111',
         bg: '#000000',
@@ -204,7 +204,7 @@ console.log('Hello, World!');
             },
           },
           {
-            scope: 'keyword.markdeco',
+            scope: 'keyword.mark-deco',
             settings: {
               foreground: '#ff0000',
             },
@@ -212,14 +212,14 @@ console.log('Hello, World!');
         ],
         tokenColors: [
           {
-            scope: 'keyword.markdeco',
+            scope: 'keyword.mark-deco',
             settings: {
               foreground: '#ff0000',
             },
           },
         ],
       };
-      const markdown = `\`\`\`markdeco-alias
+      const markdown = `\`\`\`mark-deco-alias
 MARK
 \`\`\``;
 
@@ -230,15 +230,15 @@ MARK
         codeHighlight: {
           languageDefinitions: [customLanguage],
           languageAliases: {
-            'markdeco-alias': 'markdeco-test',
+            'mark-deco-alias': 'mark-deco-test',
           },
           theme: customTheme,
         },
       });
 
       expect(result.html).toContain('data-rehype-pretty-code-figure');
-      expect(result.html).toContain('data-language="markdeco-alias"');
-      expect(result.html).toContain('data-theme="markdeco-test-theme"');
+      expect(result.html).toContain('data-language="mark-deco-alias"');
+      expect(result.html).toContain('data-theme="mark-deco-test-theme"');
       expect(result.html.toLowerCase()).toContain('#ff0000');
     });
 

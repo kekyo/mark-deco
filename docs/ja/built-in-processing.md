@@ -1,6 +1,6 @@
 ## 組み込み処理
 
-MarkDecoは、プラグインシステムやコードハイライトなどの組み込み処理を提供します。以下に内蔵されているプラグインを示します:
+mark-decoは、プラグインシステムやコードハイライトなどの組み込み処理を提供します。以下に内蔵されているプラグインを示します:
 
 | 組み込み処理 | 詳細                                                                                    |
 | :----------- | :-------------------------------------------------------------------------------------- |
@@ -61,12 +61,12 @@ const result = await processor.process(markdown, 'id', {
 ```
 
 `linkRel` を省略して `linkTarget` を `_blank` にした場合、
-MarkDeco は自動的に `rel="noopener noreferrer"` を付与します。
+mark-deco は自動的に `rel="noopener noreferrer"` を付与します。
 `remark-attr` で `target` や `rel` を明示している場合は、その値が優先されます。
 
 ### 組み込みコードハイライト
 
-MarkDecoは [Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code) によるコードハイライトを内蔵しています。`ProcessOptions` に `codeHighlight` を指定したときだけ有効になります:
+mark-decoは [Shiki](https://github.com/shikijs/shiki) + [rehype-pretty-code](https://github.com/rehype-pretty/rehype-pretty-code) によるコードハイライトを内蔵しています。`ProcessOptions` に `codeHighlight` を指定したときだけ有効になります:
 
 ```typescript
 // コードブロックをmark-decoでレンダリングする
@@ -94,29 +94,29 @@ Shikiの言語/テーマ定義を直接渡して拡張することもできま�
 import type { LanguageRegistration, ThemeRegistrationRaw } from 'shiki';
 
 const customLanguage: LanguageRegistration = {
-  name: 'markdeco-test',
-  scopeName: 'source.markdeco-test',
-  patterns: [{ name: 'keyword.markdeco', match: '\\\\bMARK\\\\b' }],
+  name: 'mark-deco-test',
+  scopeName: 'source.mark-deco-test',
+  patterns: [{ name: 'keyword.mark-deco', match: '\\\\bMARK\\\\b' }],
 };
 
 const customTheme: ThemeRegistrationRaw = {
-  name: 'markdeco-test-theme',
+  name: 'mark-deco-test-theme',
   type: 'dark',
   fg: '#111111',
   bg: '#000000',
   settings: [
     { settings: { foreground: '#111111', background: '#000000' } },
-    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+    { scope: 'keyword.mark-deco', settings: { foreground: '#ff0000' } },
   ],
   tokenColors: [
-    { scope: 'keyword.markdeco', settings: { foreground: '#ff0000' } },
+    { scope: 'keyword.mark-deco', settings: { foreground: '#ff0000' } },
   ],
 };
 
 const result = await processor.process(markdown, 'id', {
   codeHighlight: {
     languageDefinitions: [customLanguage],
-    languageAliases: { 'markdeco-alias': 'markdeco-test' },
+    languageAliases: { 'mark-deco-alias': 'mark-deco-test' },
     theme: customTheme,
   },
 });
@@ -808,7 +808,7 @@ Mermaidスクリプト本体の導入方法は、Mermaidのドキュメントを
 const processAndUpdate = async () => {
   // ...
 
-  // MarkDecoプロセッサを実行
+  // mark-decoプロセッサを実行
   const result = await processor.process(markdown, 'id');
 
   // DOMを更新
