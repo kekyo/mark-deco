@@ -101,6 +101,31 @@
         margin-top: 15px;
       }
 
+      .process-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 15px;
+      }
+
+      .mermaid-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #2c3e50;
+        white-space: nowrap;
+      }
+
+      .mermaid-toggle input {
+        accent-color: #3498db;
+      }
+
+      .process-controls .process-button {
+        flex: 1;
+        margin-top: 0;
+      }
+
       .process-button:hover {
         background: #2980b9;
       }
@@ -734,6 +759,19 @@
         .card-description {
           font-size: 13px;
         }
+
+        .process-controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .mermaid-toggle {
+          justify-content: flex-start;
+        }
+
+        .process-controls .process-button {
+          width: 100%;
+        }
       }
     </style>
   </head>
@@ -777,9 +815,15 @@ console.log('Hello, World!');
 
 [Link example](https://example.com)"
             ></textarea>
-            <button id="process-button" class="process-button">
-              Execute Process
-            </button>
+            <div class="process-controls">
+              <label class="mermaid-toggle">
+                <input type="checkbox" id="mermaid-renderer-toggle" />
+                Use Mermaid.js renderer
+              </label>
+              <button id="process-button" class="process-button">
+                Execute Process
+              </button>
+            </div>
           </div>
         </div>
 
