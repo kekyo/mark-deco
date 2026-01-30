@@ -872,5 +872,50 @@ ASCII出力もサポートします:
 </pre>
 ```
 
+#### テーマ連動 (Shiki互換)
+
+Beautiful MermaidはShikiテーマから図形の色を生成でき、シンタックスハイライトと統一できます:
+
+```typescript
+const beautifulMermaidPlugin = createBeautifulMermaidPlugin({
+  theme: { light: 'github-light', dark: 'github-dark-dimmed' },
+  themeMode: 'auto',      // デフォルト: auto
+  themeStrategy: 'css-vars',
+});
+```
+
+主なテーマ関連オプション:
+
+- `theme`: Shikiテーマ名、テーマ定義オブジェクト、または `{ light, dark }` のペア
+- `themeMode`: `'auto' | 'light' | 'dark'` (デフォルト: `auto`)
+- `themeStrategy`: `'inline' | 'css-vars'` (デフォルト: `auto` → `css-vars`)
+- `cssVarPrefix`: `css-vars` 用のCSS変数プレフィックス (デフォルト: `--mdc-bm`)
+
+`inline` はSVG内に色を埋め込みます。`css-vars` はCSS変数として公開するため外部CSSで上書きできます。
+`css-vars` モードでは `svgOptions` の色指定は無視されます（`font`/`padding` などの色以外は有効）。
+
+#### CSS変数
+
+`css-vars` 戦略では、以下のCSS変数を外郭要素に付与します:
+
+| CSS変数 | 説明 |
+| :-- | :-- |
+| `--mdc-bm-bg` | 背景色 |
+| `--mdc-bm-fg` | 前景/文字色 |
+| `--mdc-bm-line` | 線/コネクタ色 |
+| `--mdc-bm-accent` | 強調/矢印色 |
+| `--mdc-bm-muted` | 補助テキスト色 |
+| `--mdc-bm-surface` | ノード塗りの色味 |
+| `--mdc-bm-border` | 枠線色 |
+
+上書き例:
+
+```css
+.beautiful-mermaid-wrapper {
+  --mdc-bm-bg: #0f172a;
+  --mdc-bm-fg: #e2e8f0;
+}
+```
+
 注意: MermaidプラグインとBeautiful Mermaidプラグインは、どちらも `mermaid` コードブロックを処理するため、
 同時には利用できません。

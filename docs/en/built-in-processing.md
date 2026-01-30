@@ -839,6 +839,53 @@ ASCII output is also supported:
 </pre>
 ```
 
+#### Theme Options (Shiki-compatible)
+
+Beautiful Mermaid can derive diagram colors from Shiki themes so the diagram matches
+your syntax highlight theme:
+
+```typescript
+const beautifulMermaidPlugin = createBeautifulMermaidPlugin({
+  theme: { light: 'github-light', dark: 'github-dark-dimmed' },
+  themeMode: 'auto',      // default: auto
+  themeStrategy: 'css-vars',
+});
+```
+
+Available theme-related options:
+
+- `theme`: Shiki theme name, theme registration object, or `{ light, dark }` pair
+- `themeMode`: `'auto' | 'light' | 'dark'` (default: `auto`)
+- `themeStrategy`: `'inline' | 'css-vars'` (default: `auto` => `css-vars`)
+- `cssVarPrefix`: CSS variable prefix for `css-vars` strategy (default: `--mdc-bm`)
+
+When `themeStrategy` is `inline`, the resolved colors are baked into the SVG.
+When `themeStrategy` is `css-vars`, colors are exposed as CSS variables so you can override them externally.
+In `css-vars` mode, color fields in `svgOptions` are ignored (non-color options like `font`/`padding` still apply).
+
+#### CSS Variables
+
+`css-vars` strategy defines the following variables on the wrapper element:
+
+| CSS Variable | Description |
+| :-- | :-- |
+| `--mdc-bm-bg` | Background color |
+| `--mdc-bm-fg` | Foreground/text color |
+| `--mdc-bm-line` | Edge/connector color |
+| `--mdc-bm-accent` | Accent/arrow color |
+| `--mdc-bm-muted` | Secondary text color |
+| `--mdc-bm-surface` | Node fill tint |
+| `--mdc-bm-border` | Node/group border color |
+
+Example override:
+
+```css
+.beautiful-mermaid-wrapper {
+  --mdc-bm-bg: #0f172a;
+  --mdc-bm-fg: #e2e8f0;
+}
+```
+
 Note: the Mermaid plugin and Beautiful Mermaid plugin are mutually exclusive
 because both handle `mermaid` code blocks.
 
