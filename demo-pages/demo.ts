@@ -5,6 +5,7 @@ import {
   createOEmbedPlugin,
   createCardPlugin,
   createMermaidPlugin,
+  createBeautifulMermaidPlugin,
   getConsoleLogger,
   createCachedFetcher,
   createMemoryCacheStorage,
@@ -81,6 +82,9 @@ const markdownInput = document.getElementById(
 const processButton = document.getElementById(
   'process-button'
 ) as HTMLButtonElement | null;
+const mermaidRendererToggle = document.getElementById(
+  'mermaid-renderer-toggle'
+) as HTMLInputElement | null;
 const frontmatterOutput = document.getElementById(
   'frontmatter-output'
 ) as HTMLPreElement | null;
@@ -102,6 +106,7 @@ if (
   console.error('❌ Required DOM elements not found:', {
     markdownInput: !!markdownInput,
     processButton: !!processButton,
+    mermaidRendererToggle: !!mermaidRendererToggle,
     frontmatterOutput: !!frontmatterOutput,
     htmlOutput: !!htmlOutput,
     htmlSourceOutput: !!htmlSourceOutput,
@@ -406,13 +411,24 @@ sequenceDiagram
     B-->>A: Sounds good!
 \`\`\`
 
-### Pie Chart
+### State Diagram
 
 \`\`\`mermaid
-pie title Pets adopted by volunteers
-    "Dogs" : 386
-    "Cats" : 85
-    "Rats" : 15
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Processing : start
+    Processing --> Idle : done
+    Processing --> Error : fail
+    Error --> Idle : reset
+\`\`\`
+
+### ER Diagram
+
+\`\`\`mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE_ITEM : contains
+    CUSTOMER }o--|| ADDRESS : has
 \`\`\`
 
 ### Class Diagram
@@ -431,20 +447,6 @@ classDiagram
         +quack()
     }
     Animal <|-- Duck
-\`\`\`
-
-### Gantt Chart
-
-\`\`\`mermaid
-gantt
-    title A Gantt Diagram
-    dateFormat  YYYY-MM-DD
-    section Section
-    A task           :a1, 2014-01-01, 30d
-    Another task     :after a1, 20d
-    section Another
-    Task in sec      :2014-01-12, 12d
-    another task     :24d
 \`\`\`
 
 ---
@@ -522,7 +524,12 @@ function initializeProcessor(): boolean {
       timeoutEachRedirect: 15000,
     });
     const cardPlugin = createCardPlugin();
-    const mermaidPlugin = createMermaidPlugin();
+    const useMermaidJs = mermaidRendererToggle?.checked ?? false;
+    const mermaidPlugin = useMermaidJs
+      ? createMermaidPlugin()
+      : createBeautifulMermaidPlugin({
+          output: 'svg',
+        });
     console.log('✅ Plugins created');
 
     // Create processor with both plugins and cached fetcher
@@ -539,7 +546,9 @@ function initializeProcessor(): boolean {
     console.log('- Environment: Browser');
     console.log('- Cache type: localStorage');
     console.log('- Cache TTL: 30 minutes');
-    console.log('- Plugins: oEmbed, Card, Mermaid');
+    console.log(
+      `- Plugins: oEmbed, Card, ${useMermaidJs ? 'Mermaid' : 'Beautiful Mermaid'}`
+    );
 
     return true;
   } catch (error) {
@@ -587,17 +596,19 @@ async function processMarkdown(): Promise<void> {
     htmlOutput.innerHTML = result.html;
 
     // Re-render mermaid diagrams if they exist
-    if (
-      result.html.includes('class="mermaid"') &&
-      'rerenderMermaid' in window &&
-      typeof (window as unknown as { rerenderMermaid: () => void })
-        .rerenderMermaid === 'function'
-    ) {
-      setTimeout(() => {
-        (
-          window as unknown as { rerenderMermaid: () => void }
-        ).rerenderMermaid();
-      }, 100);
+    if (mermaidRendererToggle?.checked) {
+      if (
+        result.html.includes('class="mermaid"') &&
+        'rerenderMermaid' in window &&
+        typeof (window as unknown as { rerenderMermaid: () => void })
+          .rerenderMermaid === 'function'
+      ) {
+        setTimeout(() => {
+          (
+            window as unknown as { rerenderMermaid: () => void }
+          ).rerenderMermaid();
+        }, 100);
+      }
     }
 
     // Re-highlight code blocks if they exist (including frontmatter and source)
@@ -694,6 +705,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (processButton) {
       processButton.addEventListener('click', () => {
         void processMarkdown();
+      });
+    }
+
+    if (mermaidRendererToggle) {
+      mermaidRendererToggle.addEventListener('change', () => {
+        console.log(
+          `🧭 Mermaid renderer changed: ${
+            mermaidRendererToggle.checked ? 'Mermaid.js' : 'Beautiful Mermaid'
+          }`
+        );
+        const success = initializeProcessor();
+        if (!success) {
+          console.error('❌ Failed to reinitialize processor');
+        }
       });
     }
 

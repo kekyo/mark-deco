@@ -8,6 +8,7 @@ mark-decoは、プラグインシステムやコードハイライトなどの�
 | `oembed`     | 指定されたURLからoEmbed APIにアクセスして、得られるメタデータでHTMLをレンダリングします |
 | `card`       | 指定されたURLのページをスクレイピングして、得られるメタデータでHTMLをレンダリングします |
 | `mermaid`    | `mermaid.js`のグラフ構文で記述されたコードで、グラフ描画を可能にします                  |
+| `beautiful-mermaid` | `beautiful-mermaid`を使ってMermaid図形をSVGまたはASCIIで生成します           |
 
 プラグインを使用するには、以下のように指定します:
 
@@ -827,3 +828,94 @@ const processAndUpdate = async () => {
   }
 };
 ```
+
+### Beautiful Mermaidプラグイン
+
+Beautiful Mermaidプラグインは、[beautiful-mermaid](https://github.com/lukilabs/beautiful-mermaid) を使って
+Mermaid図形をSVGまたはASCIIで生成します。`mermaid`コードブロック構文はそのまま利用し、
+ブラウザ側でMermaid.jsを読み込む必要がありません。
+
+```typescript
+import {
+  createMarkdownProcessor,
+  createBeautifulMermaidPlugin,
+  createCachedFetcher,
+} from 'mark-deco';
+
+// フェッチャーを作成
+const fetcher = createCachedFetcher('MyApp/1.0');
+
+// Beautiful Mermaidプラグインを生成 (SVG出力がデフォルト)
+const beautifulMermaidPlugin = createBeautifulMermaidPlugin({
+  output: 'svg',
+});
+
+const processor = createMarkdownProcessor({
+  plugins: [beautifulMermaidPlugin],
+  fetcher,
+});
+```
+
+出力HTMLは外郭要素に `beautiful-mermaid-*` のCSSクラスが付与されます:
+
+```html
+<div class="beautiful-mermaid-wrapper beautiful-mermaid-svg" id="id-1">
+  <!-- beautiful-mermaidが生成したSVG -->
+</div>
+```
+
+ASCII出力もサポートします:
+
+```html
+<pre class="beautiful-mermaid-wrapper beautiful-mermaid-ascii" id="id-1">
+  <code class="beautiful-mermaid-code">ASCII output...</code>
+</pre>
+```
+
+#### テーマ連動 (Shiki互換)
+
+Beautiful MermaidはShikiテーマから図形の色を生成でき、シンタックスハイライトと統一できます:
+
+```typescript
+const beautifulMermaidPlugin = createBeautifulMermaidPlugin({
+  theme: { light: 'github-light', dark: 'github-dark-dimmed' },
+  themeMode: 'auto',      // デフォルト: auto
+  themeStrategy: 'css-vars',
+});
+```
+
+主なテーマ関連オプション:
+
+- `theme`: Shikiテーマ名、テーマ定義オブジェクト、または `{ light, dark }` のペア
+- `themeMode`: `'auto' | 'light' | 'dark'` (デフォルト: `auto`)
+- `themeStrategy`: `'inline' | 'css-vars'` (デフォルト: `auto` → `css-vars`)
+- `cssVarPrefix`: `css-vars` 用のCSS変数プレフィックス (デフォルト: `--mdc-bm`)
+
+`inline` はSVG内に色を埋め込みます。`css-vars` はCSS変数として公開するため外部CSSで上書きできます。
+`css-vars` モードでは `svgOptions` の色指定は無視されます（`font`/`padding` などの色以外は有効）。
+
+#### CSS変数
+
+`css-vars` 戦略では、以下のCSS変数を外郭要素に付与します:
+
+| CSS変数 | 説明 |
+| :-- | :-- |
+| `--mdc-bm-bg` | 背景色 |
+| `--mdc-bm-fg` | 前景/文字色 |
+| `--mdc-bm-line` | 線/コネクタ色 |
+| `--mdc-bm-accent` | 強調/矢印色 |
+| `--mdc-bm-muted` | 補助テキスト色 |
+| `--mdc-bm-surface` | ノード塗りの色味 |
+| `--mdc-bm-border` | 枠線色 |
+
+上書き例:
+
+```css
+.beautiful-mermaid-wrapper {
+  --mdc-bm-bg: #0f172a;
+  --mdc-bm-fg: #e2e8f0;
+}
+```
+
+注意: MermaidプラグインとBeautiful Mermaidプラグインは、どちらも `mermaid` コードブロックを処理するため、
+同時には利用できません。

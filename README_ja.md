@@ -16,12 +16,12 @@
 
 TypeScriptで書かれた、高機能なMarkdown-->HTML変換ライブラリです。
 GitHub Flavored Markdown (GFM) を解釈し、HTMLを出力します。
-frontmatter解析、見出し解析、ソースコードの整形、oEmbed/カード/Mermaidグラフのレンダリング、プラグイン拡張によるカスタムコードブロック処理をサポートします。
+frontmatter解析、見出し解析、ソースコードの整形、oEmbed/カード/Mermaid図形のレンダリング (mermaid.js または beautiful-mermaid)、プラグイン拡張によるカスタムコードブロック処理をサポートします。
 
 * Markdownを入力として、HTMLのレンダリングを行うために使用できます。
 * シンプルなインターフェイスなので、非常に簡単に使えます。
 * 独立性が高く、動作環境の要件がほぼありません。Node.jsやブラウザ環境のどちらでも使えます。
-* 組み込みプラグインとして、oEmbed・カード・Mermaid.jsをサポートしています。
+* 組み込みプラグインとして、oEmbed・カード・Mermaid.js・Beautiful Mermaidをサポートしています。
 
 ## インストール
 

@@ -32,7 +32,7 @@ Options:
   -i, --input <file>              入力Markdownファイル (デフォルト: 標準入力)
   -o, --output <file>             出力HTMLファイル (デフォルト: 標準出力)
   -c, --config <file>             設定ファイルのパス
-  -p, --plugins <plugins...>      特定のプラグインを有効化 (oembed, card, mermaid)
+  -p, --plugins <plugins...>      特定のプラグインを有効化 (oembed, card, beautiful-mermaid, mermaid)
       --no-plugins                全ての標準プラグインを無効化
       --unique-id-prefix <prefix>  一意IDのプレフィックス (デフォルト: "section")
       --hierarchical-heading-id    階層的見出しIDを使用 (デフォルト: true)
@@ -60,7 +60,7 @@ $ mark-deco -i document.md --unique-id-prefix "doc"
 $ mark-deco -i simple.md --no-plugins
 
 # 特定のプラグインのみ有効化
-$ mark-deco -i content.md -p oembed mermaid
+$ mark-deco -i content.md -p oembed beautiful-mermaid
 
 # 設定ファイルを使用
 $ mark-deco -i content.md -c config.json
@@ -78,7 +78,7 @@ JSON形式の設定ファイルでデフォルトオプションを指定でき�
 
 ```json
 {
-  "plugins": ["oembed", "card", "mermaid"],
+  "plugins": ["oembed", "card", "beautiful-mermaid"],
   "uniqueIdPrefix": "section",
   "hierarchicalHeadingId": true,
   "contentBasedHeadingId": false,
@@ -95,6 +95,10 @@ JSON形式の設定ファイルでデフォルトオプションを指定でき�
   "mermaid": {
     "enabled": true,
     "theme": "default"
+  },
+  "beautifulMermaid": {
+    "enabled": true,
+    "output": "svg"
   }
 }
 ```

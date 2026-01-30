@@ -80,7 +80,7 @@ const main = async () => {
     .addOption(
       new Option(
         '-p, --plugins [plugins...]',
-        'Enable specific plugins (oembed, card, mermaid)'
+        'Enable specific plugins (oembed, card, beautiful-mermaid, mermaid)'
       )
     )
     .addOption(new Option('--no-plugins', 'Disable all default plugins'))
