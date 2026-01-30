@@ -8,12 +8,14 @@ export * from './types';
 export * from './plugins/oembed/types';
 export * from './plugins/card/types';
 export * from './plugins/mermaid/types';
+export * from './plugins/beautiful-mermaid/types';
 
 // Main exports
 export { createMarkdownProcessor, defaultHtmlOptions } from './processor';
 export { createOEmbedPlugin } from './plugins/oembed-plugin';
 export { createCardPlugin } from './plugins/card-plugin';
 export { createMermaidPlugin } from './plugins/mermaid-plugin';
+export { createBeautifulMermaidPlugin } from './plugins/beautiful-mermaid-plugin';
 
 // Utility exports
 export { generateHeadingId, fetchData, fetchText, fetchJson } from './utils';

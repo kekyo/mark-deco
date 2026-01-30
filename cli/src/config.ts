@@ -5,6 +5,7 @@
 
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
+import type { BeautifulMermaidPluginOptions } from 'mark-deco';
 
 export interface Config {
   plugins?: string[];
@@ -23,6 +24,9 @@ export interface Config {
     enabled?: boolean;
   };
   mermaid?: {
+    enabled?: boolean;
+  };
+  beautifulMermaid?: BeautifulMermaidPluginOptions & {
     enabled?: boolean;
   };
 }
@@ -66,7 +70,7 @@ export const loadConfig = async (configPath?: string): Promise<Config> => {
  */
 export const getDefaultConfig = (): Config => {
   return {
-    plugins: ['oembed', 'card', 'mermaid'],
+    plugins: ['oembed', 'card', 'beautiful-mermaid'],
     uniqueIdPrefix: 'section',
     hierarchicalHeadingId: true,
     contentBasedHeadingId: false,
@@ -79,6 +83,9 @@ export const getDefaultConfig = (): Config => {
       enabled: true,
     },
     mermaid: {
+      enabled: true,
+    },
+    beautifulMermaid: {
       enabled: true,
     },
   };

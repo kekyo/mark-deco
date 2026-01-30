@@ -8,6 +8,7 @@ mark-decoは、プラグインシステムやコードハイライトなどの�
 | `oembed`     | 指定されたURLからoEmbed APIにアクセスして、得られるメタデータでHTMLをレンダリングします |
 | `card`       | 指定されたURLのページをスクレイピングして、得られるメタデータでHTMLをレンダリングします |
 | `mermaid`    | `mermaid.js`のグラフ構文で記述されたコードで、グラフ描画を可能にします                  |
+| `beautiful-mermaid` | `beautiful-mermaid`を使ってMermaid図形をSVGまたはASCIIで生成します           |
 
 プラグインを使用するには、以下のように指定します:
 
@@ -827,3 +828,49 @@ const processAndUpdate = async () => {
   }
 };
 ```
+
+### Beautiful Mermaidプラグイン
+
+Beautiful Mermaidプラグインは、[beautiful-mermaid](https://github.com/lukilabs/beautiful-mermaid) を使って
+Mermaid図形をSVGまたはASCIIで生成します。`mermaid`コードブロック構文はそのまま利用し、
+ブラウザ側でMermaid.jsを読み込む必要がありません。
+
+```typescript
+import {
+  createMarkdownProcessor,
+  createBeautifulMermaidPlugin,
+  createCachedFetcher,
+} from 'mark-deco';
+
+// フェッチャーを作成
+const fetcher = createCachedFetcher('MyApp/1.0');
+
+// Beautiful Mermaidプラグインを生成 (SVG出力がデフォルト)
+const beautifulMermaidPlugin = createBeautifulMermaidPlugin({
+  output: 'svg',
+});
+
+const processor = createMarkdownProcessor({
+  plugins: [beautifulMermaidPlugin],
+  fetcher,
+});
+```
+
+出力HTMLは外郭要素に `beautiful-mermaid-*` のCSSクラスが付与されます:
+
+```html
+<div class="beautiful-mermaid-wrapper beautiful-mermaid-svg" id="id-1">
+  <!-- beautiful-mermaidが生成したSVG -->
+</div>
+```
+
+ASCII出力もサポートします:
+
+```html
+<pre class="beautiful-mermaid-wrapper beautiful-mermaid-ascii" id="id-1">
+  <code class="beautiful-mermaid-code">ASCII output...</code>
+</pre>
+```
+
+注意: MermaidプラグインとBeautiful Mermaidプラグインは、どちらも `mermaid` コードブロックを処理するため、
+同時には利用できません。

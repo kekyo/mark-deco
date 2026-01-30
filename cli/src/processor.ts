@@ -8,6 +8,7 @@ import {
   createOEmbedPlugin,
   createCardPlugin,
   createMermaidPlugin,
+  createBeautifulMermaidPlugin,
   createCachedFetcher,
   createMemoryCacheStorage,
   getConsoleLogger,
@@ -35,7 +36,7 @@ export const setupProcessor = (config: Config): MarkdownProcessor => {
     ? []
     : Array.isArray(config.plugins)
       ? config.plugins
-      : ['oembed', 'card', 'mermaid'];
+      : ['oembed', 'card', 'beautiful-mermaid'];
 
   // Add oEmbed plugin
   if (enabledPlugins.includes('oembed') && config.oembed?.enabled !== false) {
@@ -47,8 +48,26 @@ export const setupProcessor = (config: Config): MarkdownProcessor => {
     plugins.push(createCardPlugin({}));
   }
 
+  const useMermaid =
+    enabledPlugins.includes('mermaid') && config.mermaid?.enabled !== false;
+  const useBeautifulMermaid =
+    enabledPlugins.includes('beautiful-mermaid') &&
+    config.beautifulMermaid?.enabled !== false;
+
+  if (useMermaid && useBeautifulMermaid) {
+    throw new Error(
+      'Plugins "mermaid" and "beautiful-mermaid" are mutually exclusive.'
+    );
+  }
+
+  if (useBeautifulMermaid) {
+    const { enabled: _enabled, ...beautifulMermaidOptions } =
+      config.beautifulMermaid ?? {};
+    plugins.push(createBeautifulMermaidPlugin(beautifulMermaidOptions));
+  }
+
   // Add Mermaid plugin
-  if (enabledPlugins.includes('mermaid') && config.mermaid?.enabled !== false) {
+  if (useMermaid) {
     plugins.push(createMermaidPlugin({}));
   }
 

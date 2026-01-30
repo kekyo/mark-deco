@@ -47,6 +47,7 @@ export default defineConfig({
         'zlib',
         'crypto',
         'async-primitives',
+        'beautiful-mermaid',
         'cheerio',
         'js-yaml',
         'js-beautify',

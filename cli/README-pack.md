@@ -37,7 +37,7 @@ Options:
   -i, --input <file>              Input markdown file (default: stdin)
   -o, --output <file>             Output HTML file (default: stdout)
   -c, --config <file>             Configuration file path
-  -p, --plugins <plugins...>      Enable specific plugins (oembed, card, mermaid)
+  -p, --plugins <plugins...>      Enable specific plugins (oembed, card, beautiful-mermaid, mermaid)
       --no-plugins                Disable all default plugins
       --unique-id-prefix <prefix>  Prefix for unique IDs (default: "section")
       --hierarchical-heading-id    Use hierarchical heading IDs (default: true)
@@ -59,7 +59,7 @@ mark-deco -i document.md --unique-id-prefix "doc"
 mark-deco -i simple.md --no-plugins
 
 # Enable specific plugins only
-mark-deco -i content.md -p oembed mermaid
+mark-deco -i content.md -p oembed beautiful-mermaid
 
 # Use configuration file
 mark-deco -i content.md -c config.json
@@ -71,7 +71,7 @@ You can use a JSON configuration file to set default options:
 
 ```json
 {
-  "plugins": ["oembed", "card", "mermaid"],
+  "plugins": ["oembed", "card", "beautiful-mermaid"],
   "uniqueIdPrefix": "section",
   "hierarchicalHeadingId": true,
   "contentBasedHeadingId": false,
@@ -86,6 +86,10 @@ You can use a JSON configuration file to set default options:
   "mermaid": {
     "enabled": true,
     "theme": "default"
+  },
+  "beautifulMermaid": {
+    "enabled": true,
+    "output": "svg"
   }
 }
 ```
@@ -95,7 +99,7 @@ You can use a JSON configuration file to set default options:
 - Frontmatter Information Extraction - Parse YAML frontmatter from Markdown files
 - Heading ID Generation and Heading Information Extraction - Automatically generate unique IDs for headings
 - Fetcher and Cache System - External HTTP request management with configurable caching
-- Built-in Plugins - oEmbed, card, and Mermaid plugins for rich content embedding
+- Built-in Plugins - oEmbed, card, and Mermaid/Beautiful Mermaid plugins for rich content embedding
 - Creating Custom Plugins - Develop custom plugins to extend Markdown processing
 - CLI Application - Command-line interface for batch processing
 

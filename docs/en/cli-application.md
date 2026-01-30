@@ -32,7 +32,7 @@ Options:
   -i, --input <file>              Input Markdown file (default: standard input)
   -o, --output <file>             Output HTML file (default: standard output)
   -c, --config <file>             Configuration file path
-  -p, --plugins <plugins...>      Enable specific plugins (oembed, card, mermaid)
+  -p, --plugins <plugins...>      Enable specific plugins (oembed, card, beautiful-mermaid, mermaid)
       --no-plugins                Disable all standard plugins
       --unique-id-prefix <prefix>  Unique ID prefix (default: "section")
       --hierarchical-heading-id    Use hierarchical heading IDs (default: true)
@@ -60,7 +60,7 @@ $ mark-deco -i document.md --unique-id-prefix "doc"
 $ mark-deco -i simple.md --no-plugins
 
 # Enable only specific plugins
-$ mark-deco -i content.md -p oembed mermaid
+$ mark-deco -i content.md -p oembed beautiful-mermaid
 
 # Use configuration file
 $ mark-deco -i content.md -c config.json
@@ -78,7 +78,7 @@ You can specify default options in JSON format configuration file:
 
 ```json
 {
-  "plugins": ["oembed", "card", "mermaid"],
+  "plugins": ["oembed", "card", "beautiful-mermaid"],
   "uniqueIdPrefix": "section",
   "hierarchicalHeadingId": true,
   "contentBasedHeadingId": false,
@@ -95,6 +95,10 @@ You can specify default options in JSON format configuration file:
   "mermaid": {
     "enabled": true,
     "theme": "default"
+  },
+  "beautifulMermaid": {
+    "enabled": true,
+    "output": "svg"
   }
 }
 ```

@@ -16,12 +16,12 @@ Flexible Markdown to HTML conversion library.
 
 Flexible Markdown to HTML conversion library written in TypeScript.
 It interprets GitHub Flavored Markdown (GFM) and outputs HTML.
-Supports frontmatter parsing, heading analysis, source code formatting, oEmbed/card/Mermaid graph rendering, and custom code block processing through plugin extensions.
+Supports frontmatter parsing, heading analysis, source code formatting, oEmbed/card/Mermaid diagram rendering (mermaid.js or beautiful-mermaid), and custom code block processing through plugin extensions.
 
 * Can be used to render HTML from Markdown input.
 * Simple interface makes it very easy to use.
 * Highly independent with minimal runtime requirements. Works in both Node.js and browser environments.
-* Built-in plugins support oEmbed, cards, and Mermaid.js.
+* Built-in plugins support oEmbed, cards, Mermaid.js, and Beautiful Mermaid.
 
 ## Installation
 
