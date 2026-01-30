@@ -401,20 +401,20 @@ export const createBeautifulMermaidPlugin = (
               }
             }
 
-            wrapperStyle = lightStyle;
-
             const darkStyle = buildCssVarStyle(darkColors, cssVarNames);
-            if (darkStyle && scopeId) {
+            if (scopeId) {
               const selector = includeId
                 ? `#${scopeId}`
                 : `[data-bm-scope="${scopeId}"]`;
-              wrapperStyleBlock = `<style>
-  @media (prefers-color-scheme: dark) {
-    ${selector} {
-      ${darkStyle};
-    }
-  }
-</style>`;
+              const lightRule = lightStyle
+                ? `  ${selector} {\n    ${lightStyle};\n  }\n`
+                : '';
+              const darkRule = darkStyle
+                ? `  @media (prefers-color-scheme: dark) {\n    ${selector} {\n      ${darkStyle};\n    }\n  }\n`
+                : '';
+              if (lightRule || darkRule) {
+                wrapperStyleBlock = `<style>\n${lightRule}${darkRule}</style>`;
+              }
             }
           } else {
             const selectedColors = selectThemeColors(themePair, themeMode);
