@@ -140,6 +140,62 @@ describe('BeautifulMermaidPlugin theme options', () => {
 
     vi.doUnmock('beautiful-mermaid');
   });
+
+  it('should emit light/dark css-vars rules when themeMode is auto', async () => {
+    vi.resetModules();
+
+    const renderMermaid = vi.fn(async () => '<svg></svg>');
+    const renderMermaidAscii = vi.fn(() => 'ASCII-OUTPUT');
+
+    vi.doMock('beautiful-mermaid', () => ({
+      renderMermaid,
+      renderMermaidAscii,
+      THEMES: {
+        'test-light': {
+          bg: '#ffffff',
+          fg: '#111111',
+          line: '#222222',
+          accent: '#333333',
+          muted: '#444444',
+        },
+        'test-dark': {
+          bg: '#000000',
+          fg: '#eeeeee',
+          line: '#cccccc',
+          accent: '#bbbbbb',
+          muted: '#aaaaaa',
+        },
+      },
+    }));
+
+    const { createBeautifulMermaidPlugin } =
+      await import('../src/plugins/beautiful-mermaid');
+    const plugin = createBeautifulMermaidPlugin({
+      theme: {
+        light: 'test-light',
+        dark: 'test-dark',
+      },
+      themeMode: 'auto',
+      themeStrategy: 'css-vars',
+      cssVarPrefix: '--mdc-bm',
+    });
+
+    const { mockContext } = createMockContext();
+    const result = await plugin.processBlock('graph TD\nA --> B', mockContext);
+
+    expect(renderMermaid).toHaveBeenCalledOnce();
+    const optionsArg = (
+      renderMermaid.mock.calls[0] as [string, RenderOptions?] | undefined
+    )?.[1];
+    expect(optionsArg?.bg).toBe('var(--mdc-bm-bg)');
+    expect(result).not.toContain('style="--mdc-bm-bg');
+    expect(result).toContain('#test-id-123');
+    expect(result).toContain('--mdc-bm-bg: #ffffff');
+    expect(result).toContain('--mdc-bm-bg: #000000');
+    expect(result).toContain('@media (prefers-color-scheme: dark)');
+
+    vi.doUnmock('beautiful-mermaid');
+  });
 });
 
 describe('BeautifulMermaidPlugin fallback', () => {
