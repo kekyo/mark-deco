@@ -250,6 +250,8 @@ export interface ProcessOptions {
   headerTitleTransform?: HeaderTitleTransform;
   /** Default CSS class name(s) to apply to the parent paragraph of images (space-separated) */
   defaultImageOuterClassName?: string;
+  /** Whether to add loading="lazy" to img tags (default: false) */
+  applyLazyLoadingToImg?: boolean;
   /** Options for built-in code highlighting (enable when provided) */
   codeHighlight?: CodeHighlightOptions;
   /** Optional URL resolver hook for links, images, and raw HTML attributes */
@@ -282,6 +284,8 @@ export interface ProcessWithFrontmatterTransformOptions {
   headerTitleTransform?: HeaderTitleTransform;
   /** Default CSS class name(s) to apply to the parent paragraph of images (space-separated) */
   defaultImageOuterClassName?: string;
+  /** Whether to add loading="lazy" to img tags (default: false) */
+  applyLazyLoadingToImg?: boolean;
   /** Options for built-in code highlighting (enable when provided) */
   codeHighlight?: CodeHighlightOptions;
   /** Optional URL resolver hook for links, images, and raw HTML attributes */

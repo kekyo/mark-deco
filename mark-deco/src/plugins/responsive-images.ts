@@ -13,6 +13,8 @@ import type { Element } from 'hast';
 export interface ResponsiveImageOptions {
   /** Default CSS class name(s) to apply to the parent paragraph of images (space-separated). */
   defaultOuterClassName?: string;
+  /** Whether to add loading="lazy" to img tags (default: false). */
+  applyLazyLoadingToImg?: boolean;
 }
 
 const normalizeClassList = (value: unknown): string[] => {
@@ -73,6 +75,13 @@ const setNodeClassList = (node: Element, classList: string[]) => {
   }
 };
 
+const hasLoadingProperty = (node: Element): boolean => {
+  if (!node.properties) {
+    return false;
+  }
+  return Object.prototype.hasOwnProperty.call(node.properties, 'loading');
+};
+
 const collectImageNodes = (node: Element): Element[] => {
   const images: Element[] = [];
   const stack = [...(node.children ?? [])];
@@ -107,9 +116,10 @@ export const rehypeResponsiveImages = (
   const defaultOuterClassList = normalizeClassList(
     options.defaultOuterClassName
   );
+  const applyLazyLoadingToImg = options.applyLazyLoadingToImg === true;
 
   return (tree: any) => {
-    visit(tree, 'element', (node: Element) => {
+    visit(tree, 'element', (node: Element, _index, parent) => {
       if (node.tagName === 'p') {
         const imageNodes = collectImageNodes(node);
         if (imageNodes.length > 0) {
@@ -141,6 +151,21 @@ export const rehypeResponsiveImages = (
         // Initialize properties object if it doesn't exist
         if (!node.properties) {
           node.properties = {};
+        }
+
+        const parentElement =
+          parent && (parent as Element).type === 'element'
+            ? (parent as Element)
+            : undefined;
+        const hasParentLoading =
+          parentElement?.tagName === 'p' && hasLoadingProperty(parentElement);
+
+        if (
+          applyLazyLoadingToImg &&
+          !hasLoadingProperty(node) &&
+          !hasParentLoading
+        ) {
+          node.properties.loading = 'lazy';
         }
 
         // Get existing style attribute if any

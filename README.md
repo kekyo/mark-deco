@@ -122,6 +122,17 @@ await processor.process(markdown, 'id', {
 });
 ```
 
+### Image Lazy Loading
+
+You can add `loading="lazy"` to all generated `<img>` tags with `applyLazyLoadingToImg` (default: `false`).
+Explicit `loading` attributes in Markdown are preserved.
+
+```typescript
+await processor.process(markdown, 'id', {
+  applyLazyLoadingToImg: true,
+});
+```
+
 ### URL Resolver Hook
 
 `resolveUrl` lets you rewrite URLs generated from Markdown before HTML output.
