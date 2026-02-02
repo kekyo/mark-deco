@@ -252,6 +252,37 @@ MARK
       expect(result.html).toContain('<p class="existing img-default">');
     });
 
+    it('should not add lazy loading to images by default', async () => {
+      const markdown = '![Alt](https://example.com/image.png)';
+      const result = await processor.process(markdown, 'id', {
+        headerTitleTransform: 'none',
+      });
+
+      expect(result.html).toContain('<img');
+      expect(result.html).not.toContain('loading="lazy"');
+    });
+
+    it('should add lazy loading to images when enabled', async () => {
+      const markdown = '![Alt](https://example.com/image.png)';
+      const result = await processor.process(markdown, 'id', {
+        headerTitleTransform: 'none',
+        applyLazyLoadingToImg: true,
+      });
+
+      expect(result.html).toContain('loading="lazy"');
+    });
+
+    it('should not override explicit image loading attribute', async () => {
+      const markdown = '![Alt](https://example.com/image.png){loading="eager"}';
+      const result = await processor.process(markdown, 'id', {
+        headerTitleTransform: 'none',
+        applyLazyLoadingToImg: true,
+      });
+
+      expect(result.html).toContain('loading="eager"');
+      expect(result.html).not.toContain('loading="lazy"');
+    });
+
     it('should apply default link target to markdown links', async () => {
       const markdown = '[Link](https://example.com)';
       const result = await processor.process(markdown, 'id', {

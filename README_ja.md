@@ -122,6 +122,17 @@ await processor.process(markdown, 'id', {
 });
 ```
 
+### 画像の Lazy Loading
+
+`applyLazyLoadingToImg` を `true` にすると、生成される `<img>` に `loading="lazy"` を付与できます（デフォルトは `false`）。
+Markdown 側で `loading` 属性を明示した場合は上書きしません。
+
+```typescript
+await processor.process(markdown, 'id', {
+  applyLazyLoadingToImg: true,
+});
+```
+
 ### URL解決フック
 
 `resolveUrl` はMarkdownから生成されるURLを、HTML出力直前に書き換えるためのフックです。

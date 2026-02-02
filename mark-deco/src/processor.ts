@@ -520,6 +520,7 @@ export const createMarkdownProcessor = (
       useHierarchicalHeadingId = true,
       headingBaseLevel,
       defaultImageOuterClassName,
+      applyLazyLoadingToImg = false,
       codeHighlight,
       resolveUrl,
       linkTarget,
@@ -562,9 +563,12 @@ export const createMarkdownProcessor = (
     }
 
     const responsiveImageOptions =
-      defaultImageOuterClassName === undefined
+      defaultImageOuterClassName === undefined && !applyLazyLoadingToImg
         ? undefined
-        : { defaultOuterClassName: defaultImageOuterClassName };
+        : {
+            defaultOuterClassName: defaultImageOuterClassName,
+            applyLazyLoadingToImg,
+          };
     const normalizedLinkTarget =
       typeof linkTarget === 'string' && linkTarget.trim().length > 0
         ? linkTarget
